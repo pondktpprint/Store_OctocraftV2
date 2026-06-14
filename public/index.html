@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Octo Craft SMP - Webshop</title>
+    <meta name="description" content="ระบบร้านค้าออนไลน์และข้อมูลเซิร์ฟเวอร์ Octo Craft SMP">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=639170753152425175">
+    <!-- Skinview3d Library -->
+    <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
+</head>
+<body>
+    <!-- Background Bubbles Animation Container -->
+    <div class="bubbles" id="bubbles-container"></div>
+
+    <!-- Top Navigation for User Profile -->
+    <nav class="top-nav">
+        <!-- User Profile Dropdown (Simulating Logged In State) -->
+        <div class="user-profile-menu">
+            <div class="user-profile-btn" id="user-profile-btn">
+                <img src="https://minotar.net/helm/Steve/32.png" alt="Steve" class="user-avatar">
+                <div class="user-details">
+                    <span class="user-name">Steve</span>
+                    <span class="user-points"><i class="fas fa-coins"></i> 5,000 Points</span>
+                </div>
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+            </div>
+            
+            <!-- Dropdown Content -->
+            <div class="profile-dropdown" id="profile-dropdown">
+                <a href="#" class="dropdown-item"><i class="fas fa-history"></i> ประวัติการเติมเงิน</a>
+                <a href="#" class="dropdown-item"><i class="fas fa-shopping-bag"></i> ประวัติการซื้อ</a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item logout-item" onclick="alert('จำลองการออกจากระบบ');"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Logo Section -->
+        <div class="logo-container">
+            <!-- User should place their logo image here -->
+            <img src="images/logo.png" alt="Octo Craft SMP Logo" class="logo" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+            <!-- Fallback text if logo.png is not found -->
+            <div id="logo-fallback" class="logo-fallback">OCTO CRAFT SMP</div>
+        </div>
+
+        <!-- Server & Discord Status Widgets -->
+        <div class="status-widgets">
+            <div class="status-pill server-status" id="server-status-pill">
+                <div class="status-icon">🎮</div>
+                <div class="status-text">
+                    <span class="status-title">PLAY.OCTOCRAFT.ONLINE</span>
+                    <span class="status-value" id="server-online-count">🟢 กำลังโหลด...</span>
+                </div>
+                <button class="copy-ip-btn" onclick="navigator.clipboard.writeText('play.octocraft.online'); window.showToast('คัดลอก IP เรียบร้อยแล้ว!');">Copy IP</button>
+            </div>
+            
+            <a href="https://discord.gg/dU2wma23f3" target="_blank" class="status-pill discord-status">
+                <div class="status-icon">💬</div>
+                <div class="status-text">
+                    <span class="status-title">Discord Community</span>
+                    <span class="status-value" id="discord-online-count">💬 กำลังโหลด...</span>
+                </div>
+                <div class="join-btn">Join</div>
+            </a>
+        </div>
+        
+        <!-- Main Navigation Section -->
+        <div class="main-menu-container">
+            <!-- Left: 3 Menu Cards -->
+            <div class="menu-grid">
+                <!-- Row 1: Shop -->
+                <a href="shop.html" class="job-card">
+                    <div class="card-icon">🛒</div>
+                    <div class="card-content">
+                        <h2>ร้านค้า (Shop)</h2>
+                        <p>เลือกซื้อไอเทม กล่องสุ่ม และยศต่างๆ</p>
+                    </div>
+                </a>
+
+                <!-- Row 2: Top-up -->
+                <a href="topup.html" class="job-card">
+                    <div class="card-icon">💎</div>
+                    <div class="card-content">
+                        <h2>เติมเงิน (Top-up)</h2>
+                        <p>สนับสนุนเซิร์ฟเวอร์และรับพอยท์</p>
+                    </div>
+                </a>
+
+                <!-- Row 3: Contact / Info -->
+                <a href="contact.html" class="job-card">
+                    <div class="card-icon">🌊</div>
+                    <div class="card-content">
+                        <h2>ติดต่อเรา (Contact)</h2>
+                        <p>ข้อมูลเซิร์ฟเวอร์ กฎระเบียบ และช่องทางติดต่อ</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Right: Promotion Banner -->
+            <div class="promo-card">
+                <!-- Mockup Promo Image (Using Minecraft Shader Image) -->
+                <img src="https://images.unsplash.com/photo-1610041321420-a596dd148c90?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Promotion" class="promo-image">
+                <div class="promo-overlay">
+                    <span class="promo-badge"><i class="fas fa-fire"></i> PROMOTION</span>
+                    <h3>ลดราคาแพ็กเกจ Rank สูงสุด 50% ต้อนรับเปิดซีซั่นใหม่!</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donators Dashboard Layout -->
+        <div class="donators-dashboard">
+            <!-- Left: Top 3 Donators Card -->
+            <div class="dashboard-card top-donators-card">
+                <h2 class="section-title">🏆 ผู้สนับสนุนสูงสุด 🏆</h2>
+                <div class="donators-container">
+                    <!-- Rank 2 -->
+                    <div class="donator-card rank-2">
+                        <div class="donator-rank">#2</div>
+                        <div id="skin-container-2" class="skin-container"></div>
+                        <div class="donator-info">
+                            <h3>Jeb_</h3>
+                            <p>5,000 THB</p>
+                        </div>
+                    </div>
+                    <!-- Rank 1 -->
+                    <div class="donator-card rank-1">
+                        <div class="donator-rank">#1</div>
+                        <div id="skin-container-1" class="skin-container"></div>
+                        <div class="donator-info">
+                            <h3>Notch</h3>
+                            <p>10,000 THB</p>
+                        </div>
+                    </div>
+                    <!-- Rank 3 -->
+                    <div class="donator-card rank-3">
+                        <div class="donator-rank">#3</div>
+                        <div id="skin-container-3" class="skin-container"></div>
+                        <div class="donator-info">
+                            <h3>Dream</h3>
+                            <p>3,000 THB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Recent Donators Card -->
+            <div class="dashboard-card recent-donators-card-new">
+                <h2 class="section-title">💸 เติมเงินล่าสุด</h2>
+                <ul class="recent-list" id="recent-list-container">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
+        <p>Made with ❤️ By PondPer</p>
+        <p>© 2026 Octocraft. All Right Reserved.</p>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+            <div class="modal-header">
+                <h3>เข้าสู่ระบบ</h3>
+                <p>กรุณาเข้าสู่ระบบเพื่อเข้าใช้งาน Webshop</p>
+            </div>
+            <form class="login-form">
+                <div class="input-group">
+                    <label for="username">ชื่อตัวละคร (Username)</label>
+                    <input type="text" id="username" placeholder="Minecraft Username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">รหัสผ่าน (Password)</label>
+                    <input type="password" id="password" placeholder="รหัสผ่านของคุณ" required>
+                </div>
+                <button type="submit" class="submit-login-btn">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="modal-overlay">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h3>ยืนยันการออกจากระบบ</h3>
+                <p>คุณต้องการออกจากระบบใช่หรือไม่?</p>
+            </div>
+            <div class="modal-actions" style="display:flex; gap:10px; margin-top:20px;">
+                <button class="cancel-btn" style="flex:1; padding:10px; border-radius:8px; background:var(--card-bg); color:white; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">ยกเลิก</button>
+                <button id="confirm-logout-btn" style="flex:1; padding:10px; border-radius:8px; background:var(--danger); color:white; border:none; cursor:pointer;">ออกจากระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redeem Code Modal -->
+    <div id="redeem-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h3>🎁 เติมไอเทมโค้ด</h3>
+                <p>กรอกรหัส Item Code ของคุณเพื่อรับของรางวัล</p>
+            </div>
+            <form id="redeem-form" class="login-form">
+                <div class="input-group">
+                    <label for="redeem-code-input">รหัสโค้ด (Item Code)</label>
+                    <input type="text" id="redeem-code-input" placeholder="ตัวอย่าง: FREESWORD" required style="text-transform: uppercase;">
+                </div>
+                <button type="submit" class="submit-login-btn">ยืนยันแลกโค้ด</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/main.js?v=639170756396345705"></script>
+    <script>
+        function createBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const bubbleCount = 20;
+
+            for (let i = 0; i < bubbleCount; i++) {
+                let bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                let size = Math.random() * 40 + 10;
+                let left = Math.random() * 100;
+                let duration = Math.random() * 10 + 10;
+                let delay = Math.random() * 10;
+
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+
+                container.appendChild(bubble);
+            }
+            fetchDonators();
+            fetchServerStatus();
+            fetchDiscordStatus();
+        }
+
+        async function fetchDiscordStatus() {
+            try {
+                const res = await fetch('/api/public/discord');
+                const data = await res.json();
+                if(data.ok && data.online) {
+                    document.getElementById('discord-online-count').innerHTML = `💬 ${data.online} Online`;
+                } else {
+                    document.getElementById('discord-online-count').innerHTML = `💬 คลิกเพื่อเข้าร่วม`;
+                }
+            } catch(e) {
+                document.getElementById('discord-online-count').innerHTML = `💬 คลิกเพื่อเข้าร่วม`;
+            }
+        }
+
+        async function fetchDonators() {
+            try {
+                const res = await fetch('/api/public/donators');
+                const data = await res.json();
+                if (data.ok) {
+                    renderTopDonators(data.topDonators || []);
+                    renderRecentDonators(data.recentDonators || []);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function fetchServerStatus() {
+            try {
+                const res = await fetch('/api/public/server-status');
+                const data = await res.json();
+                const countSpan = document.getElementById('server-online-count');
+                if (data.ok && data.online) {
+                    countSpan.innerHTML = `🟢 ${data.players.online} / ${data.players.max} Online`;
+                } else {
+                    countSpan.innerHTML = `🔴 ออฟไลน์`;
+                }
+            } catch (err) {
+                document.getElementById('server-online-count').innerHTML = `🔴 ออฟไลน์`;
+            }
+        }
+
+        function renderRecentDonators(donators) {
+            const container = document.getElementById('recent-list-container');
+            container.innerHTML = '';
+            
+            if (donators.length === 0) {
+                container.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">ยังไม่มีรายการเติมเงินล่าสุด</li>';
+                return;
+            }
+
+            donators.forEach((d) => {
+                const timeDiffMs = new Date().getTime() - new Date(d.time).getTime();
+                const timeDiffMins = Math.max(1, Math.floor(timeDiffMs / 60000));
+                let timeStr = `เมื่อ ${timeDiffMins} นาทีที่แล้ว`;
+                if (timeDiffMins > 1440) timeStr = `เมื่อ ${Math.floor(timeDiffMins/1440)} วันที่แล้ว`;
+                else if (timeDiffMins > 60) timeStr = `เมื่อ ${Math.floor(timeDiffMins/60)} ชั่วโมงที่แล้ว`;
+
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="recent-player">
+                        <img src="https://minotar.net/helm/${d.name}/64.png" alt="${d.name}" class="recent-avatar">
+                        <div class="recent-info">
+                            <span class="recent-username">${d.name}</span>
+                            <span class="recent-time">${timeStr}</span>
+                        </div>
+                    </div>
+                    <div class="recent-amount">+${d.amount} THB</div>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function renderTopDonators(donators) {
+            const containerMapping = [
+                { id: 'skin-container-1', rank: 1 },
+                { id: 'skin-container-2', rank: 2 },
+                { id: 'skin-container-3', rank: 3 }
+            ];
+
+            // Update UI texts
+            const card1 = document.querySelector('.donator-card.rank-1');
+            const card2 = document.querySelector('.donator-card.rank-2');
+            const card3 = document.querySelector('.donator-card.rank-3');
+
+            if (donators[0] && card1) {
+                card1.querySelector('h3').textContent = donators[0].name;
+                card1.querySelector('p').textContent = donators[0].amount + ' THB';
+            } else if (card1) card1.style.display = 'none';
+
+            if (donators[1] && card2) {
+                card2.querySelector('h3').textContent = donators[1].name;
+                card2.querySelector('p').textContent = donators[1].amount + ' THB';
+            } else if (card2) card2.style.opacity = '0.3';
+
+            if (donators[2] && card3) {
+                card3.querySelector('h3').textContent = donators[2].name;
+                card3.querySelector('p').textContent = donators[2].amount + ' THB';
+            } else if (card3) card3.style.opacity = '0.3';
+
+            // Render Skins
+            containerMapping.forEach((mapping, index) => {
+                const donator = donators[index];
+                if (!donator) return; // Skip if no donator for this rank
+
+                const el = document.getElementById(mapping.id);
+                if (!el) return;
+                el.innerHTML = ''; // clear old canvas
+
+                const viewer = new skinview3d.SkinViewer({
+                    canvas: document.createElement("canvas"),
+                    width: mapping.rank === 1 ? 200 : 160,
+                    height: mapping.rank === 1 ? 300 : 250,
+                    skin: `https://minotar.net/skin/${donator.name}`
+                });
+
+                el.appendChild(viewer.canvas);
+                viewer.animation = new skinview3d.WalkingAnimation();
+                viewer.animation.speed = 0.5;
+                viewer.controls.enableRotate = true;
+                viewer.controls.enableZoom = false;
+                viewer.controls.enablePan = false;
+            });
+        }
+
+        window.onload = createBubbles;
+    </script>
+</body>
+</html>
+    <!-- History Modal -->
+    <div class="modal-overlay" id="history-modal">
+        <div class="modal-card">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" id="history-modal-title">???????</h2>
+            <div class="history-list-container" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                <ul id="history-list" style="list-style: none; padding: 0;">
+                    <!-- History items injected here -->
+                </ul>
+            </div>
+        </div>
+    </div>

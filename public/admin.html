@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Octo Craft SMP</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="logo.png" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=O&background=3b82f6&color=fff'">
+            <h2>Admin Panel</h2>
+        </div>
+        <div class="sidebar-menu">
+            <a class="menu-item active" onclick="switchTab('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a class="menu-item" onclick="switchTab('shop', this)"><i class="fas fa-store"></i> จัดการร้านค้า (Shop)</a>
+            <a class="menu-item" onclick="switchTab('codes', this)"><i class="fas fa-ticket-alt"></i> ไอเทมโค้ด (Item Codes)</a>
+            <a class="menu-item" onclick="switchTab('members', this)"><i class="fas fa-users"></i> จัดการสมาชิก (Members)</a>
+            <a class="menu-item" onclick="switchTab('topup', this)"><i class="fas fa-wallet"></i> ระบบเติมเงิน (Top-up)</a>
+            <a class="menu-item" onclick="switchTab('tickets', this)"><i class="fas fa-envelope-open-text"></i> จัดการตั๋ว (Tickets)</a>
+            <a class="menu-item" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> ตั้งค่าระบบ (Settings)</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> กลับหน้าเว็บไซต์</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div class="topbar-title" id="topbar-title">Dashboard</div>
+            <div class="topbar-actions">
+                <div class="admin-profile">
+                    <span style="font-weight: 600;" id="admin-logged-name">Admin</span>
+                    <img id="admin-logged-avatar" src="images/logo.png" alt="Admin">
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            
+            <!-- 1. Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="grid-3">
+                    <div class="card stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>สมาชิกทั้งหมด</h3>
+                            <p id="stat-total-members">...</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.1); color:#10b981;"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <h3>รายได้สะสม (THB)</h3>
+                            <p id="stat-total-income">...</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-info">
+                            <h3>การสั่งซื้อรวม</h3>
+                            <p id="stat-total-orders">...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-chart-line"></i> ยินดีต้อนรับสู่ระบบจัดการหลังบ้าน</h2>
+                    <p style="color:var(--text-muted); line-height:1.6;">เลือกระบบที่คุณต้องการจัดการจากเมนูด้านซ้ายมือได้เลยครับ ระบบถูกออกแบบมาให้ใช้งานง่ายและจัดการข้อมูลแบบ Real-time</p>
+                </div>
+            </section>
+
+            <!-- 2. Manage Shop & Categories -->
+            <section id="shop" class="content-section">
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 25px;">
+                    
+                    <!-- Left: Categories -->
+                    <div class="card" style="margin-bottom:0;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h2 class="card-title" style="margin:0;"><i class="fas fa-folder"></i> หมวดหมู่</h2>
+                            <button class="btn btn-primary" onclick="openModal('category-modal')" style="padding: 5px 10px; font-size: 0.9rem;"><i class="fas fa-plus"></i> เพิ่ม</button>
+                        </div>
+                        <ul class="admin-list">
+                            <li>
+                                <span>All</span>
+                                <div>
+                                    <button class="icon-btn text-primary"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </li>
+                            <li>
+                                <span>Rank</span>
+                                <div>
+                                    <button class="icon-btn text-primary"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </li>
+                            <li>
+                                <span>Key</span>
+                                <div>
+                                    <button class="icon-btn text-primary"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </li>
+                            <li>
+                                <span>Privilege</span>
+                                <div>
+                                    <button class="icon-btn text-primary"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Right: Items -->
+                    <div class="card" style="margin-bottom:0;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h2 class="card-title" style="margin:0;"><i class="fas fa-box"></i> ไอเท็มในร้านค้า</h2>
+                            <button class="btn btn-primary" onclick="openModal('item-modal')" style="padding: 5px 10px; font-size: 0.9rem;"><i class="fas fa-plus"></i> เพิ่ม</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>รูปภาพ</th>
+                                        <th>ชื่อสินค้า</th>
+                                        <th>ราคา</th>
+                                        <th>หมวดหมู่</th>
+                                        <th>จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><img src="https://cdn-icons-png.flaticon.com/512/2838/2838575.png" style="width:30px;"></td>
+                                        <td>VIP Rank (30 Days)</td>
+                                        <td>150</td>
+                                        <td><span class="badge badge-warning">Rank</span></td>
+                                        <td>
+                                            <button class="icon-btn text-primary" onclick="openModal('item-modal')"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="icon-btn text-danger"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="https://cdn-icons-png.flaticon.com/512/3218/3218006.png" style="width:30px;"></td>
+                                        <td>Mythic Key x1</td>
+                                        <td>50</td>
+                                        <td><span class="badge badge-success">Key</span></td>
+                                        <td>
+                                            <button class="icon-btn text-primary" onclick="openModal('item-modal')"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="icon-btn text-danger"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Item Codes -->
+            <section id="codes" class="content-section">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2 class="card-title" style="margin:0;"><i class="fas fa-ticket-alt"></i> จัดการไอเทมโค้ด (Item Codes)</h2>
+                        <button class="btn btn-primary" onclick="createItemCode()"><i class="fas fa-plus"></i> สร้างโค้ดใหม่</button>
+                    </div>
+
+                    <div class="grid-2" style="margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label>รหัสโค้ด (Code String)</label>
+                            <input type="text" id="admin-code-input" class="form-control" placeholder="เช่น FREEMYTHIC2026" style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label>จำนวนครั้งที่ใช้ได้ (Usage Limit) *ใส่ 0 คือไม่จำกัด</label>
+                            <input type="number" id="admin-limit-input" class="form-control" placeholder="เช่น 100" value="0">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>คำสั่งเซิร์ฟเวอร์ (Command) *ใช้ {player} แทนชื่อคนกรอกโค้ด</label>
+                            <input type="text" id="admin-cmd-input" class="form-control" placeholder="เช่น lp user {player} parent add VIP">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>โควต้าเหลือ</th>
+                                    <th>คำสั่ง</th>
+                                    <th>ประวัติคนใช้</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-codes-list">
+                                <tr><td colspan="5" style="text-align:center;">กำลังโหลด...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Members -->
+            <section id="members" class="content-section">
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <!-- Top 3 Spend -->
+                    <div class="card" style="margin-bottom:0;">
+                        <h2 class="card-title"><i class="fas fa-trophy" style="color:#d97706;"></i> Top 3 Spenders</h2>
+                        <ul id="admin-top-spenders" style="list-style:none;">
+                        </ul>
+                    </div>
+                    <!-- Latest Donate -->
+                    <div class="card" style="margin-bottom:0; grid-column: span 2;">
+                        <h2 class="card-title"><i class="fas fa-history" style="color:var(--primary);"></i> ประวัติการเติมเงินล่าสุด</h2>
+                        <ul id="admin-recent-topups" style="list-style:none; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <!-- Dynamic -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-users"></i> ตารางสมาชิกทั้งหมด</h2>
+                    <div class="form-group" style="max-width: 300px;">
+                        <input type="text" class="form-control" placeholder="ค้นหาชื่อผู้เล่น..." id="admin-search-member" onkeyup="filterMembers(this.value)">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Username</th>
+                                    <th>Points</th>
+                                    <th>ยอดเติมสะสม</th>
+                                    <th>สถานะ</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-members-tbody">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        <span id="member-page-info" style="color: var(--text-muted); font-size: 0.9rem;">หน้า 1 / 1</span>
+                        <div>
+                            <button class="btn btn-secondary" id="member-prev-btn" onclick="prevMemberPage()">ก่อนหน้า</button>
+                            <button class="btn btn-secondary" id="member-next-btn" onclick="nextMemberPage()">ถัดไป</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Top-up System -->
+            <section id="topup" class="content-section">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-wallet"></i> จัดการระบบเติมเงิน</h2>
+                    <div class="grid-2">
+                        <!-- PromptPay Config -->
+                        <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e6/PromptPay-logo.png" alt="PromptPay" style="height: 35px; object-fit: contain;">
+                                <h3 style="margin: 0; font-size: 1.1rem;">ตั้งค่าบัญชี PromptPay</h3>
+                            </div>
+                            <div class="form-group">
+                                <label>ชื่อ-นามสกุล บัญชีรับเงิน</label>
+                                <input type="text" id="admin-pp-name" class="form-control" placeholder="ชื่อบัญชี">
+                            </div>
+                            <div class="form-group">
+                                <label>เบอร์พร้อมเพย์ (10 หลัก)</label>
+                                <input type="text" id="admin-pp-target" class="form-control" placeholder="เบอร์โทรศัพท์หรือบัตรประชาชน">
+                            </div>
+                            <div class="form-group">
+                                <label>สถานะแสดงผลบนหน้าเว็บ</label>
+                                <select class="form-control">
+                                    <option>เปิดใช้งาน (Active)</option>
+                                    <option>ปิดใช้งาน (Disabled)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- TrueMoney Wallet Config -->
+                        <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                <img src="https://1000logos.net/wp-content/uploads/2023/10/TrueMoney-Logo.png" alt="TrueMoney Wallet" style="height: 35px; object-fit: contain;">
+                                <h3 style="margin: 0; font-size: 1.1rem;">ตั้งค่า TrueMoney Wallet</h3>
+                            </div>
+                            <div class="form-group">
+                                <label>ชื่อบัญชี</label>
+                                <input type="text" class="form-control" value="นาย พงษ์ธร ใจดี">
+                            </div>
+                            <div class="form-group">
+                                <label>เบอร์ทรูมันนี่ (10 หลัก)</label>
+                                <input type="text" class="form-control" value="0812345678">
+                            </div>
+                            <div class="form-group">
+                                <label>สถานะแสดงผลบนหน้าเว็บ</label>
+                                <select class="form-control">
+                                    <option>เปิดใช้งาน (Active)</option>
+                                    <option selected>ปิดปรับปรุงชั่วคราว (Maintenance)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Easyslip Config -->
+                    <div class="card" style="box-shadow: none; border: 1px solid var(--border-color); margin-top: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                            <div class="stat-icon" style="width: 40px; height: 40px; font-size: 1.2rem; background: #eff6ff; color: var(--primary); border-radius: 10px;"><i class="fas fa-receipt"></i></div>
+                            <h3 style="margin: 0; font-size: 1.1rem;">ตั้งค่า API ตรวจสลิป (Easyslip)</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Easyslip API Key</label>
+                            <input type="password" id="admin-easyslip-key" class="form-control" placeholder="easyslip_xxxxxxxxxxxxxxxxx">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="savePaymentConfig()"><i class="fas fa-save"></i> บันทึกการตั้งค่าระบบเติมเงิน</button>
+                </div>
+            </section>
+
+            <!-- 6. Settings -->
+            <section id="settings" class="content-section">
+                <div class="grid-2">
+                    <!-- Server IP Config -->
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-server"></i> Server Configuration</h2>
+                        <div class="form-group">
+                            <label>Server IP</label>
+                            <input type="text" id="admin-server-ip" class="form-control" value="play.octocraft.net">
+                        </div>
+                        <div class="form-group">
+                            <label>Server Port</label>
+                            <input type="number" id="admin-server-port" class="form-control" value="25565">
+                        </div>
+                        <button class="btn btn-secondary" onclick="checkServerStatus()"><i class="fas fa-wifi"></i> Check Status</button>
+                        <button class="btn btn-primary" style="margin-left: 10px;" onclick="saveServerConfig()">บันทึก</button>
+                    </div>
+
+                    <!-- API Token Config -->
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-key"></i> API Token (Bridge Plugin)</h2>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">โทเคนสำหรับเชื่อมต่อเว็บกับปลั๊กอินในเซิร์ฟเวอร์เพื่อส่งคำสั่ง (เช่น ให้ยศ, ให้พอยท์)</p>
+                        <div class="form-group">
+                            <input type="text" id="admin-api-token" class="form-control" value="กำลังโหลด..." readonly style="background:#f8fafc;">
+                        </div>
+                        <button class="btn btn-secondary" onclick="copyApiToken()"><i class="fas fa-copy"></i> Copy Token</button>
+                        <button class="btn btn-primary" style="margin-left: 10px; background:var(--danger);" onclick="generateApiToken()"><i class="fas fa-sync-alt"></i> Generate New</button>
+                    </div>
+
+                    <!-- Database Config -->
+                    <div class="card" style="grid-column: span 2;">
+                        <h2 class="card-title"><i class="fas fa-database"></i> Database Connection (nLogin)</h2>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>DB Host</label>
+                                <input type="text" id="admin-db-host" class="form-control" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>DB Port</label>
+                                <input type="number" id="admin-db-port" class="form-control" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>DB Name</label>
+                                <input type="text" id="admin-db-name" class="form-control" value="">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" id="admin-db-user" class="form-control" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="admin-db-pass" class="form-control" value="">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="saveDbConfig()">บันทึกการเชื่อมต่อ</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Tickets -->
+            <section id="tickets" class="content-section">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-envelope-open-text"></i> ตั๋วแจ้งปัญหา (Tickets)</h2>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>รหัสตั๋ว</th>
+                                    <th>ผู้ส่ง</th>
+                                    <th>หัวข้อ</th>
+                                    <th>วันที่</th>
+                                    <th>สถานะ</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-table-body">
+                                <tr><td colspan="6" style="text-align:center;">กำลังโหลด...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="admin-modal-overlay">
+        <div class="admin-modal-content" style="max-width: 400px;">
+            <div class="admin-modal-header">
+                <h3><i class="fas fa-folder"></i> เพิ่ม/แก้ไข หมวดหมู่</h3>
+                <button class="close-modal-btn" onclick="closeModal('category-modal')">&times;</button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="form-group">
+                    <label>ชื่อหมวดหมู่ (Category Name)</label>
+                    <input type="text" class="form-control" placeholder="เช่น Rank, Key">
+                </div>
+                <button class="btn btn-success" style="width:100%; justify-content:center;" onclick="closeModal('category-modal')">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Modal -->
+    <div id="item-modal" class="admin-modal-overlay">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3><i class="fas fa-box"></i> เพิ่ม/แก้ไข ไอเท็ม</h3>
+                <button class="close-modal-btn" onclick="closeModal('item-modal')">&times;</button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="form-group">
+                    <label>ชื่อสินค้า</label>
+                    <input type="text" class="form-control" placeholder="เช่น VIP Rank">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>ราคา (THB)</label>
+                        <input type="number" class="form-control" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>ลดราคา (Discount Price)</label>
+                        <input type="number" class="form-control" placeholder="เว้นว่างได้ถ้าไม่ลด">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>หมวดหมู่</label>
+                    <select class="form-control">
+                        <option>Rank</option>
+                        <option>Key</option>
+                        <option>Privilege</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>คำสั่งเซิร์ฟเวอร์ (Command)</label>
+                    <input type="text" class="form-control" placeholder="เช่น lp user {player} parent add VIP">
+                    <small style="color:var(--text-muted); display:block; margin-top:5px;">ใช้ <strong>{player}</strong> แทนชื่อผู้เล่นที่ทำการสั่งซื้อ</small>
+                </div>
+                <div class="form-group">
+                    <label>อัปโหลดรูปภาพสินค้า</label>
+                    <div class="upload-area">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>คลิกเพื่อเลือกไฟล์รูปภาพจากเครื่อง</p>
+                    </div>
+                </div>
+                <button class="btn btn-success" style="width:100%; justify-content:center;" onclick="closeModal('item-modal')">บันทึกสินค้า</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            // Show target section
+            document.getElementById(tabId).classList.add('active');
+
+            // Update menu active state
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Update Topbar Title
+            document.getElementById('topbar-title').innerText = element.innerText;
+        }
+
+        // Modal Logic
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('admin-modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // On load, if URL has hash, switch to it, else default to shop
+        window.onload = function() {
+            // Initialize Admin Panel
+            switchTab('dashboard', document.querySelectorAll('.menu-item')[0]);
+            fetchAdminConfig();
+            fetchAdminDashboard();
+            fetchItemCodes();
+            fetchAdminTickets();
+        };
+
+        async function fetchAdminDashboard() {
+            try {
+                const res = await fetch('/api/admin/dashboard', { headers: adminHeaders });
+                const data = await res.json();
+                if (data.ok) {
+                    const members = data.members || [];
+                    const topSpenders = data.topSpenders || [];
+                    const recentTopups = data.recentTopups || [];
+                    
+                    document.getElementById('stat-total-members').innerText = members.length;
+                    document.getElementById('stat-total-income').innerText = members.reduce((acc, m) => acc + (m.totalTopup || 0), 0);
+                    document.getElementById('stat-total-orders').innerText = '0'; // placeholder for now
+                    
+                    const topSpendersHTML = topSpenders.map((u,i) => `<li style="padding:10px 0; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>${i+1}. ${u.name}</span> <strong>${u.totalTopup || 0} THB</strong></li>`).join('');
+                    document.getElementById('admin-top-spenders').innerHTML = topSpendersHTML || '<li style="padding:10px 0; color:var(--text-muted);">ไม่มีข้อมูล</li>';
+                    
+                    const topupsHTML = recentTopups.map(t => `<li style="padding:8px 0; border-bottom:1px solid var(--border-color);"><strong>${t.username}</strong> เติม ${t.amount} THB</li>`).join('');
+                    document.getElementById('admin-recent-topups').innerHTML = topupsHTML || '<li style="padding:8px 0; color:var(--text-muted);">ไม่มีข้อมูล</li>';
+                    
+                    window.allMembersData = members;
+                    window.filteredMembersData = members;
+                    window.currentMemberPage = 1;
+                    renderMemberPage();
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        window.filterMembers = function(query) {
+            query = query.toLowerCase();
+            window.filteredMembersData = window.allMembersData.filter(m => m.name.toLowerCase().includes(query));
+            window.currentMemberPage = 1;
+            renderMemberPage();
+        };
+
+        window.renderMemberPage = function() {
+            const itemsPerPage = 10;
+            const members = window.filteredMembersData || [];
+            const totalPages = Math.ceil(members.length / itemsPerPage) || 1;
+            
+            if (window.currentMemberPage < 1) window.currentMemberPage = 1;
+            if (window.currentMemberPage > totalPages) window.currentMemberPage = totalPages;
+            
+            const start = (window.currentMemberPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageMembers = members.slice(start, end);
+            
+            const membersHTML = pageMembers.map(m => `
+                <tr>
+                    <td style="padding:10px;"><img src="https://minotar.net/helm/${m.name}/32.png" style="border-radius:4px; width:32px;"></td>
+                    <td>${m.name}</td>
+                    <td>${(m.points || 0).toLocaleString()}</td>
+                    <td>${(m.totalTopup || 0).toLocaleString()}</td>
+                    <td><span class="badge badge-success">Online</span></td>
+                    <td><button class="btn btn-secondary" style="padding:5px 10px;" onclick="editMemberPoints('${m.name}', ${m.points || 0})"><i class="fas fa-edit"></i> แก้ไขพอยท์</button></td>
+                </tr>
+            `).join('');
+            document.getElementById('admin-members-tbody').innerHTML = membersHTML || '<tr><td colspan="6" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+            
+            document.getElementById('member-page-info').innerText = `หน้า ${window.currentMemberPage} / ${totalPages}`;
+            document.getElementById('member-prev-btn').disabled = window.currentMemberPage === 1;
+            document.getElementById('member-next-btn').disabled = window.currentMemberPage === totalPages;
+        };
+
+        window.prevMemberPage = function() {
+            window.currentMemberPage--;
+            renderMemberPage();
+        };
+
+        window.nextMemberPage = function() {
+            window.currentMemberPage++;
+            renderMemberPage();
+        };
+
+        window.editMemberPoints = async function(username, currentPoints) {
+            const newPts = prompt(`แก้ไขพอยท์สำหรับ ${username}:\nพอยท์ปัจจุบัน: ${currentPoints}`, currentPoints);
+            if (newPts === null) return;
+            const pts = parseInt(newPts);
+            if (isNaN(pts) || pts < 0) {
+                alert('จำนวนพอยท์ไม่ถูกต้อง');
+                return;
+            }
+            try {
+                const res = await fetch('/api/admin/members/edit', {
+                    method: 'POST',
+                    headers: adminHeaders,
+                    body: JSON.stringify({ username, points: pts })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    alert('อัปเดตพอยท์สำเร็จ');
+                    fetchAdminDashboard(); // Refresh
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + data.error);
+                }
+            } catch(e) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            }
+        };
+
+        async function fetchAdminConfig() {
+            try {
+                const res = await fetch('/api/config', { headers: adminHeaders });
+                const data = await res.json();
+                if (data.ok) {
+                    document.getElementById('admin-db-host').value = data.mysqlConfig.mysqlHost;
+                    document.getElementById('admin-db-port').value = data.mysqlConfig.mysqlPort;
+                    document.getElementById('admin-db-name').value = data.mysqlConfig.mysqlDatabase;
+                    document.getElementById('admin-db-user').value = data.mysqlConfig.mysqlUsername;
+                    document.getElementById('admin-db-pass').value = data.mysqlConfig.mysqlPassword;
+                    
+                    if (data.paymentConfig) {
+                        document.getElementById('admin-pp-name').value = data.paymentConfig.promptpayName || '';
+                        document.getElementById('admin-pp-target').value = data.paymentConfig.promptpayTarget || '';
+                        document.getElementById('admin-easyslip-key').value = data.paymentConfig.easySlipApiKey || '';
+                    }
+                } else if (data.error === 'admin_session_required') {
+                    alert('เซสชัน Admin หมดอายุ กรุณาเข้าสู่ระบบใหม่');
+                    window.location.href = 'index.html';
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function savePaymentConfig() {
+            const ppName = document.getElementById('admin-pp-name').value;
+            const ppTarget = document.getElementById('admin-pp-target').value;
+            const easyslipKey = document.getElementById('admin-easyslip-key').value;
+            try {
+                const res = await fetch('/api/config/payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...adminHeaders },
+                    body: JSON.stringify({
+                        promptpayName: ppName,
+                        promptpayTarget: ppTarget,
+                        easySlipApiKey: easyslipKey
+                    })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    alert('บันทึกตั้งค่าระบบเติมเงินสำเร็จ!');
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + (data.error || 'Unknown Error'));
+                }
+            } catch(e) { 
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+                console.error(e); 
+            }
+        }
+
+        async function fetchAdminTokens() {
+            try {
+                const res = await fetch('/api/tokens', { headers: adminHeaders });
+                const data = await res.json();
+                if (data.ok && data.tokens && data.tokens.length > 0) {
+                    document.getElementById('admin-api-token').value = data.tokens[0].token;
+                } else {
+                    document.getElementById('admin-api-token').value = "ยังไม่มี Token (กดปุ่ม Generate)";
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function generateApiToken() {
+            if(!confirm('การสร้าง Token ใหม่จะทำให้ Token เก่าใช้งานไม่ได้ใน Bridge ทันที ยืนยันหรือไม่?')) return;
+            try {
+                const res = await fetch('/api/tokens', { method: 'POST', headers: adminHeaders });
+                const data = await res.json();
+                if (data.ok) {
+                    document.getElementById('admin-api-token').value = data.token.token;
+                    alert('สร้าง Token สำเร็จ! กรุณานำไปใส่ใน config.yml ของปลั๊กอิน OctoBridge');
+                } else {
+                    alert('สร้าง Token ไม่สำเร็จ: ' + (data.error || 'Unknown Error'));
+                }
+            } catch(e) { console.error(e); alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
+        }
+
+        function copyApiToken() {
+            const token = document.getElementById('admin-api-token').value;
+            if(!token || token.includes('ยังไม่มี')) return alert('ไม่มี Token ให้คัดลอก');
+            navigator.clipboard.writeText(token);
+            alert('คัดลอก Token แล้ว!');
+        }
+
+        async function checkServerStatus() {
+            try {
+                const res = await fetch('/api/public/server-status');
+                const data = await res.json();
+                if (data.ok && data.online) {
+                    alert(`✅ เซิร์ฟเวอร์ออนไลน์!\\nผู้เล่น: ${data.players.online}/${data.players.max}\\nเวอร์ชัน: ${data.version}`);
+                } else {
+                    alert(`❌ เซิร์ฟเวอร์ออฟไลน์หรือไม่สามารถติดต่อได้`);
+                }
+            } catch(e) { alert('เช็คสถานะไม่สำเร็จ'); }
+        }
+
+        async function saveDbConfig() {
+            const body = {
+                mysqlHost: document.getElementById('admin-db-host').value,
+                mysqlPort: document.getElementById('admin-db-port').value,
+                mysqlDatabase: document.getElementById('admin-db-name').value,
+                mysqlUsername: document.getElementById('admin-db-user').value,
+                mysqlPassword: document.getElementById('admin-db-pass').value
+            };
+            try {
+                const res = await fetch('/api/config/mysql', {
+                    method: 'POST',
+                    headers: adminHeaders,
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.ok) alert('บันทึกการตั้งค่า Database สำเร็จ! (มีผลทันที)');
+            } catch(e) { alert('เกิดข้อผิดพลาดในการบันทึก'); }
+        }
+
+        const adminToken = localStorage.getItem('octo_token');
+        const adminHeaders = {
+            'Content-Type': 'application/json',
+            'Authorization': adminToken
+        };
+
+        // Fetch Tickets
+        async function fetchAdminTickets() {
+            try {
+                const res = await fetch('/api/admin/tickets', { headers: adminHeaders });
+                const data = await res.json();
+                if (data.ok && data.tickets) {
+                    const tbody = document.getElementById('tickets-table-body');
+                    if (data.tickets.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">ไม่มีตั๋วแจ้งปัญหา</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = data.tickets.map(t => `
+                        <tr>
+                            <td style="font-family:monospace; color:var(--primary-blue); font-weight:bold;">${t.id}</td>
+                            <td>${t.username}</td>
+                            <td>${t.subject}</td>
+                            <td>${new Date(t.date).toLocaleString('th-TH')}</td>
+                            <td><span class="badge ${t.status === 'open' ? 'badge-warning' : 'badge-success'}">${t.status === 'open' ? 'รอดำเนินการ' : 'แก้ไขแล้ว'}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding:5px 10px;" onclick="alert('ข้อความ: ' + decodeURIComponent('${encodeURIComponent(t.message)}'))"><i class="fas fa-eye"></i> อ่าน</button>
+                                ${t.status === 'open' ? `<button class="btn btn-success" style="padding:5px 10px; margin-left:5px;" onclick="resolveTicket('${t.id}')"><i class="fas fa-check"></i> เสร็จสิ้น</button>` : ''}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function resolveTicket(id) {
+            if (!confirm('ยืนยันว่าแก้ไขปัญหานี้เรียบร้อยแล้ว?')) return;
+            try {
+                const res = await fetch('/api/admin/tickets/resolve', {
+                    method: 'POST',
+                    headers: adminHeaders,
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    fetchAdminTickets();
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function fetchItemCodes() {
+            try {
+                const res = await fetch('/api/admin/codes', { headers: adminHeaders });
+                const data = await res.json();
+                if (data.ok) renderItemCodes(data.codes);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderItemCodes(codes) {
+            const tbody = document.getElementById('admin-codes-list');
+            if (codes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">ไม่มีไอเทมโค้ดในระบบ</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            codes.forEach(c => {
+                const usedCount = (c.usedBy || []).length;
+                const limitText = c.limit > 0 ? `${c.limit - usedCount} / ${c.limit}` : `∞ (ไม่จำกัด)`;
+                const statusHtml = c.limit > 0 && usedCount >= c.limit ? `<span class="badge badge-warning" style="background:#fee2e2; color:#ef4444;">Fully Used</span>` : `<span class="badge badge-success">Active</span>`;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${c.code}</strong> ${statusHtml}</td>
+                    <td>${limitText}</td>
+                    <td>${c.command}</td>
+                    <td><button class="btn btn-secondary" style="padding:5px 10px;" onclick="alert('ผู้ใช้ที่แลกแล้ว:\\n${(c.usedBy || []).join(', ') || 'ยังไม่มีคนใช้'}')"><i class="fas fa-eye"></i> ดูคนกดใช้</button></td>
+                    <td><button class="icon-btn text-danger" onclick="deleteItemCode('${c.code}')"><i class="fas fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function createItemCode() {
+            const code = document.getElementById('admin-code-input').value.trim().toUpperCase();
+            const limit = document.getElementById('admin-limit-input').value;
+            const command = document.getElementById('admin-cmd-input').value.trim();
+
+            if (!code || !command) return alert('กรุณากรอก Code และ Command ให้ครบ');
+            
+            try {
+                const res = await fetch('/api/admin/codes', {
+                    method: 'POST',
+                    headers: adminHeaders,
+                    body: JSON.stringify({ code, limit: Number(limit), command })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    renderItemCodes(data.codes);
+                    document.getElementById('admin-code-input').value = '';
+                    document.getElementById('admin-cmd-input').value = '';
+                } else {
+                    alert(data.error || 'เพิ่มโค้ดไม่ได้');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function deleteItemCode(codeId) {
+            if (!confirm(`คุณแน่ใจหรือไม่ว่าจะลบโค้ด ${codeId} ?`)) return;
+            try {
+                const res = await fetch('/api/admin/codes/' + encodeURIComponent(codeId), {
+                    method: 'DELETE',
+                    headers: adminHeaders
+                });
+                const data = await res.json();
+                if (data.ok) renderItemCodes(data.codes);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+<script src="js/main.js?v=639170756396345705"></script></body>
+</html>

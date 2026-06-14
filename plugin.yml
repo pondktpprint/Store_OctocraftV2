@@ -1,0 +1,18 @@
+name: OctoBridge
+version: 1.0-Beta
+main: me.octocraft.octobridge.OctoBridgePlugin
+api-version: '1.21'
+author: OctoCraft
+description: Bridge Paper server status and member data to an OctoCraft web panel.
+
+commands:
+  octobridge:
+    description: Manage OctoBridge.
+    usage: /octobridge <status|reload|reconnect>
+    aliases: [obridge]
+    permission: octobridge.admin
+
+permissions:
+  octobridge.admin:
+    description: Allows management of OctoBridge.
+    default: op

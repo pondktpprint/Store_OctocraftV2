@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Octo Craft SMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=639170753152425175">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="shop-page">
+    <div class="bubbles" id="bubbles-container"></div>
+
+    <!-- Shop Navbar -->
+    <nav class="shop-nav">
+        <a href="index.html" class="back-home-btn"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="shop-logo-small">
+            <img src="logo.png" alt="Octo Craft Logo" onerror="this.style.display='none'; document.getElementById('logo-fallback-small').style.display='block';">
+            <div id="logo-fallback-small" class="logo-fallback" style="font-size: 1.5rem; display:none;">OCTOCRAFT</div>
+        </div>
+        <div class="shop-nav-actions">
+            <!-- User Profile Menu -->
+            <div class="user-profile-menu">
+                <div class="user-profile-btn" id="user-profile-btn">
+                    <img src="https://minotar.net/helm/Steve/32.png" alt="Steve" class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name">Steve</span>
+                        <span class="user-points"><i class="fas fa-coins"></i> 5,000 Points</span>
+                    </div>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                
+                <!-- Dropdown Content -->
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <a href="#" class="dropdown-item"><i class="fas fa-history"></i> ประวัติการเติมเงิน</a>
+                    <a href="#" class="dropdown-item"><i class="fas fa-shopping-bag"></i> ประวัติการซื้อ</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item logout-item" onclick="alert('จำลองการออกจากระบบ');"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                </div>
+            </div>
+
+            <button class="cart-toggle-btn" id="cart-open-btn">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cart-badge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="shop-container">
+        <!-- Categories -->
+        <div class="category-filter" id="category-filter-container">
+            <button class="cat-btn active" data-filter="all">All</button>
+        </div>
+
+        <!-- Items Grid -->
+        <div class="items-grid" id="items-grid">
+            <!-- Rendered by JS -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
+        <p>Made with ❤️ By PondPer</p>
+        <p>© 2026 Octocraft. All Right Reserved.</p>
+    </footer>
+
+    <!-- Cart Sidebar (Off-canvas) -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2><i class="fas fa-shopping-cart"></i> ตะกร้าสินค้า</h2>
+            <button class="close-cart-btn" id="close-cart-btn">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <!-- Rendered by JS -->
+            <div class="empty-cart-msg">ยังไม่มีสินค้าในตะกร้า</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>ยอดรวมทั้งหมด:</span>
+                <span id="cart-total-price">0 THB</span>
+            </div>
+            <button class="checkout-btn">ดำเนินการชำระเงิน</button>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- Details Pop-up Modal -->
+    <div class="modal-overlay" id="details-modal">
+        <div class="modal-content shop-modal-content">
+            <button class="close-modal" id="close-details-btn">&times;</button>
+            <div id="details-modal-body">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script src="js/main.js?v=639170756396345705"></script>
+    <script>
+        let shopItems = [];
+        let categories = [];
+        let cart = [];
+
+        // Setup Page
+        async function initShop() {
+            createBubbles();
+            await loadShopConfig();
+            setupCartEvents();
+        }
+
+        async function loadShopConfig() {
+            try {
+                const res = await fetch('/api/shop/config');
+                const data = await res.json();
+                if (data.ok) {
+                    categories = data.categories || [];
+                    renderCategoryFilters();
+                    
+                    shopItems = (data.items || []).map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        category: item.category,
+                        desc: `พิมพ์คำสั่งเมื่อซื้อ: ${item.command || ''}`,
+                        image: item.icon || 'https://cdn-icons-png.flaticon.com/512/2838/2838575.png'
+                    }));
+                    renderItems('all');
+                }
+            } catch (err) {
+                console.error("Failed to load shop config", err);
+            }
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filter-container');
+            if (!container) return;
+            
+            container.innerHTML = '<button class="cat-btn active" data-filter="all">All</button>';
+            categories.forEach(cat => {
+                if (cat.slug === 'all') return;
+                const btn = document.createElement('button');
+                btn.className = 'cat-btn';
+                btn.dataset.filter = cat.slug;
+                btn.innerText = cat.name;
+                container.appendChild(btn);
+            });
+            setupFilters();
+        }
+
+
+        // Bubbles Animation
+        function createBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const bubbleCount = 20;
+            for (let i = 0; i < bubbleCount; i++) {
+                let bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                let size = Math.random() * 40 + 10;
+                let left = Math.random() * 100;
+                let duration = Math.random() * 10 + 10;
+                let delay = Math.random() * 10;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+                container.appendChild(bubble);
+            }
+        }
+
+        // Render Items
+        function renderItems(filter) {
+            const grid = document.getElementById('items-grid');
+            grid.innerHTML = '';
+            
+            const filtered = filter === 'all' ? shopItems : shopItems.filter(item => item.category === filter);
+            
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('item-card');
+                card.innerHTML = `
+                    <div class="item-img-container">
+                        <img src="${item.image}" alt="${item.name}" class="item-image">
+                    </div>
+                    <div class="item-info-shop">
+                        <h3 class="item-name">${item.name}</h3>
+                        <div class="item-price">${item.price} Points</div>
+                    </div>
+                    <div class="item-actions">
+                        <div class="qty-selector">
+                            <button onclick="updateQty('${item.id}', -1)">-</button>
+                            <input type="number" id="qty-${item.id}" value="1" min="1" max="99" onchange="validateQty('${item.id}')">
+                            <button onclick="updateQty('${item.id}', 1)">+</button>
+                        </div>
+                        <div class="action-btns">
+                            <button class="details-btn" onclick="openDetails('${item.id}')"><i class="fas fa-info-circle"></i></button>
+                            <button class="add-cart-btn" onclick="addToCart(event, '${item.id}')"><i class="fas fa-cart-plus"></i></button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Category Filter
+        function setupFilters() {
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    btns.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderItems(e.target.dataset.filter);
+                });
+            });
+        }
+
+        // Quantity Input Logic
+        function updateQty(id, change) {
+            const input = document.getElementById(`qty-${id}`);
+            let val = parseInt(input.value) + change;
+            if (val < 1) val = 1;
+            if (val > 99) val = 99;
+            input.value = val;
+        }
+
+        function validateQty(id) {
+            const input = document.getElementById(`qty-${id}`);
+            let val = parseInt(input.value);
+            if (isNaN(val) || val < 1) input.value = 1;
+            if (val > 99) input.value = 99;
+        }
+
+        // Add to Cart
+        function addToCart(event, id) {
+            const item = shopItems.find(i => i.id === id);
+            const qty = parseInt(document.getElementById(`qty-${id}`).value);
+            
+            const existing = cart.find(c => c.id === id);
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                cart.push({ ...item, qty });
+            }
+            
+            updateCartUI();
+            
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.style.background = '#00ff88';
+            btn.style.color = '#000';
+            btn.style.borderColor = '#00ff88';
+            
+            const cartBadge = document.getElementById('cart-badge');
+            cartBadge.classList.add('bounce');
+            cartBadge.classList.add('bounce');
+            setTimeout(() => cartBadge.classList.remove('bounce'), 300);
+
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+            }, 800);
+        }
+
+        // Cart UI Logic
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const container = document.getElementById('cart-items-container');
+            const totalEl = document.getElementById('cart-total-price');
+            
+            let totalQty = 0;
+            let totalPrice = 0;
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="empty-cart-msg">ยังไม่มีสินค้าในตะกร้า</div>';
+                badge.innerText = '0';
+                badge.style.display = 'none';
+                totalEl.innerText = '0 Points';
+                return;
+            }
+            
+            badge.style.display = 'flex';
+            container.innerHTML = '';
+            cart.forEach(item => {
+                totalQty += item.qty;
+                totalPrice += (item.price * item.qty);
+                
+                const div = document.createElement('div');
+                div.classList.add('cart-item');
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <div class="cart-item-price">${item.price} Points x ${item.qty}</div>
+                    </div>
+                    <button class="remove-item-btn" onclick="removeFromCart('${item.id}')"><i class="fas fa-trash"></i></button>
+                `;
+                container.appendChild(div);
+            });
+            
+            badge.innerText = totalQty;
+            totalEl.innerText = totalPrice.toLocaleString() + ' Points';
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(c => c.id !== id);
+            updateCartUI();
+        }
+
+        function setupCartEvents() {
+            const openBtn = document.getElementById('cart-open-btn');
+            const closeBtn = document.getElementById('close-cart-btn');
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            
+            openBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            
+            const closeCart = () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            };
+            
+            closeBtn.addEventListener('click', closeCart);
+            overlay.addEventListener('click', closeCart);
+
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', checkout);
+            }
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                window.showToast("ไม่มีสินค้าในตะกร้า");
+                return;
+            }
+            
+            const userStr = localStorage.getItem('octo_user');
+            if (!userStr) {
+                alert("กรุณาเข้าสู่ระบบก่อนทำรายการ");
+                return;
+            }
+            const user = JSON.parse(userStr);
+            
+            const btn = document.querySelector('.checkout-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังชำระเงิน...';
+            
+            let totalCost = 0;
+            cart.forEach(item => {
+                totalCost += item.price * item.qty;
+            });
+            
+            if (user.points < totalCost) {
+                alert("พอยท์ไม่เพียงพอในการซื้อสินค้า");
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                return;
+            }
+
+            if (!confirm(`ยืนยันการซื้อสินค้าในตะกร้าทั้งหมดเป็นจำนวน ${totalCost} Points ?`)) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                return;
+            }
+            
+            let successCount = 0;
+            let lastError = "";
+            
+            for (const item of cart) {
+                for (let i = 0; i < item.qty; i++) {
+                    try {
+                        const res = await fetch('/api/shop/buy', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': localStorage.getItem('octo_token') || ''
+                            },
+                            body: JSON.stringify({
+                                username: user.name,
+                                itemId: item.id
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.ok) {
+                            successCount++;
+                            if (data.newPoints !== undefined) {
+                                window.updatePointsUI(data.newPoints);
+                            }
+                        } else {
+                            lastError = data.error || "เกิดข้อผิดพลาด";
+                        }
+                    } catch (err) {
+                        lastError = "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้";
+                    }
+                }
+            }
+            
+            if (successCount > 0) {
+                alert(`🎉 ซื้อสินค้าสำเร็จ ${successCount} รายการ!`);
+                cart = [];
+                updateCartUI();
+                document.getElementById('cart-sidebar').classList.remove('active');
+                document.getElementById('cart-overlay').classList.remove('active');
+            } else {
+                alert(`❌ ไม่สามารถซื้อสินค้าได้: ${lastError}`);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+
+        // Details Modal Logic
+        function openDetails(id) {
+            const item = shopItems.find(i => i.id === id);
+            const modal = document.getElementById('details-modal');
+            const body = document.getElementById('details-modal-body');
+            
+            body.innerHTML = `
+                <div class="details-header">
+                    <div class="details-img-bg">
+                        <img src="${item.image}" alt="${item.name}" class="details-image">
+                    </div>
+                    <h2 class="details-title">${item.name}</h2>
+                    <div class="details-price">${item.price} Points</div>
+                </div>
+                <div class="details-desc">
+                    <p>${item.desc}</p>
+                </div>
+                <button class="details-add-cart" onclick="addToCart(event, '${item.id}'); setTimeout(() => document.getElementById('details-modal').classList.remove('active'), 800);"><i class="fas fa-cart-plus"></i> เพิ่มลงตะกร้า</button>
+            `;
+            modal.classList.add('active');
+        }
+
+        document.getElementById('close-details-btn').addEventListener('click', () => {
+            document.getElementById('details-modal').classList.remove('active');
+        });
+        
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('details-modal');
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        window.onload = initShop;
+    </script>
+</body>
+</html>

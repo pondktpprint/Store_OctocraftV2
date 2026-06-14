@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Octo Craft SMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=639170753152425175">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="contact-page">
+    <div class="bubbles" id="bubbles-container"></div>
+
+    <!-- Navbar -->
+    <nav class="shop-nav">
+        <a href="index.html" class="back-home-btn"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="shop-logo-small">
+            <img src="logo.png" alt="Octo Craft Logo" onerror="this.style.display='none'; document.getElementById('logo-fallback-small').style.display='block';">
+            <div id="logo-fallback-small" class="logo-fallback" style="font-size: 1.5rem; display:none;">OCTOCRAFT</div>
+        </div>
+        <div class="shop-nav-actions">
+            <div class="user-profile-menu">
+                <div class="user-profile-btn" id="user-profile-btn">
+                    <img src="https://minotar.net/helm/Steve/32.png" alt="Steve" class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name">Steve</span>
+                        <span class="user-points"><i class="fas fa-coins"></i> 5,000 Points</span>
+                    </div>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                
+                <!-- Dropdown Content -->
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <a href="#" class="dropdown-item"><i class="fas fa-history"></i> ประวัติการเติมเงิน</a>
+                    <a href="#" class="dropdown-item"><i class="fas fa-shopping-bag"></i> ประวัติการซื้อ</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item logout-item" onclick="alert('จำลองการออกจากระบบ');"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="contact-header" style="text-align: center; margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 10px;">ติดต่อทีมงาน (Contact Us)</h1>
+            <p style="color: var(--text-muted); font-size: 1.1rem;">มีปัญหา ข้อสงสัย หรือต้องการแจ้งเบาะแส ติดต่อพวกเราได้ผ่านช่องทางด้านล่าง</p>
+        </div>
+
+        <!-- Navigation Menu Grid (1 Column, 3 Rows) -->
+        <div class="menu-grid">
+            <!-- Row 1: Discord -->
+            <a href="#" target="_blank" class="job-card">
+                <div class="card-icon" style="color: #5865F2;"><i class="fab fa-discord"></i></div>
+                <div class="card-content">
+                    <h2>Discord Community</h2>
+                    <p>เข้าร่วมดิสคอร์ดเพื่อพูดคุยและอัปเดตข่าวสาร</p>
+                </div>
+            </a>
+
+            <!-- Row 2: Facebook -->
+            <a href="#" target="_blank" class="job-card">
+                <div class="card-icon" style="color: #1877F2;"><i class="fab fa-facebook"></i></div>
+                <div class="card-content">
+                    <h2>Facebook Fanpage</h2>
+                    <p>ติดตามกิจกรรมและประกาศจากทีมงานผ่านหน้าเพจ</p>
+                </div>
+            </a>
+
+            <!-- Row 3: Ticket System -->
+            <a href="javascript:void(0)" class="job-card" id="open-ticket-btn">
+                <div class="card-icon" style="color: var(--primary-blue);"><i class="fas fa-envelope-open-text"></i></div>
+                <div class="card-content">
+                    <h2>ระบบเปิดตั๋ว (Ticket)</h2>
+                    <p>ส่งข้อความติดต่อแอดมินโดยตรงจากหน้าเว็บ (ระบบหลังบ้าน)</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
+        <p>Made with ❤️ By PondPer</p>
+        <p>© 2026 Octocraft. All Right Reserved.</p>
+    </footer>
+
+    <!-- Ticket Modal -->
+    <div id="ticket-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="close-ticket-btn">&times;</button>
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope-open-text"></i> เปิดตั๋วติดต่อแอดมิน</h3>
+                <p>โปรดระบุรายละเอียดให้ชัดเจนเพื่อให้ทีมงานช่วยเหลือได้รวดเร็วขึ้น</p>
+            </div>
+            <form class="login-form" onsubmit="event.preventDefault(); submitTicket();">
+                <div class="input-group">
+                    <label for="ticket-subject">หัวข้อ (Subject)</label>
+                    <input type="text" id="ticket-subject" placeholder="ตัวอย่าง: แจ้งพบบัคในเซิร์ฟเวอร์, เติมเงินไม่เข้า ฯลฯ" required>
+                </div>
+                <div class="input-group">
+                    <label for="ticket-message">รายละเอียด (Message)</label>
+                    <textarea id="ticket-message" placeholder="อธิบายปัญหาหรือข้อสงสัยของคุณให้ทีมงานทราบ..." rows="5" required style="width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(138, 43, 226, 0.4); color: white; padding: 15px; border-radius: 12px; font-family: inherit; font-size: 1rem; resize: vertical; transition: border-color 0.3s;"></textarea>
+                </div>
+                <button type="submit" class="submit-login-btn" id="submit-ticket-btn">ส่งตั๋ว (Submit Ticket)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        function initContact() {
+            createBubbles();
+            setupTicketModal();
+        }
+
+        // Bubbles Animation
+        function createBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const bubbleCount = 20;
+            for (let i = 0; i < bubbleCount; i++) {
+                let bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                let size = Math.random() * 40 + 10;
+                let left = Math.random() * 100;
+                let duration = Math.random() * 10 + 10;
+                let delay = Math.random() * 10;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+                container.appendChild(bubble);
+            }
+        }
+
+
+        // Ticket Modal Logic
+        function setupTicketModal() {
+            const openBtn = document.getElementById('open-ticket-btn');
+            const modal = document.getElementById('ticket-modal');
+            const closeBtn = document.getElementById('close-ticket-btn');
+
+            openBtn.addEventListener('click', () => {
+                modal.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitTicket() {
+            const btn = document.getElementById('submit-ticket-btn');
+            const subject = document.getElementById('ticket-subject').value;
+            const message = document.getElementById('ticket-message').value;
+            
+            // Loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
+            btn.disabled = true;
+
+            try {
+                const token = localStorage.getItem('octo_token') || '';
+                const res = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ subject, message })
+                });
+                const data = await res.json();
+                
+                if (data.ok) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> ส่งสำเร็จแล้ว!';
+                    btn.style.background = '#00ff88';
+                    btn.style.color = '#000';
+                    setTimeout(() => {
+                        window.showToast("ส่งตั๋วติดต่อแอดมินสำเร็จแล้ว");
+                        document.getElementById('ticket-modal').classList.remove('active');
+                        document.getElementById('ticket-subject').value = '';
+                        document.getElementById('ticket-message').value = '';
+                        btn.innerHTML = 'ส่งตั๋ว (Submit Ticket)';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.disabled = false;
+                    }, 1000);
+                } else {
+                    alert("เกิดข้อผิดพลาด: " + (data.error === "not_logged_in" ? "กรุณาเข้าสู่ระบบก่อนส่งตั๋ว" : data.error));
+                    btn.innerHTML = 'ส่งตั๋ว (Submit Ticket)';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+                btn.innerHTML = 'ส่งตั๋ว (Submit Ticket)';
+                btn.disabled = false;
+            }
+        }
+
+        window.onload = initContact;
+    </script>
+<script src="js/main.js?v=639170756396345705"></script></body>
+</html>
