@@ -34,7 +34,7 @@ async function checkHealth() {
 async function searchPlayers(query) {
   if (!query) return [];
   const pool = getNLoginPool();
-  const [rows] = await pool.execute(
+  const [rows] = await pool.query(
     `SELECT ??, ??, ??, ??, ?? FROM ?? WHERE ?? LIKE ? LIMIT 50`,
     [
       COL_ID, COL_USERNAME, COL_EMAIL, COL_CREATED, COL_LAST_SEEN,
@@ -49,7 +49,7 @@ async function searchPlayers(query) {
 async function getPlayerByUsername(username) {
   if (!username) return null;
   const pool = getNLoginPool();
-  const [rows] = await pool.execute(
+  const [rows] = await pool.query(
     `SELECT ??, ??, ??, ??, ?? FROM ?? WHERE ?? = ? LIMIT 1`,
     [
       COL_ID, COL_USERNAME, COL_EMAIL, COL_CREATED, COL_LAST_SEEN,
@@ -67,7 +67,7 @@ async function verifyNLoginPassword(username, password) {
   if (!username || !password) return null;
   try {
     const pool = getNLoginPool();
-    const [rows] = await pool.execute(
+    const [rows] = await pool.query(
       `SELECT ??, ?? FROM ?? WHERE ?? = ? LIMIT 1`,
       [COL_ID, env.NLOGIN_COL_PASSWORD, TBL, COL_USERNAME, username]
     );
