@@ -289,8 +289,8 @@ const Admin = {
             name: document.getElementById('prod-name').value,
             category: document.getElementById('prod-category').value,
             description: document.getElementById('prod-desc').value,
-            pricePoints: parseInt(document.getElementById('prod-price').value),
-            command: document.getElementById('prod-cmd').value,
+            price_points: parseInt(document.getElementById('prod-price').value),
+            minecraft_command: document.getElementById('prod-cmd').value,
             active: parseInt(document.getElementById('prod-active').value)
         };
 
