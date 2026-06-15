@@ -11,21 +11,21 @@
         .status-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
             max-width: 1200px;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             z-index: 2;
         }
 
         .status-card-new {
             background: rgba(15, 20, 35, 0.5);
             border: 1px solid rgba(0, 210, 255, 0.25);
-            border-radius: 16px;
-            padding: 20px 25px;
+            border-radius: 12px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -38,7 +38,7 @@
         }
 
         .status-card-new:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             border-color: rgba(0, 210, 255, 0.5);
             box-shadow: 0 12px 40px rgba(0, 210, 255, 0.15);
             background: rgba(15, 20, 35, 0.65);
@@ -54,16 +54,17 @@
         }
 
         .status-icon-container {
-            width: 60px;
-            height: 60px;
+            width: 46px;
+            height: 46px;
             background: rgba(0, 210, 255, 0.1);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             color: #00d2ff;
             text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+            flex-shrink: 0;
         }
 
         .status-icon-container.discord {
@@ -76,11 +77,11 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 2px;
         }
 
         .status-card-info h3 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #ffffff;
             margin: 0;
@@ -89,32 +90,33 @@
         .status-details {
             display: flex;
             align-items: center;
-            gap: 15px;
-            font-size: 0.95rem;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            width: 100%;
         }
 
         .status-dot-container {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-weight: 600;
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
         }
 
         .status-dot.online {
             background-color: #00ff88;
-            box-shadow: 0 0 10px #00ff88;
+            box-shadow: 0 0 8px #00ff88;
         }
 
         .status-dot.offline {
             background-color: #ff4d4d;
-            box-shadow: 0 0 10px #ff4d4d;
+            box-shadow: 0 0 8px #ff4d4d;
         }
 
         .players-online {
@@ -122,7 +124,6 @@
         }
 
         .copy-ip-action-btn, .join-discord-action-btn {
-            align-self: flex-start;
             background: rgba(0, 210, 255, 0.15);
             border: 1px solid rgba(0, 210, 255, 0.3);
             color: #00d2ff;
@@ -155,7 +156,7 @@
             color: #ffffff;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
             .status-grid {
                 grid-template-columns: 1fr;
             }
@@ -183,17 +184,17 @@
                     <i class="fas fa-server"></i>
                 </div>
                 <div class="status-card-info">
-                    <h3>สถานะเซิร์ฟเวอร์</h3>
-                    <div class="status-details">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3>สถานะเซิร์ฟเวอร์</h3>
                         <div class="status-dot-container">
                             <span class="status-dot offline" id="server-dot"></span>
                             <span id="server-status-lbl">Offline</span>
                         </div>
-                        <div class="players-online" id="server-players">0 / 0 ผู้เล่น</div>
                     </div>
-                    <button class="copy-ip-action-btn" onclick="copyServerIP(event)">
-                        <i class="fas fa-copy"></i> IP: sv3.mcsv.me:10976 (คลิกคัดลอก)
-                    </button>
+                    <div class="status-details" style="margin-top: 2px;">
+                        <span style="color: #00d2ff; font-weight: 600; font-size: 0.85rem;"><i class="fas fa-copy"></i> play.octocraft.online</span>
+                        <span class="players-online" id="server-players" style="font-size: 0.85rem;">0 / 0 ผู้เล่น</span>
+                    </div>
                 </div>
             </div>
 
@@ -203,17 +204,17 @@
                     <i class="fab fa-discord"></i>
                 </div>
                 <div class="status-card-info">
-                    <h3>Discord Community</h3>
-                    <div class="status-details">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3>Discord Community</h3>
                         <div class="status-dot-container">
                             <span class="status-dot online"></span>
-                            <span>Online</span>
+                            <span style="color: #7289da; font-size: 0.85rem; font-weight: 600;">Online</span>
                         </div>
-                        <div class="players-online" id="discord-members">กำลังโหลด...</div>
                     </div>
-                    <span class="join-discord-action-btn">
-                        <i class="fas fa-external-link-alt"></i> เข้าร่วมพูดคุย
-                    </span>
+                    <div class="status-details" style="margin-top: 2px;">
+                        <span id="discord-members" style="font-size: 0.85rem; color: var(--text-muted);">กำลังโหลด...</span>
+                        <span style="color: #7289da; font-weight: 600; font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> เข้าร่วม</span>
+                    </div>
                 </div>
             </a>
         </div>
@@ -305,11 +306,11 @@
         function copyServerIP(event) {
             event.preventDefault();
             event.stopPropagation();
-            navigator.clipboard.writeText('sv3.mcsv.me:10976');
+            navigator.clipboard.writeText('play.octocraft.online');
             if (typeof App !== 'undefined' && App.showToast) {
-                App.showToast('คัดลอก IP: sv3.mcsv.me:10976 แล้ว!');
+                App.showToast('คัดลอก IP: play.octocraft.online แล้ว!');
             } else {
-                alert('คัดลอก IP: sv3.mcsv.me:10976 เรียบร้อย!');
+                alert('คัดลอก IP: play.octocraft.online เรียบร้อย!');
             }
         }
 
