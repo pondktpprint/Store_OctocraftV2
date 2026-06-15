@@ -9,7 +9,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', createProxyMiddleware({
   target: 'http://127.0.0.1:4987',
-  changeOrigin: true
+  changeOrigin: true,
+  pathRewrite: (path) => `/api${path}`
 }));
 
 app.listen(PORT, () => {
