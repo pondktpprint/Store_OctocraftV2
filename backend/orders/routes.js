@@ -3,6 +3,7 @@ const { pool, transaction } = require("../db");
 const { HttpError, asyncHandler } = require("../errors");
 const { requireUser } = require("../auth/session");
 const { recordTransaction } = require("../wallet/service");
+const { triggerDelivery } = require("../rcon/bridge");
 
 const ordersRouter = express.Router();
 const MAX_ORDER_LINES = 50;
@@ -117,6 +118,11 @@ ordersRouter.post("/", requireUser, asyncHandler(async (req, res) => {
     }
 
     return { id: orderId, status: "pending_delivery", total_points: total };
+  });
+
+  // Trigger immediate command delivery through the WebSocket bridge
+  triggerDelivery().catch((err) => {
+    console.error("Failed to trigger delivery on checkout:", err);
   });
 
   res.status(201).json({ ok: true, order });
