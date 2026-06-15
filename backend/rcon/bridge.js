@@ -139,4 +139,8 @@ async function recordDeliveryResult(message) {
   });
 }
 
-module.exports = { attachBridge, requeueExpiredProcessingJobs, recordDeliveryResult };
+function getConnectedClientCount() {
+  return clients.size;
+}
+
+module.exports = { attachBridge, requeueExpiredProcessingJobs, recordDeliveryResult, getConnectedClientCount };

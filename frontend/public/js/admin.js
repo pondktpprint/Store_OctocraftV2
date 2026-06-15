@@ -38,6 +38,7 @@ const Admin = {
                 const tabId = btn.getAttribute('data-tab');
                 document.getElementById(tabId).classList.add('active');
 
+                if (tabId === 'status') this.loadSystemStatus();
                 if (tabId === 'products') this.loadProducts();
                 if (tabId === 'players') { document.getElementById('player-search-results').style.display='block'; document.getElementById('player-profile-view').style.display='none'; }
                 if (tabId === 'orders') this.loadOrders();
@@ -56,6 +57,37 @@ const Admin = {
         } catch (e) {
             alert('Error: ' + e.message);
             throw e;
+        }
+    },
+
+    // --- SYSTEM STATUS ---
+    async loadSystemStatus() {
+        try {
+            const res = await this.fetchAdmin('/api/admin/system-status');
+            
+            document.getElementById('status-bridge-token').value = res.bridge_token;
+            
+            const bIcon = document.getElementById('status-bridge-icon');
+            const bText = document.getElementById('status-bridge-text');
+            if (res.bridge_connected) {
+                bIcon.style.color = 'var(--success)';
+                bText.innerText = 'Online';
+            } else {
+                bIcon.style.color = 'var(--danger)';
+                bText.innerText = 'Offline (No Plugin Connected)';
+            }
+            
+            const nIcon = document.getElementById('status-nlogin-icon');
+            const nText = document.getElementById('status-nlogin-text');
+            if (res.nlogin_db_status) {
+                nIcon.style.color = 'var(--success)';
+                nText.innerText = 'Connected';
+            } else {
+                nIcon.style.color = 'var(--danger)';
+                nText.innerText = 'Connection Failed';
+            }
+        } catch(e) {
+            console.error('Failed to load system status', e);
         }
     },
 
