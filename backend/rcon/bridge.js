@@ -11,22 +11,40 @@ function attachBridge(server) {
   const wss = new WebSocketServer({ noServer: true });
 
   server.on("upgrade", async (req, socket, head) => {
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    if (url.pathname !== "/bridge") return;
+    console.log(`[Bridge Debug] Upgrade request event fired.`);
+    console.log(`[Bridge Debug] req.url: "${req.url}"`);
+    console.log(`[Bridge Debug] req.headers.host: "${req.headers.host}"`);
+    console.log(`[Bridge Debug] req.headers:`, JSON.stringify(req.headers));
+
+    const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    console.log(`[Bridge Debug] Parsed URL pathname: "${url.pathname}"`);
+
+    if (url.pathname !== "/bridge") {
+      console.log(`[Bridge Debug] Pathname is not "/bridge", ignoring upgrade event.`);
+      return;
+    }
     
     let token = url.searchParams.get("token");
     if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
       token = req.headers.authorization.substring(7);
     }
+    console.log(`[Bridge Debug] Extracted Token: "${token ? (token.substring(0, 12) + "...") : "none"}"`);
     
     const settings = await getSettings();
+    console.log(`[Bridge Debug] Database BRIDGE_TOKEN: "${settings.BRIDGE_TOKEN ? (settings.BRIDGE_TOKEN.substring(0, 12) + "...") : "none"}"`);
     
     if (token !== settings.BRIDGE_TOKEN) {
+      console.log(`[Bridge Debug] Token MISMATCH. Rejecting with 401 Unauthorized.`);
       socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
       socket.destroy();
       return;
     }
-    wss.handleUpgrade(req, socket, head, (ws) => wss.emit("connection", ws));
+    
+    console.log(`[Bridge Debug] Token verified. Upgrading connection...`);
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      console.log(`[Bridge Debug] Upgrade complete, connection established!`);
+      wss.emit("connection", ws);
+    });
   });
 
   wss.on("connection", (ws) => {
