@@ -39,13 +39,77 @@
                         </div>
                     </div>
 
-                    <div class="amount-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 25px 0;">
-                        <button class="amount-btn modern-btn" onclick="selectAmount(50)"><span class="amt">50 บาท</span></button>
-                        <button class="amount-btn modern-btn" onclick="selectAmount(90)"><span class="amt">90 บาท</span></button>
-                        <button class="amount-btn modern-btn" onclick="selectAmount(150)"><span class="amt">150 บาท</span></button>
-                        <button class="amount-btn modern-btn" onclick="selectAmount(300)"><span class="amt">300 บาท</span></button>
-                        <button class="amount-btn modern-btn" onclick="selectAmount(500)"><span class="amt">500 บาท</span></button>
-                        <button class="amount-btn modern-btn" onclick="selectAmount(1000)"><span class="amt">1000 บาท</span></button>
+                    <style>
+                        .premium-amount-grid {
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 15px;
+                            margin: 25px 0;
+                        }
+                        .premium-amount-btn {
+                            height: 60px;
+                            border-radius: 14px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: rgba(255, 255, 255, 0.02);
+                            border: 1px solid rgba(255, 255, 255, 0.05);
+                            color: #94a3b8;
+                            font-size: 1.1rem;
+                            font-weight: 500;
+                            cursor: pointer;
+                            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                            position: relative;
+                            overflow: hidden;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        }
+                        .premium-amount-btn:hover {
+                            background: rgba(255, 255, 255, 0.06);
+                            color: #f8fafc;
+                            transform: translateY(-4px);
+                            border-color: rgba(138, 43, 226, 0.2);
+                            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.15);
+                        }
+                        .premium-amount-btn.active {
+                            background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(0, 210, 255, 0.15));
+                            color: white;
+                            border-color: rgba(138, 43, 226, 0.5);
+                            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.25);
+                            font-weight: 600;
+                            transform: translateY(-2px);
+                        }
+                        .premium-amount-btn.active::before {
+                            content: '';
+                            position: absolute;
+                            bottom: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 3px;
+                            background: linear-gradient(to right, #00d2ff, #8a2be2);
+                        }
+                        .premium-amount-btn .amt {
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                        }
+                        .premium-amount-btn .cur {
+                            font-size: 0.9rem;
+                            opacity: 0.7;
+                            margin-left: 5px;
+                            font-weight: 400;
+                        }
+                        @media (max-width: 600px) {
+                            .premium-amount-grid {
+                                grid-template-columns: repeat(2, 1fr);
+                            }
+                        }
+                    </style>
+                    <div class="premium-amount-grid">
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(50)"><span class="amt">50</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(90)"><span class="amt">90</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(150)"><span class="amt">150</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(300)"><span class="amt">300</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(500)"><span class="amt">500</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(1000)"><span class="amt">1000</span><span class="cur">บาท</span></button>
                     </div>
 
                     <div class="custom-amount">
