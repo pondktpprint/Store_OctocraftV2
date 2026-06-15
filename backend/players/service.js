@@ -62,17 +62,22 @@ const bcrypt = require("bcryptjs");
 
 async function verifyNLoginPassword(username, password) {
   if (!username || !password) return null;
-  const [rows] = await nLoginPool.execute(
-    `SELECT ??, ?? FROM ?? WHERE ?? = ? LIMIT 1`,
-    [COL_ID, env.NLOGIN_COL_PASSWORD, TBL, COL_USERNAME, username]
-  );
-  if (!rows.length) return null;
-  
-  const hash = String(rows[0][env.NLOGIN_COL_PASSWORD]);
-  const valid = await bcrypt.compare(password, hash);
-  if (!valid) return null;
+  try {
+    const [rows] = await nLoginPool.execute(
+      `SELECT ??, ?? FROM ?? WHERE ?? = ? LIMIT 1`,
+      [COL_ID, env.NLOGIN_COL_PASSWORD, TBL, COL_USERNAME, username]
+    );
+    if (!rows.length) return null;
+    
+    const hash = String(rows[0][env.NLOGIN_COL_PASSWORD]);
+    const valid = await bcrypt.compare(password, hash);
+    if (!valid) return null;
 
-  return getPlayerByUsername(username); // Returns the safe mapped player object
+    return getPlayerByUsername(username); // Returns the safe mapped player object
+  } catch (error) {
+    console.error("nLogin verification error:", error);
+    return null;
+  }
 }
 
 module.exports = {
