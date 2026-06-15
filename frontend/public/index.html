@@ -341,7 +341,12 @@
                             App.state.user = data.user;
                             App.renderSession();
                             document.getElementById('login-modal').classList.remove('active');
-                            window.location.href = 'shop.html';
+                            // If they came from another page via login redirect, go to shop. Otherwise just reload.
+                            if (new URLSearchParams(window.location.search).get('login') === 'true') {
+                                window.location.href = 'shop.html';
+                            } else {
+                                window.location.reload();
+                            }
                         } else {
                             alert(data.error || 'เข้าสู่ระบบล้มเหลว');
                         }
