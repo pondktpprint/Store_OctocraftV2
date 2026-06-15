@@ -208,7 +208,23 @@ const Admin = {
             oTbody.appendChild(tr);
         });
 
-        // 3. Delivery Jobs (matched by orderIds)
+        // 3. Topup / Wallet Transactions
+        const pTbody = document.getElementById('profile-topup-tbody');
+        if (pTbody) {
+            pTbody.innerHTML = '';
+            if (userTxs.length === 0) {
+                pTbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No recent wallet transactions found</td></tr>';
+            } else {
+                userTxs.forEach(t => {
+                    const tr = document.createElement('tr');
+                    const color = t.type === 'credit' ? 'var(--success)' : 'var(--danger)';
+                    tr.innerHTML = `<td>${t.id}</td><td style="color:${color}; font-weight:bold;">${App.escapeHTML(t.type).toUpperCase()}</td><td>${t.amount_points}</td><td>${t.balance_after}</td><td>${new Date(t.created_at).toLocaleString()}</td>`;
+                    pTbody.appendChild(tr);
+                });
+            }
+        }
+
+        // 4. Delivery Jobs (matched by orderIds)
         const userJobs = this.globalData.jobs.filter(j => orderIds.has(j.order_id));
         const jTbody = document.getElementById('profile-jobs-tbody');
         jTbody.innerHTML = '';
@@ -264,6 +280,7 @@ const Admin = {
         document.getElementById('prod-price').value = '';
         document.getElementById('prod-cmd').value = '';
         document.getElementById('prod-active').value = '1';
+        document.getElementById('prod-image').value = '';
         document.getElementById('product-modal-title').innerText = 'Create Product';
         document.getElementById('product-modal').classList.add('active');
     },
@@ -277,6 +294,7 @@ const Admin = {
         document.getElementById('prod-price').value = p.price_points;
         document.getElementById('prod-cmd').value = p.minecraft_command;
         document.getElementById('prod-active').value = p.active;
+        document.getElementById('prod-image').value = '';
         document.getElementById('product-modal-title').innerText = 'Edit Product';
         document.getElementById('product-modal').classList.add('active');
     },
@@ -293,6 +311,22 @@ const Admin = {
             minecraft_command: document.getElementById('prod-cmd').value,
             active: parseInt(document.getElementById('prod-active').value)
         };
+
+        const imageFile = document.getElementById('prod-image').files[0];
+        if (imageFile) {
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(imageFile);
+                });
+                payload.image = base64;
+            } catch (err) {
+                App.showToast('Error reading image file');
+                return;
+            }
+        }
 
         const path = id ? `/api/products/${id}` : '/api/products';
         const method = id ? 'PATCH' : 'POST';

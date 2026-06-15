@@ -9,8 +9,9 @@ const App = {
         this.bindEvents();
         this.renderSession();
         this.updateCartUI();
-        if (this.state.token && !this.state.user) {
-            this.fetchProfile();
+        if (this.state.token) {
+            if (!this.state.user) this.fetchProfile();
+            this.updateNavPoints();
         }
     },
 
@@ -80,12 +81,22 @@ const App = {
                 this.state.user = res.user;
                 localStorage.setItem('octo_user', JSON.stringify(res.user));
                 this.renderSession();
+                this.updateNavPoints();
             } else {
                 this.logout();
             }
         } catch (e) {
             console.error(e);
         }
+    },
+
+    async updateNavPoints() {
+        try {
+            const res = await this.api('/api/wallet');
+            if (res.ok && document.getElementById('dropdown-points')) {
+                document.getElementById('dropdown-points').innerText = res.wallet.balance_points.toLocaleString();
+            }
+        } catch(e) {}
     },
 
     async api(path, options = {}) {
@@ -108,7 +119,6 @@ const App = {
                     <img src="https://minotar.net/helm/${this.escapeHTML(this.state.user.username)}/32.png" alt="${this.escapeHTML(this.state.user.username)}" class="user-avatar" onerror="this.src='/images/logo.png'">
                     <div class="user-details">
                         <span class="user-name">${this.escapeHTML(this.state.user.username)}</span>
-                        <span class="user-points" id="nav-points" style="cursor: pointer;" onclick="App.openWalletModal(); event.stopPropagation();"><i class="fas fa-coins"></i> Wallet</span>
                     </div>
                     <i class="fas fa-chevron-down dropdown-icon"></i>
                 </div>
@@ -118,10 +128,13 @@ const App = {
                     <a href="admin.html" class="dropdown-item" style="color: #00d2ff;"><i class="fas fa-user-shield" style="color: #00d2ff;"></i> ระบบหลังบ้าน (Admin)</a>
                     <div class="dropdown-divider"></div>
                     ` : ''}
-                    <a href="#" class="dropdown-item" onclick="App.openWalletModal(); return false;"><i class="fas fa-wallet"></i> กระเป๋าเงิน (Wallet)</a>
-                    <a href="history.html" class="dropdown-item"><i class="fas fa-history"></i> ประวัติการสั่งซื้อ</a>
+                    <div class="dropdown-item" style="cursor: default; color: #f59e0b; font-weight: bold;">
+                        <i class="fas fa-coins"></i> Point: <span id="dropdown-points">...</span>
+                    </div>
+                    <a href="#" class="dropdown-item" onclick="App.openTopupHistoryModal(); return false;"><i class="fas fa-wallet"></i> ประวัติการเติมเงิน</a>
+                    <a href="#" class="dropdown-item" onclick="App.openPurchaseHistoryModal(); return false;"><i class="fas fa-history"></i> ประวัติการสั่งซื้อ</a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item logout-item"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                    <a href="#" class="dropdown-item logout-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                 </div>
             `;
             profileMenu.innerHTML = profileHtml;
@@ -251,31 +264,21 @@ const App = {
         }
     },
 
-    openWalletModal() {
-        let modal = document.getElementById('wallet-modal');
+    openTopupHistoryModal() {
+        let modal = document.getElementById('topup-history-modal');
         if (!modal) {
             const div = document.createElement('div');
-            div.id = 'wallet-modal';
+            div.id = 'topup-history-modal';
             div.className = 'modal-overlay';
             div.innerHTML = `
                 <div class="modal-content" style="max-width: 500px; padding: 25px; border-radius: 16px; background: rgba(10, 15, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);">
-                    <button class="close-modal" onclick="document.getElementById('wallet-modal').classList.remove('active')">&times;</button>
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:15px;">
-                        <h3 style="margin:0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i class="fas fa-wallet" style="color:#00d2ff;"></i> กระเป๋าเงิน (Wallet)</h3>
-                        <div style="text-align: right;">
-                            <div style="font-size:0.75rem; color:var(--text-muted);">ยอดคงเหลือ</div>
-                            <div style="font-size:1.35rem; font-weight:800; color:#ffd700;" id="wallet-popup-balance">... Points</div>
-                        </div>
-                    </div>
-                    <h4 style="margin-bottom:10px; color:#ffffff; font-size:0.95rem;">ประวัติการทำรายการล่าสุด</h4>
-                    <div style="max-height: 250px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
-                        <ul id="wallet-popup-tx-list" style="list-style: none; padding: 0; margin: 0;">
+                    <button class="close-modal" onclick="document.getElementById('topup-history-modal').classList.remove('active')">&times;</button>
+                    <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i class="fas fa-wallet" style="color:#00d2ff;"></i> ประวัติการเติมเงิน</h3>
+                    <div style="max-height: 300px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
+                        <ul id="topup-popup-tx-list" style="list-style: none; padding: 0; margin: 0;">
                             <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">กำลังโหลด...</li>
                         </ul>
                     </div>
-                    <button class="login-btn" onclick="window.location.href='wallet.html'; return false;" style="width:100%; padding:10px; border-radius:10px; font-size:0.9rem;">
-                        <i class="fas fa-external-link-alt"></i> ดูประวัติแบบเต็ม
-                    </button>
                 </div>
             `;
             document.body.appendChild(div);
@@ -283,25 +286,22 @@ const App = {
         }
 
         modal.classList.add('active');
-        this.fetchWalletDetails();
+        this.fetchTopupHistory();
     },
 
-    async fetchWalletDetails() {
+    async fetchTopupHistory() {
         try {
-            const balanceEl = document.getElementById('wallet-popup-balance');
-            const listEl = document.getElementById('wallet-popup-tx-list');
-            if (!balanceEl || !listEl) return;
+            const listEl = document.getElementById('topup-popup-tx-list');
+            if (!listEl) return;
 
             const res = await this.api('/api/wallet');
             if (res.ok) {
-                balanceEl.innerHTML = `<i class="fas fa-coins"></i> ${res.wallet.balance_points.toLocaleString()} Points`;
                 listEl.innerHTML = '';
-                if (res.transactions.length === 0) {
-                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการทำรายการ</li>';
+                const topups = res.transactions.filter(tx => tx.type === 'credit');
+                if (topups.length === 0) {
+                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการเติมเงิน</li>';
                 } else {
-                    // Show up to 5 recent transactions in the popup
-                    const recent = res.transactions.slice(0, 5);
-                    recent.forEach(tx => {
+                    topups.forEach(tx => {
                         const li = document.createElement('li');
                         li.style.padding = '10px 0';
                         li.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
@@ -310,19 +310,15 @@ const App = {
                         li.style.alignItems = 'center';
                         
                         const d = new Date(tx.created_at).toLocaleDateString('th-TH') + ' ' + new Date(tx.created_at).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
-                        const isCredit = tx.type === 'credit';
-                        const color = isCredit ? '#00ff88' : '#ff4d4d';
-                        const sign = isCredit ? '+' : '-';
-                        const title = isCredit ? 'รับพอยท์ (Topup/Admin)' : `ซื้อสินค้า (Order #${tx.reference_id || ''})`;
                         
                         li.innerHTML = `
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem; color: #ffffff;">${title}</div>
+                                <div style="font-weight: 600; font-size: 0.9rem; color: #ffffff;">เติมเงินเข้าสู่ระบบ</div>
                                 <div style="font-size: 0.75rem; color: var(--text-muted);">${d}</div>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 1rem; font-weight: bold; color: ${color};">${sign}${tx.amount_points}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">คงเหลือ: ${tx.balance_after}</div>
+                                <div style="font-size: 1rem; font-weight: bold; color: #00ff88;">+${tx.amount_points} Points</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">ยอดคงเหลือ: ${tx.balance_after}</div>
                             </div>
                         `;
                         listEl.appendChild(li);
@@ -332,8 +328,80 @@ const App = {
                 listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">ไม่สามารถโหลดประวัติได้</li>';
             }
         } catch(e) {
-            console.error(e);
-            const listEl = document.getElementById('wallet-popup-tx-list');
+            const listEl = document.getElementById('topup-popup-tx-list');
+            if (listEl) listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</li>';
+        }
+    },
+
+    openPurchaseHistoryModal() {
+        let modal = document.getElementById('purchase-history-modal');
+        if (!modal) {
+            const div = document.createElement('div');
+            div.id = 'purchase-history-modal';
+            div.className = 'modal-overlay';
+            div.innerHTML = `
+                <div class="modal-content" style="max-width: 500px; padding: 25px; border-radius: 16px; background: rgba(10, 15, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);">
+                    <button class="close-modal" onclick="document.getElementById('purchase-history-modal').classList.remove('active')">&times;</button>
+                    <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i class="fas fa-history" style="color:#00d2ff;"></i> ประวัติการสั่งซื้อ</h3>
+                    <div style="max-height: 300px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
+                        <ul id="purchase-popup-list" style="list-style: none; padding: 0; margin: 0;">
+                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">กำลังโหลด...</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(div);
+            modal = div;
+        }
+
+        modal.classList.add('active');
+        this.fetchPurchaseHistory();
+    },
+
+    async fetchPurchaseHistory() {
+        try {
+            const listEl = document.getElementById('purchase-popup-list');
+            if (!listEl) return;
+
+            const res = await this.api('/api/orders');
+            if (res.ok) {
+                listEl.innerHTML = '';
+                if (res.orders.length === 0) {
+                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการสั่งซื้อ</li>';
+                } else {
+                    res.orders.forEach(order => {
+                        const li = document.createElement('li');
+                        li.style.padding = '10px 0';
+                        li.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                        li.style.display = 'flex';
+                        li.style.justifyContent = 'space-between';
+                        li.style.alignItems = 'center';
+                        
+                        const d = new Date(order.created_at).toLocaleDateString('th-TH') + ' ' + new Date(order.created_at).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+                        
+                        let statusHtml = '';
+                        if (order.status === 'delivered') statusHtml = '<span style="color:#00ff88; font-size:0.8rem;">จัดส่งแล้ว</span>';
+                        else if (order.status === 'pending_delivery') statusHtml = '<span style="color:#f59e0b; font-size:0.8rem;">กำลังดำเนินการ</span>';
+                        else statusHtml = '<span style="color:#ff4d4d; font-size:0.8rem;">ล้มเหลว</span>';
+
+                        li.innerHTML = `
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem; color: #ffffff;">Order #${order.id}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${d}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">${order.total_points} Points</div>
+                                ${statusHtml}
+                            </div>
+                        `;
+                        listEl.appendChild(li);
+                    });
+                }
+            } else {
+                listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">ไม่สามารถโหลดประวัติได้</li>';
+            }
+        } catch(e) {
+            const listEl = document.getElementById('purchase-popup-list');
             if (listEl) listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</li>';
         }
     },
