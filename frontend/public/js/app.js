@@ -121,7 +121,7 @@ const App = {
             `;
             profileMenu.innerHTML = profileHtml;
         } else {
-            profileMenu.innerHTML = `<button class="login-btn" onclick="window.location.href='index.html'"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>`;
+            profileMenu.innerHTML = `<button class="login-btn" onclick="window.location.href='index.html?login=true'"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>`;
         }
     },
 

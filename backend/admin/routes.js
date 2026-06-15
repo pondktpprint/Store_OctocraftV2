@@ -3,10 +3,23 @@ const { pool, transaction } = require("../db");
 const { HttpError, asyncHandler } = require("../errors");
 const { requireUser, requireAdmin } = require("../auth/session");
 const { recordTransaction } = require("../wallet/service");
+const { getConnectedClientCount } = require("../rcon/bridge");
+const { checkHealth } = require("../players/service");
+const { config, env } = require("../config");
 
 const adminRouter = express.Router();
 
 adminRouter.use(requireUser, requireAdmin);
+
+adminRouter.get("/system-status", asyncHandler(async (req, res) => {
+  const nloginDbStatus = await checkHealth();
+  res.json({
+    ok: true,
+    bridge_token: config.bridgeToken,
+    bridge_connected: getConnectedClientCount() > 0,
+    nlogin_db_status: nloginDbStatus
+  });
+}));
 
 adminRouter.get("/orders", asyncHandler(async (req, res) => {
   const [orders] = await pool.execute(
