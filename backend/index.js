@@ -12,6 +12,7 @@ const { playersRouter } = require("./players/routes");
 const { attachBridge } = require("./rcon/bridge");
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Nginx) for rate limiting
 app.use(express.json({ limit: "1mb" }));
 
 const rateLimit = require("express-rate-limit");
