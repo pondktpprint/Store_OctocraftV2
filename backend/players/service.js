@@ -1,4 +1,4 @@
-const { nLoginPool } = require("./nlogin-db");
+const { getNLoginPool } = require("./nlogin-db");
 const { env } = require("../config/env");
 
 const TBL = env.NLOGIN_TABLE;
@@ -22,7 +22,8 @@ function mapSafePlayer(row) {
 
 async function checkHealth() {
   try {
-    await nLoginPool.execute("SELECT 1");
+    const pool = getNLoginPool();
+    await pool.execute("SELECT 1");
     return true;
   } catch (error) {
     console.error("nLogin DB Health Check Failed:", error);
@@ -32,7 +33,8 @@ async function checkHealth() {
 
 async function searchPlayers(query) {
   if (!query) return [];
-  const [rows] = await nLoginPool.execute(
+  const pool = getNLoginPool();
+  const [rows] = await pool.execute(
     `SELECT ??, ??, ??, ??, ?? FROM ?? WHERE ?? LIKE ? LIMIT 50`,
     [
       COL_ID, COL_USERNAME, COL_EMAIL, COL_CREATED, COL_LAST_SEEN,
@@ -46,7 +48,8 @@ async function searchPlayers(query) {
 
 async function getPlayerByUsername(username) {
   if (!username) return null;
-  const [rows] = await nLoginPool.execute(
+  const pool = getNLoginPool();
+  const [rows] = await pool.execute(
     `SELECT ??, ??, ??, ??, ?? FROM ?? WHERE ?? = ? LIMIT 1`,
     [
       COL_ID, COL_USERNAME, COL_EMAIL, COL_CREATED, COL_LAST_SEEN,
@@ -63,7 +66,8 @@ const bcrypt = require("bcryptjs");
 async function verifyNLoginPassword(username, password) {
   if (!username || !password) return null;
   try {
-    const [rows] = await nLoginPool.execute(
+    const pool = getNLoginPool();
+    const [rows] = await pool.execute(
       `SELECT ??, ?? FROM ?? WHERE ?? = ? LIMIT 1`,
       [COL_ID, env.NLOGIN_COL_PASSWORD, TBL, COL_USERNAME, username]
     );

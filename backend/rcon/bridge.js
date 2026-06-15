@@ -1,8 +1,8 @@
 const crypto = require("crypto");
 const { WebSocketServer } = require("ws");
-const { config } = require("../config");
 const { pool, transaction } = require("../db");
 const { shouldIgnoreDeliveryResult } = require("./delivery-state");
+const { getSettings } = require("../settings/service");
 
 const clients = new Set();
 const DELIVERY_LEASE_MS = Number(process.env.DELIVERY_LEASE_MS || 30000);
@@ -10,7 +10,7 @@ const DELIVERY_LEASE_MS = Number(process.env.DELIVERY_LEASE_MS || 30000);
 function attachBridge(server) {
   const wss = new WebSocketServer({ noServer: true });
 
-  server.on("upgrade", (req, socket, head) => {
+  server.on("upgrade", async (req, socket, head) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname !== "/bridge") return;
     
@@ -19,7 +19,9 @@ function attachBridge(server) {
       token = req.headers.authorization.substring(7);
     }
     
-    if (token !== config.bridgeToken) {
+    const settings = await getSettings();
+    
+    if (token !== settings.BRIDGE_TOKEN) {
       socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
       socket.destroy();
       return;

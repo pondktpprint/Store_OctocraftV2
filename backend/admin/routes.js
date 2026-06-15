@@ -6,6 +6,7 @@ const { recordTransaction } = require("../wallet/service");
 const { getConnectedClientCount } = require("../rcon/bridge");
 const { checkHealth } = require("../players/service");
 const { config, env } = require("../config");
+const { getSettings, updateBulkSettings, regenerateBridgeToken } = require("../settings/service");
 
 const adminRouter = express.Router();
 
@@ -13,12 +14,28 @@ adminRouter.use(requireUser, requireAdmin);
 
 adminRouter.get("/system-status", asyncHandler(async (req, res) => {
   const nloginDbStatus = await checkHealth();
+  const settings = await getSettings();
   res.json({
     ok: true,
-    bridge_token: config.bridgeToken,
+    bridge_token: settings.BRIDGE_TOKEN,
     bridge_connected: getConnectedClientCount() > 0,
     nlogin_db_status: nloginDbStatus
   });
+}));
+
+adminRouter.get("/settings", asyncHandler(async (req, res) => {
+  const settings = await getSettings();
+  res.json({ ok: true, settings });
+}));
+
+adminRouter.post("/settings", asyncHandler(async (req, res) => {
+  await updateBulkSettings(req.body);
+  res.json({ ok: true });
+}));
+
+adminRouter.post("/settings/regenerate-token", asyncHandler(async (req, res) => {
+  const newToken = await regenerateBridgeToken();
+  res.json({ ok: true, token: newToken });
 }));
 
 adminRouter.get("/orders", asyncHandler(async (req, res) => {

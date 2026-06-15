@@ -48,9 +48,16 @@ app.use((error, req, res, next) => {
   res.status(500).json({ ok: false, error: "internal_error" });
 });
 
+const { initSettings } = require("./settings/service");
+
 const server = http.createServer(app);
 attachBridge(server);
 
-server.listen(config.port, config.host, () => {
-  console.log(`OctoCraft backend listening on ${config.host}:${config.port}`);
+initSettings().then(() => {
+  server.listen(config.port, config.host, () => {
+    console.log(`OctoCraft backend listening on ${config.host}:${config.port}`);
+  });
+}).catch(err => {
+  console.error("Failed to initialize system settings:", err);
+  process.exit(1);
 });

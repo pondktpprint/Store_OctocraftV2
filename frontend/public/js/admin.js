@@ -60,7 +60,7 @@ const Admin = {
         }
     },
 
-    // --- SYSTEM STATUS ---
+    // --- SYSTEM STATUS & SETTINGS ---
     async loadSystemStatus() {
         try {
             const res = await this.fetchAdmin('/api/admin/system-status');
@@ -86,8 +86,55 @@ const Admin = {
                 nIcon.style.color = 'var(--danger)';
                 nText.innerText = 'Connection Failed';
             }
+
+            // Load Settings
+            const setRes = await this.fetchAdmin('/api/admin/settings');
+            const s = setRes.settings;
+            document.getElementById('setting-server-ip').value = s.SERVER_IP || '';
+            document.getElementById('setting-server-port').value = s.SERVER_PORT || '';
+            document.getElementById('setting-nlogin-host').value = s.NLOGIN_DB_HOST || '';
+            document.getElementById('setting-nlogin-port').value = s.NLOGIN_DB_PORT || '';
+            document.getElementById('setting-nlogin-name').value = s.NLOGIN_DB_NAME || '';
+            document.getElementById('setting-nlogin-user').value = s.NLOGIN_DB_USER || '';
+            document.getElementById('setting-nlogin-password').value = s.NLOGIN_DB_PASSWORD || '';
+            
         } catch(e) {
             console.error('Failed to load system status', e);
+        }
+    },
+
+    async regenerateToken() {
+        if (!confirm('Are you sure? All connected Minecraft servers will be disconnected until they update their config.')) return;
+        try {
+            const res = await this.fetchAdmin('/api/admin/settings/regenerate-token', { method: 'POST' });
+            document.getElementById('status-bridge-token').value = res.token;
+            App.showToast('Token regenerated successfully');
+            this.loadSystemStatus();
+        } catch (e) {
+            console.error(e);
+        }
+    },
+
+    async saveSettings() {
+        const payload = {
+            SERVER_IP: document.getElementById('setting-server-ip').value,
+            SERVER_PORT: document.getElementById('setting-server-port').value,
+            NLOGIN_DB_HOST: document.getElementById('setting-nlogin-host').value,
+            NLOGIN_DB_PORT: document.getElementById('setting-nlogin-port').value,
+            NLOGIN_DB_NAME: document.getElementById('setting-nlogin-name').value,
+            NLOGIN_DB_USER: document.getElementById('setting-nlogin-user').value,
+            NLOGIN_DB_PASSWORD: document.getElementById('setting-nlogin-password').value,
+        };
+
+        try {
+            await this.fetchAdmin('/api/admin/settings', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            App.showToast('Settings saved successfully!');
+            this.loadSystemStatus();
+        } catch (e) {
+            console.error(e);
         }
     },
 
