@@ -27,16 +27,129 @@
     </nav>
 
     <main class="shop-container">
-        <!-- Category Filter Tabs -->
-        <div class="category-menu">
-            <button class="category-btn active" onclick="filterByCategory('all')"><i class="fas fa-cubes"></i> ทั้งหมด</button>
-            <button class="category-btn" onclick="filterByCategory('Rank')"><i class="fas fa-crown"></i> ยศ (Rank)</button>
-            <button class="category-btn" onclick="filterByCategory('Key')"><i class="fas fa-key"></i> กุญแจ (Key)</button>
-            <button class="category-btn" onclick="filterByCategory('Privilege')"><i class="fas fa-gem"></i> สิทธิพิเศษ (Privilege)</button>
-        </div>
+        <style>
+            .shop-layout-wrapper {
+                display: flex;
+                gap: 40px;
+                width: 100%;
+                align-items: flex-start;
+                margin-top: 10px;
+            }
+            .shop-sidebar {
+                flex: 0 0 280px;
+                position: sticky;
+                top: 100px;
+                background: rgba(15, 20, 35, 0.5);
+                border: 1px solid rgba(138, 43, 226, 0.25);
+                border-radius: 20px;
+                padding: 25px;
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
+            .shop-sidebar-title {
+                font-size: 1.3rem;
+                font-weight: 800;
+                margin-top: 0;
+                margin-bottom: 20px;
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 15px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .shop-sidebar-title i {
+                color: var(--primary-blue);
+            }
+            .sidebar-category-menu {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+            .sidebar-category-btn {
+                width: 100%;
+                justify-content: flex-start;
+                padding: 14px 20px;
+                border-radius: 12px;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                color: #94a3b8;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                backdrop-filter: blur(10px);
+            }
+            .sidebar-category-btn:hover {
+                background: rgba(255, 255, 255, 0.08);
+                color: #f8fafc;
+                transform: translateX(5px);
+            }
+            .sidebar-category-btn.active {
+                background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue));
+                color: white;
+                border-color: transparent;
+                box-shadow: 0 5px 15px var(--glow-purple);
+            }
+            .sidebar-category-btn i {
+                width: 24px;
+                text-align: center;
+            }
+            .shop-main-content {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            @media (max-width: 900px) {
+                .shop-layout-wrapper {
+                    flex-direction: column;
+                }
+                .shop-sidebar {
+                    flex: auto;
+                    width: 100%;
+                    position: static;
+                }
+                .sidebar-category-btn:hover {
+                    transform: translateY(-2px);
+                }
+            }
+        </style>
 
-        <div class="items-grid" id="items-grid">
-            <div style="text-align: center; width: 100%; color: white;">กำลังโหลดสินค้า...</div>
+        <div class="shop-layout-wrapper">
+            <!-- Category Sidebar (Left) -->
+            <div class="shop-sidebar">
+                <h2 class="shop-sidebar-title">
+                    <i class="fas fa-list-ul"></i> หมวดหมู่สินค้า
+                </h2>
+                <div class="sidebar-category-menu">
+                    <button class="sidebar-category-btn category-btn active" onclick="filterByCategory('all')">
+                        <i class="fas fa-cubes"></i> ทั้งหมด
+                    </button>
+                    <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Rank')">
+                        <i class="fas fa-crown"></i> ยศ (Rank)
+                    </button>
+                    <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Key')">
+                        <i class="fas fa-key"></i> กุญแจ (Key)
+                    </button>
+                    <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Privilege')">
+                        <i class="fas fa-gem"></i> สิทธิพิเศษ (Privilege)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Items Grid (Right) -->
+            <div class="shop-main-content">
+                <div class="items-grid" id="items-grid">
+                    <div style="text-align: center; width: 100%; color: white; padding: 40px;">กำลังโหลดสินค้า...</div>
+                </div>
+            </div>
         </div>
     </main>
 
