@@ -439,10 +439,14 @@ body {
 }
 
 .promo-image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
+    z-index: 1;
 }
 
 .promo-card:hover .promo-image {
@@ -456,6 +460,7 @@ body {
     width: 100%;
     padding: 30px 20px 20px 20px;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    z-index: 2;
 }
 
 .promo-badge {
