@@ -7,6 +7,160 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 3rem;
+            z-index: 2;
+        }
+
+        .status-card-new {
+            background: rgba(15, 20, 35, 0.5);
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            border-radius: 16px;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card-new:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 210, 255, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 210, 255, 0.15);
+            background: rgba(15, 20, 35, 0.65);
+        }
+
+        .status-card-new.discord-card {
+            border-color: rgba(114, 137, 218, 0.25);
+        }
+
+        .status-card-new.discord-card:hover {
+            border-color: rgba(114, 137, 218, 0.5);
+            box-shadow: 0 12px 40px rgba(114, 137, 218, 0.15);
+        }
+
+        .status-icon-container {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            color: #00d2ff;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        .status-icon-container.discord {
+            background: rgba(114, 137, 218, 0.1);
+            color: #7289da;
+            text-shadow: 0 0 10px rgba(114, 137, 218, 0.5);
+        }
+
+        .status-card-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .status-card-info h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .status-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.95rem;
+        }
+
+        .status-dot-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.online {
+            background-color: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .status-dot.offline {
+            background-color: #ff4d4d;
+            box-shadow: 0 0 10px #ff4d4d;
+        }
+
+        .players-online {
+            color: var(--text-muted);
+        }
+
+        .copy-ip-action-btn, .join-discord-action-btn {
+            align-self: flex-start;
+            background: rgba(0, 210, 255, 0.15);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            color: #00d2ff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            margin-top: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-ip-action-btn:hover {
+            background: #00d2ff;
+            color: #000000;
+        }
+
+        .join-discord-action-btn {
+            background: rgba(114, 137, 218, 0.15);
+            border-color: rgba(114, 137, 218, 0.3);
+            color: #7289da;
+        }
+
+        .status-card-new.discord-card:hover .join-discord-action-btn {
+            background: #7289da;
+            color: #ffffff;
+        }
+
+        @media (max-width: 900px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="bubbles" id="bubbles-container"></div>
@@ -21,15 +175,104 @@
             <div id="logo-fallback" class="logo-fallback">OCTO CRAFT SMP</div>
         </div>
         
-        <div class="main-menu-container" style="justify-content: center;">
+        <!-- 2-Column Status Section -->
+        <div class="status-grid">
+            <!-- Server Status Card -->
+            <div class="status-card-new" id="server-status-card" onclick="copyServerIP(event)">
+                <div class="status-icon-container">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div class="status-card-info">
+                    <h3>สถานะเซิร์ฟเวอร์</h3>
+                    <div class="status-details">
+                        <div class="status-dot-container">
+                            <span class="status-dot offline" id="server-dot"></span>
+                            <span id="server-status-lbl">Offline</span>
+                        </div>
+                        <div class="players-online" id="server-players">0 / 0 ผู้เล่น</div>
+                    </div>
+                    <button class="copy-ip-action-btn" onclick="copyServerIP(event)">
+                        <i class="fas fa-copy"></i> IP: sv3.mcsv.me:10976 (คลิกคัดลอก)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Discord Status Card -->
+            <a href="https://discord.gg/dU2wma23f3" target="_blank" class="status-card-new discord-card">
+                <div class="status-icon-container discord">
+                    <i class="fab fa-discord"></i>
+                </div>
+                <div class="status-card-info">
+                    <h3>Discord Community</h3>
+                    <div class="status-details">
+                        <div class="status-dot-container">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                        <div class="players-online" id="discord-members">กำลังโหลด...</div>
+                    </div>
+                    <span class="join-discord-action-btn">
+                        <i class="fas fa-external-link-alt"></i> เข้าร่วมพูดคุย
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Bottom Layout: Left (Shop, Topup, Contact) | Right (Promotion) -->
+        <div class="main-menu-container">
+            <!-- Left Column: Menu Cards -->
             <div class="menu-grid">
+                <!-- Shop Card -->
                 <a href="shop.html" class="job-card">
                     <div class="card-icon">🛒</div>
                     <div class="card-content">
                         <h2>ร้านค้า (Shop)</h2>
-                        <p>เลือกซื้อไอเทม กล่องสุ่ม และยศต่างๆ</p>
+                        <p>เลือกซื้อไอเทมกล่องสุ่มและยศพิเศษต่างๆ ในเกม</p>
                     </div>
                 </a>
+
+                <!-- Topup Card -->
+                <a href="wallet.html" class="job-card">
+                    <div class="card-icon">💎</div>
+                    <div class="card-content">
+                        <h2>เติมเงิน (Topup)</h2>
+                        <p>เติมพอยท์ผ่านคิวอาร์โค้ดระบบอัตโนมัติ 24 ชม.</p>
+                    </div>
+                </a>
+
+                <!-- Contact Card -->
+                <div class="job-card" style="cursor: default;">
+                    <div class="card-icon">💬</div>
+                    <div class="card-content">
+                        <h2>ติดต่อเรา (Contact)</h2>
+                        <p>พบปัญหาการใช้งาน ติดต่อทีมงานช่วยเหลือได้ตลอดเวลา</p>
+                        <div style="display: flex; gap: 15px; margin-top: 12px; flex-wrap: wrap;">
+                            <a href="https://discord.gg/dU2wma23f3" target="_blank" class="copy-ip-action-btn" style="text-decoration:none; margin-top:0;">
+                                <i class="fab fa-discord"></i> Discord Invite
+                            </a>
+                            <a href="https://facebook.com" target="_blank" class="copy-ip-action-btn" style="text-decoration:none; margin-top:0; background:rgba(24,119,242,0.15); border-color:rgba(24,119,242,0.3); color:#1877f2;">
+                                <i class="fab fa-facebook"></i> Facebook Page
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Promotion Card -->
+            <div class="promo-card">
+                <div style="position: absolute; top: 20px; left: 20px; z-index: 5;">
+                    <span class="promo-badge">PROMOTION</span>
+                </div>
+                <img src="images/promo.png" alt="Promotion" class="promo-image" onerror="this.src='https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=600&h=800'">
+                <div class="promo-overlay">
+                    <h3>เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!</h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 8px; font-weight: 400; line-height: 1.4;">
+                        รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!
+                    </p>
+                    <button class="login-btn" onclick="window.location.href='wallet.html'" style="margin-top: 15px; width: 100%;">
+                        <i class="fas fa-coins"></i> เติมเงินทันที
+                    </button>
+                </div>
             </div>
         </div>
     </main>
@@ -58,6 +301,18 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Copy IP helper
+        function copyServerIP(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            navigator.clipboard.writeText('sv3.mcsv.me:10976');
+            if (typeof App !== 'undefined' && App.showToast) {
+                App.showToast('คัดลอก IP: sv3.mcsv.me:10976 แล้ว!');
+            } else {
+                alert('คัดลอก IP: sv3.mcsv.me:10976 เรียบร้อย!');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const loginForm = document.getElementById('login-form');
             if (loginForm) {
@@ -97,6 +352,54 @@
                     }
                 });
             }
+
+            // Live status fetches
+            async function updateServerStatus() {
+                try {
+                    const res = await fetch('/api/public/server-status');
+                    const data = await res.json();
+                    const dot = document.getElementById('server-dot');
+                    const lbl = document.getElementById('server-status-lbl');
+                    const players = document.getElementById('server-players');
+                    
+                    if (data.ok && data.online) {
+                        dot.className = 'status-dot online';
+                        lbl.innerText = 'Online';
+                        players.innerText = `${data.players.online} / ${data.players.max} ผู้เล่น`;
+                    } else {
+                        dot.className = 'status-dot offline';
+                        lbl.innerText = 'Offline';
+                        players.innerText = '0 / 0 ผู้เล่น';
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch server status:", e);
+                }
+            }
+
+            async function updateDiscordStatus() {
+                try {
+                    const res = await fetch('https://discord.com/api/v10/invites/dU2wma23f3?with_counts=true');
+                    const data = await res.json();
+                    const members = document.getElementById('discord-members');
+                    
+                    if (data && data.approximate_presence_count !== undefined) {
+                        const online = data.approximate_presence_count;
+                        const total = data.approximate_member_count;
+                        members.innerText = `${online.toLocaleString()} คนออนไลน์ (${total.toLocaleString()} สมาชิก)`;
+                    } else {
+                        members.innerText = 'คลิกเพื่อเข้าร่วมชุมชน';
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch Discord status:", e);
+                    const members = document.getElementById('discord-members');
+                    if (members) members.innerText = 'คลิกเพื่อเข้าร่วมชุมชน';
+                }
+            }
+
+            updateServerStatus();
+            updateDiscordStatus();
+            setInterval(updateServerStatus, 30000); // 30s
+            setInterval(updateDiscordStatus, 60000); // 60s
 
             // Show login modal if ?login=true
             if (new URLSearchParams(window.location.search).get('login') === 'true' && !App.state.token) {
