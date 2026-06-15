@@ -36,71 +36,115 @@
                 margin-top: 10px;
             }
             .shop-sidebar {
-                flex: 0 0 280px;
+                flex: 0 0 300px;
                 position: sticky;
                 top: 100px;
-                background: rgba(15, 20, 35, 0.5);
-                border: 1px solid rgba(138, 43, 226, 0.25);
-                border-radius: 20px;
-                padding: 25px;
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                background: rgba(10, 14, 25, 0.6);
+                border: 1px solid rgba(138, 43, 226, 0.2);
+                border-radius: 18px;
+                padding: 20px;
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05);
             }
             .shop-sidebar-title {
-                font-size: 1.3rem;
-                font-weight: 800;
-                margin-top: 0;
-                margin-bottom: 20px;
-                color: white;
+                font-size: 1rem;
+                font-weight: 600;
+                margin: 0 0 15px 5px;
+                color: #a0a5b5;
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding-bottom: 15px;
+                gap: 8px;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                letter-spacing: 1.5px;
             }
             .shop-sidebar-title i {
-                color: var(--primary-blue);
+                color: rgba(138, 43, 226, 0.8);
+                font-size: 0.9rem;
             }
             .sidebar-category-menu {
                 display: flex;
                 flex-direction: column;
-                gap: 12px;
+                gap: 8px;
                 width: 100%;
             }
             .sidebar-category-btn {
                 width: 100%;
-                justify-content: flex-start;
-                padding: 14px 20px;
-                border-radius: 12px;
+                height: 56px;
+                padding: 0 16px;
+                border-radius: 14px;
                 font-size: 1rem;
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.05);
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid transparent;
                 color: #94a3b8;
-                font-weight: 600;
+                font-weight: 500;
                 cursor: pointer;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                backdrop-filter: blur(10px);
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                overflow: hidden;
             }
             .sidebar-category-btn:hover {
-                background: rgba(255, 255, 255, 0.08);
+                background: rgba(255, 255, 255, 0.06);
                 color: #f8fafc;
-                transform: translateX(5px);
+                transform: translateX(6px);
+                border-color: rgba(138, 43, 226, 0.15);
+                box-shadow: 0 5px 15px rgba(138, 43, 226, 0.1);
             }
             .sidebar-category-btn.active {
-                background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue));
+                background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(0, 210, 255, 0.15));
                 color: white;
-                border-color: transparent;
-                box-shadow: 0 5px 15px var(--glow-purple);
+                border-color: rgba(138, 43, 226, 0.4);
+                box-shadow: 0 5px 20px rgba(138, 43, 226, 0.2);
+                font-weight: 600;
             }
-            .sidebar-category-btn i {
+            .sidebar-category-btn.active::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 4px;
+                background: linear-gradient(to bottom, #00d2ff, #8a2be2);
+                border-radius: 4px 0 0 4px;
+            }
+            .cat-icon-wrap {
                 width: 24px;
-                text-align: center;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 12px;
+                font-size: 1.1rem;
+                color: #8a2be2;
+                transition: all 0.3s ease;
+            }
+            .sidebar-category-btn.active .cat-icon-wrap {
+                color: #00d2ff;
+                filter: drop-shadow(0 0 5px rgba(0,210,255,0.5));
+            }
+            .sidebar-category-btn:hover .cat-icon-wrap {
+                transform: scale(1.1);
+            }
+            .cat-text {
+                flex: 1;
+                text-align: left;
+            }
+            .cat-count {
+                background: rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.05);
+                border-radius: 20px;
+                padding: 2px 8px;
+                font-size: 0.8rem;
+                color: #a0a5b5;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            .sidebar-category-btn.active .cat-count {
+                background: rgba(138, 43, 226, 0.2);
+                color: #00d2ff;
+                border-color: rgba(0, 210, 255, 0.2);
             }
             .shop-main-content {
                 flex: 1;
@@ -110,14 +154,41 @@
             @media (max-width: 900px) {
                 .shop-layout-wrapper {
                     flex-direction: column;
+                    gap: 20px;
                 }
                 .shop-sidebar {
                     flex: auto;
                     width: 100%;
                     position: static;
+                    padding: 15px;
+                    border-radius: 16px;
+                }
+                .shop-sidebar-title {
+                    margin-bottom: 10px;
+                }
+                .sidebar-category-menu {
+                    flex-direction: row;
+                    overflow-x: auto;
+                    scroll-snap-type: x mandatory;
+                    -webkit-overflow-scrolling: touch;
+                    scrollbar-width: none;
+                    gap: 10px;
+                    padding-bottom: 5px;
+                }
+                .sidebar-category-menu::-webkit-scrollbar {
+                    display: none;
+                }
+                .sidebar-category-btn {
+                    flex: 0 0 auto;
+                    width: auto;
+                    padding: 0 20px;
+                    scroll-snap-align: start;
                 }
                 .sidebar-category-btn:hover {
                     transform: translateY(-2px);
+                }
+                .cat-count {
+                    margin-left: 8px;
                 }
             }
         </style>
@@ -126,20 +197,28 @@
             <!-- Category Sidebar (Left) -->
             <div class="shop-sidebar">
                 <h2 class="shop-sidebar-title">
-                    <i class="fas fa-list-ul"></i> หมวดหมู่สินค้า
+                    <i class="fas fa-layer-group"></i> หมวดหมู่สินค้า
                 </h2>
                 <div class="sidebar-category-menu">
                     <button class="sidebar-category-btn category-btn active" onclick="filterByCategory('all')">
-                        <i class="fas fa-cubes"></i> ทั้งหมด
+                        <span class="cat-icon-wrap"><i class="fas fa-cubes"></i></span>
+                        <span class="cat-text">ทั้งหมด</span>
+                        <span class="cat-count" id="count-all">0</span>
                     </button>
                     <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Rank')">
-                        <i class="fas fa-crown"></i> ยศ (Rank)
+                        <span class="cat-icon-wrap"><i class="fas fa-crown"></i></span>
+                        <span class="cat-text">ยศ (Rank)</span>
+                        <span class="cat-count" id="count-Rank">0</span>
                     </button>
                     <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Key')">
-                        <i class="fas fa-key"></i> กุญแจ (Key)
+                        <span class="cat-icon-wrap"><i class="fas fa-key"></i></span>
+                        <span class="cat-text">กุญแจ (Key)</span>
+                        <span class="cat-count" id="count-Key">0</span>
                     </button>
                     <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Privilege')">
-                        <i class="fas fa-gem"></i> สิทธิพิเศษ (Privilege)
+                        <span class="cat-icon-wrap"><i class="fas fa-gem"></i></span>
+                        <span class="cat-text">สิทธิพิเศษ</span>
+                        <span class="cat-count" id="count-Privilege">0</span>
                     </button>
                 </div>
             </div>
@@ -196,11 +275,24 @@
                 if (res.ok) {
                     shopItems = res.products;
                     renderProducts(shopItems);
+                    updateCategoryCounts();
                 } else {
                     document.getElementById('items-grid').innerHTML = '<div style="color:red; text-align:center;">ไม่สามารถโหลดสินค้าได้</div>';
                 }
             } catch (err) {
                 document.getElementById('items-grid').innerHTML = '<div style="color:red; text-align:center;">ไม่สามารถโหลดสินค้าได้</div>';
+            }
+
+            function updateCategoryCounts() {
+                const counts = { all: shopItems.length, Rank: 0, Key: 0, Privilege: 0 };
+                shopItems.forEach(item => {
+                    const cat = item.category || 'Rank';
+                    if (counts[cat] !== undefined) counts[cat]++;
+                });
+                if (document.getElementById('count-all')) document.getElementById('count-all').innerText = counts.all;
+                if (document.getElementById('count-Rank')) document.getElementById('count-Rank').innerText = counts.Rank;
+                if (document.getElementById('count-Key')) document.getElementById('count-Key').innerText = counts.Key;
+                if (document.getElementById('count-Privilege')) document.getElementById('count-Privilege').innerText = counts.Privilege;
             }
 
             function getItemIcon(item) {
