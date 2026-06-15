@@ -1359,7 +1359,7 @@ body {
     font-weight: 800;
 }
 
-.checkout-btn {
+.checkout-btn, .action-btn {
     width: 100%;
     background: linear-gradient(135deg, #00d2ff, #8a2be2);
     color: white;
@@ -1375,7 +1375,7 @@ body {
     letter-spacing: 1px;
 }
 
-.checkout-btn:hover {
+.checkout-btn:hover, .action-btn:hover {
     box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
     transform: translateY(-2px);
 }
