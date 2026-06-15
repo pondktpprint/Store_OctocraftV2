@@ -13,7 +13,13 @@ function attachBridge(server) {
   server.on("upgrade", (req, socket, head) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname !== "/bridge") return;
-    if (url.searchParams.get("token") !== config.bridgeToken) {
+    
+    let token = url.searchParams.get("token");
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+      token = req.headers.authorization.substring(7);
+    }
+    
+    if (token !== config.bridgeToken) {
       socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
       socket.destroy();
       return;
