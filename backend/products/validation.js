@@ -7,6 +7,7 @@ function requireProductPayload(body) {
   const pricePoints = Number(body.price_points);
   const command = String(body.minecraft_command || "").trim();
   const active = body.active === false ? 0 : 1;
+  const category = String(body.category || "Rank").trim();
 
   if (!sku) throw new HttpError(400, "sku_required");
   if (!name) throw new HttpError(400, "product_name_required");
@@ -21,7 +22,8 @@ function requireProductPayload(body) {
     description,
     pricePoints,
     command,
-    active
+    active,
+    category
   };
 }
 

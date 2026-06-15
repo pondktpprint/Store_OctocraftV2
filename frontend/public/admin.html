@@ -484,16 +484,17 @@
                 </div>
                 <div class="admin-table-wrapper">
                     <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>SKU</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
                         <tbody id="products-tbody"></tbody>
                     </table>
                 </div>
@@ -675,6 +676,14 @@
                 <div class="admin-form-group">
                     <label>Name</label>
                     <input type="text" id="prod-name" required placeholder="e.g. VIP Rank (30 Days)">
+                </div>
+                <div class="admin-form-group">
+                    <label>Category (หมวดหมู่)</label>
+                    <select id="prod-category">
+                        <option value="Rank">ยศ (Rank)</option>
+                        <option value="Key">กุญแจ (Key)</option>
+                        <option value="Privilege">สิทธิพิเศษ (Privilege)</option>
+                    </select>
                 </div>
                 <div class="admin-form-group">
                     <label>Description</label>

@@ -61,7 +61,7 @@ adminRouter.get("/delivery-jobs", asyncHandler(async (req, res) => {
 
 adminRouter.get("/products", asyncHandler(async (req, res) => {
   const [products] = await pool.execute(
-    "SELECT id, sku, name, description, price_points, minecraft_command, active FROM products ORDER BY id DESC"
+    "SELECT id, sku, name, description, price_points, category, minecraft_command, active FROM products ORDER BY id DESC"
   );
   res.json({ ok: true, products });
 }));

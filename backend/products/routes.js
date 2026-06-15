@@ -8,7 +8,7 @@ const productsRouter = express.Router();
 
 productsRouter.get("/", asyncHandler(async (req, res) => {
   const [products] = await pool.execute(
-    "SELECT id, sku, name, description, price_points, active FROM products WHERE active = 1 ORDER BY id DESC"
+    "SELECT id, sku, name, description, price_points, category, active FROM products WHERE active = 1 ORDER BY id DESC"
   );
   res.json({ ok: true, products });
 }));
@@ -17,13 +17,14 @@ productsRouter.post("/", requireUser, requireAdmin, asyncHandler(async (req, res
   const product = requireProductPayload(req.body);
   try {
     const [result] = await pool.execute(
-      `INSERT INTO products (sku, name, description, price_points, minecraft_command, active)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (sku, name, description, price_points, category, minecraft_command, active)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         product.sku,
         product.name,
         product.description,
         product.pricePoints,
+        product.category,
         product.command,
         product.active
       ]
@@ -39,13 +40,14 @@ productsRouter.patch("/:id", requireUser, requireAdmin, asyncHandler(async (req,
   try {
     await pool.execute(
       `UPDATE products
-       SET sku = ?, name = ?, description = ?, price_points = ?, minecraft_command = ?, active = ?
+       SET sku = ?, name = ?, description = ?, price_points = ?, category = ?, minecraft_command = ?, active = ?
        WHERE id = ?`,
       [
         product.sku,
         product.name,
         product.description,
         product.pricePoints,
+        product.category,
         product.command,
         product.active,
         req.params.id

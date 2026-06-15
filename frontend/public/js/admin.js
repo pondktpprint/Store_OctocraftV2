@@ -243,6 +243,7 @@ const Admin = {
                 <td>${p.id}</td>
                 <td>${App.escapeHTML(p.sku)}</td>
                 <td>${App.escapeHTML(p.name)}</td>
+                <td><span class="badge" style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">${App.escapeHTML(p.category || 'Rank')}</span></td>
                 <td>${p.price_points}</td>
                 <td>${status}</td>
                 <td>
@@ -258,6 +259,7 @@ const Admin = {
         document.getElementById('prod-id').value = '';
         document.getElementById('prod-sku').value = '';
         document.getElementById('prod-name').value = '';
+        document.getElementById('prod-category').value = 'Rank';
         document.getElementById('prod-desc').value = '';
         document.getElementById('prod-price').value = '';
         document.getElementById('prod-cmd').value = '';
@@ -270,6 +272,7 @@ const Admin = {
         document.getElementById('prod-id').value = p.id;
         document.getElementById('prod-sku').value = p.sku;
         document.getElementById('prod-name').value = p.name;
+        document.getElementById('prod-category').value = p.category || 'Rank';
         document.getElementById('prod-desc').value = p.description;
         document.getElementById('prod-price').value = p.price_points;
         document.getElementById('prod-cmd').value = p.minecraft_command;
@@ -284,6 +287,7 @@ const Admin = {
         const payload = {
             sku: document.getElementById('prod-sku').value,
             name: document.getElementById('prod-name').value,
+            category: document.getElementById('prod-category').value,
             description: document.getElementById('prod-desc').value,
             pricePoints: parseInt(document.getElementById('prod-price').value),
             command: document.getElementById('prod-cmd').value,

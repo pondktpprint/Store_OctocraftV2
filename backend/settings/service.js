@@ -14,6 +14,16 @@ async function initSettings() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `);
 
+  // Migration: Add category column to products table if not exists
+  try {
+    const [cols] = await pool.execute("SHOW COLUMNS FROM products LIKE 'category'");
+    if (cols.length === 0) {
+      await pool.execute("ALTER TABLE products ADD COLUMN category VARCHAR(64) NOT NULL DEFAULT 'Rank'");
+    }
+  } catch (err) {
+    console.error("Migration: failed to add category column:", err);
+  }
+
   // Load existing settings
   const [rows] = await pool.execute("SELECT setting_key, setting_value FROM system_settings");
   rows.forEach(row => {

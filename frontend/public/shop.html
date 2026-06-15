@@ -27,6 +27,14 @@
     </nav>
 
     <main class="shop-container">
+        <!-- Category Filter Tabs -->
+        <div class="category-menu">
+            <button class="category-btn active" onclick="filterByCategory('all')"><i class="fas fa-cubes"></i> ทั้งหมด</button>
+            <button class="category-btn" onclick="filterByCategory('Rank')"><i class="fas fa-crown"></i> ยศ (Rank)</button>
+            <button class="category-btn" onclick="filterByCategory('Key')"><i class="fas fa-key"></i> กุญแจ (Key)</button>
+            <button class="category-btn" onclick="filterByCategory('Privilege')"><i class="fas fa-gem"></i> สิทธิพิเศษ (Privilege)</button>
+        </div>
+
         <div class="items-grid" id="items-grid">
             <div style="text-align: center; width: 100%; color: white;">กำลังโหลดสินค้า...</div>
         </div>
@@ -68,6 +76,7 @@
             }
 
             let shopItems = [];
+            let currentCategory = 'all';
 
             try {
                 const res = await App.api('/api/products');
@@ -75,42 +84,74 @@
                     shopItems = res.products;
                     renderProducts(shopItems);
                 } else {
-                    document.getElementById('items-grid').innerHTML = '<div style="color:red;">ไม่สามารถโหลดสินค้าได้</div>';
+                    document.getElementById('items-grid').innerHTML = '<div style="color:red; text-align:center;">ไม่สามารถโหลดสินค้าได้</div>';
                 }
             } catch (err) {
-                document.getElementById('items-grid').innerHTML = '<div style="color:red;">ไม่สามารถโหลดสินค้าได้</div>';
+                document.getElementById('items-grid').innerHTML = '<div style="color:red; text-align:center;">ไม่สามารถโหลดสินค้าได้</div>';
+            }
+
+            function getItemIcon(item) {
+                if (item.category === 'Rank') return 'https://cdn-icons-png.flaticon.com/512/2838/2838575.png';
+                if (item.category === 'Key') return 'https://cdn-icons-png.flaticon.com/512/3218/3218006.png';
+                if (item.category === 'Privilege') return 'https://cdn-icons-png.flaticon.com/512/3208/3208756.png';
+                return 'https://cdn-icons-png.flaticon.com/512/2838/2838575.png';
             }
 
             function renderProducts(products) {
                 const grid = document.getElementById('items-grid');
                 grid.innerHTML = '';
                 
+                if (products.length === 0) {
+                    grid.innerHTML = '<div style="text-align: center; width: 100%; color: var(--text-muted); padding: 40px; font-size: 1.1rem;">ไม่มีสินค้าในหมวดหมู่นี้</div>';
+                    return;
+                }
+
                 products.forEach(item => {
                     const card = document.createElement('div');
                     card.classList.add('item-card');
                     card.innerHTML = `
                         <div class="item-img-container">
-                            <img src="https://cdn-icons-png.flaticon.com/512/2838/2838575.png" alt="${item.name}" class="item-image">
+                            <img src="${getItemIcon(item)}" alt="${item.name}" class="item-image">
                         </div>
                         <div class="item-info-shop">
-                            <h3 class="item-name">${item.name}</h3>
-                            <div class="item-price">${item.price_points} Points</div>
+                            <span class="badge" style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.08); display: inline-block; margin-bottom: 8px;">${item.category || 'Rank'}</span>
+                            <h3 class="item-name" style="margin-top:0;">${item.name}</h3>
+                            <div class="item-price"><i class="fas fa-coins"></i> ${item.price_points.toLocaleString()} Points</div>
                         </div>
-                        <div class="item-actions">
-                            <div class="qty-selector">
-                                <button onclick="updateLocalQty('${item.id}', -1)">-</button>
-                                <input type="number" id="qty-${item.id}" value="1" min="1" max="99">
-                                <button onclick="updateLocalQty('${item.id}', 1)">+</button>
+                        <div class="item-actions" style="margin-top:15px; display:flex; flex-direction:column; gap:12px;">
+                            <div class="qty-selector" style="display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); border-radius:8px; overflow:hidden;">
+                                <button onclick="updateLocalQty('${item.id}', -1)" style="background:none; border:none; color:white; width:35px; height:35px; font-size:1.2rem; cursor:pointer;">-</button>
+                                <input type="number" id="qty-${item.id}" value="1" min="1" max="99" readonly style="background:none; border:none; color:white; width:40px; text-align:center; font-size:1rem; font-weight:bold;">
+                                <button onclick="updateLocalQty('${item.id}', 1)" style="background:none; border:none; color:white; width:35px; height:35px; font-size:1.2rem; cursor:pointer;">+</button>
                             </div>
-                            <div class="action-btns">
-                                <button class="details-btn" onclick="openProductDetails(${item.id})"><i class="fas fa-info-circle"></i></button>
-                                <button class="add-cart-btn" onclick="addToCartLocal(event, ${item.id})"><i class="fas fa-cart-plus"></i></button>
+                            <div class="action-btns" style="display:flex; gap:10px;">
+                                <button class="details-btn" onclick="openProductDetails(${item.id})" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; cursor:pointer; font-weight:600;"><i class="fas fa-info-circle"></i> รายละเอียด</button>
+                                <button class="add-cart-btn" onclick="addToCartLocal(event, ${item.id})" style="flex:1.2; padding:10px; border-radius:8px; border:none; background:var(--primary); color:white; cursor:pointer; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fas fa-shopping-cart"></i> ใส่ตะกร้า</button>
                             </div>
                         </div>
                     `;
                     grid.appendChild(card);
                 });
             }
+
+            window.filterByCategory = (category) => {
+                currentCategory = category;
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    const onclickStr = btn.getAttribute('onclick') || '';
+                    if (onclickStr.includes(`'${category}'`)) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                if (category === 'all') {
+                    renderProducts(shopItems);
+                } else {
+                    const filtered = shopItems.filter(item => item.category === category);
+                    renderProducts(filtered);
+                }
+            };
 
             window.updateLocalQty = (id, change) => {
                 const input = document.getElementById(`qty-${id}`);
@@ -136,18 +177,19 @@
                 const item = shopItems.find(i => i.id === id);
                 const body = document.getElementById('details-modal-body');
                 body.innerHTML = `
-                    <div class="details-header">
-                        <div class="details-img-bg">
-                            <img src="https://cdn-icons-png.flaticon.com/512/2838/2838575.png" alt="${item.name}" class="details-image">
+                    <div class="details-header" style="text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px; margin-bottom:20px;">
+                        <div class="details-img-bg" style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
+                            <img src="${getItemIcon(item)}" alt="${item.name}" class="details-image" style="width:50px; height:50px; object-fit:contain;">
                         </div>
-                        <h2 class="details-title">${item.name}</h2>
-                        <div class="details-price">${item.price_points} Points</div>
+                        <span class="badge" style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); display: inline-block; margin-bottom: 10px;">${item.category || 'Rank'}</span>
+                        <h2 class="details-title" style="margin:0; font-size:1.6rem; color:white;">${item.name}</h2>
+                        <div class="details-price" style="font-size: 1.3rem; font-weight: bold; color: #f59e0b; margin-top: 5px;"><i class="fas fa-coins"></i> ${item.price_points.toLocaleString()} Points</div>
                     </div>
-                    <div class="details-desc">
-                        <p>${item.description}</p>
-                        <p><small>SKU: ${item.sku}</small></p>
+                    <div class="details-desc" style="color:var(--text-muted); line-height:1.6; margin-bottom:25px;">
+                        <p>${item.description || 'ไม่มีคำอธิบายเพิ่มเติมสำหรับสินค้านี้'}</p>
+                        <p style="font-size:0.85rem;"><small>SKU: ${item.sku}</small></p>
                     </div>
-                    <button class="details-add-cart" onclick="App.addToCart({id: ${item.id}, name: '${item.name}', price_points: ${item.price_points}}, 1); document.getElementById('details-modal').classList.remove('active');"><i class="fas fa-cart-plus"></i> เพิ่มลงตะกร้า 1 ชิ้น</button>
+                    <button class="checkout-btn" onclick="App.addToCart({id: ${item.id}, name: '${item.name}', price_points: ${item.price_points}}, 1); document.getElementById('details-modal').classList.remove('active');" style="width:100%; padding:15px; border-radius:8px; border:none; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fas fa-cart-plus"></i> เพิ่มลงตะกร้า 1 ชิ้น</button>
                 `;
                 document.getElementById('details-modal').classList.add('active');
             };
