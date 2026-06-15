@@ -73,6 +73,53 @@ app.get("/api/public/server-status", async (req, res) => {
   }
 });
 
+app.get("/api/public/donators", async (req, res) => {
+  try {
+    const [topDonators] = await pool.execute(
+      `SELECT u.username AS name, SUM(tr.amount_minor) AS total_minor
+       FROM topup_requests tr
+       JOIN users u ON u.id = tr.user_id
+       WHERE tr.status = 'approved'
+       GROUP BY tr.user_id, u.username
+       ORDER BY total_minor DESC
+       LIMIT 3`
+    );
+    
+    const topDonatorsMapped = topDonators.map(d => ({
+      name: d.name,
+      amount: (Number(d.total_minor) / 100).toFixed(2)
+    }));
+
+    const [recentDonators] = await pool.execute(
+      `SELECT u.username AS name, tr.amount_minor, tr.created_at
+       FROM topup_requests tr
+       JOIN users u ON u.id = tr.user_id
+       WHERE tr.status = 'approved'
+       ORDER BY tr.id DESC
+       LIMIT 5`
+    );
+
+    const recentDonatorsMapped = recentDonators.map(d => ({
+      name: d.name,
+      amount: (Number(d.amount_minor) / 100).toFixed(2),
+      created_at: d.created_at
+    }));
+
+    res.json({
+      ok: true,
+      topDonators: topDonatorsMapped,
+      recentDonators: recentDonatorsMapped
+    });
+  } catch (error) {
+    console.error("Failed to query donators:", error);
+    res.json({
+      ok: true,
+      topDonators: [],
+      recentDonators: []
+    });
+  }
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/wallet", walletRouter);

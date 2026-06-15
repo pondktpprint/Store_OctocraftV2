@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
     <style>
         .status-grid {
             display: grid;
@@ -270,10 +271,55 @@
                     <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 8px; font-weight: 400; line-height: 1.4;">
                         รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!
                     </p>
-                    <button class="login-btn" onclick="window.location.href='wallet.html'" style="margin-top: 15px; width: 100%;">
+                    <button class="login-btn" onclick="window.location.href='topup.html'" style="margin-top: 15px; width: 100%;">
                         <i class="fas fa-coins"></i> เติมเงินทันที
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Donators Dashboard Layout -->
+        <div class="donators-dashboard">
+            <!-- Left: Top 3 Donators Card -->
+            <div class="dashboard-card top-donators-card">
+                <h2 class="section-title">🏆 ผู้สนับสนุนสูงสุด 🏆</h2>
+                <div class="donators-container">
+                    <!-- Rank 2 -->
+                    <div class="donator-card rank-2">
+                        <div class="donator-rank">#2</div>
+                        <div id="skin-container-2" class="skin-container"></div>
+                        <div class="donator-info">
+                            <h3>รอผู้สนับสนุนอันดับ 2</h3>
+                            <p>0.00 บาท</p>
+                        </div>
+                    </div>
+                    <!-- Rank 1 -->
+                    <div class="donator-card rank-1">
+                        <div class="donator-rank">#1</div>
+                        <div id="skin-container-1" class="skin-container"></div>
+                        <div class="donator-info">
+                            <h3>รอผู้สนับสนุนอันดับ 1</h3>
+                            <p>0.00 บาท</p>
+                        </div>
+                    </div>
+                    <!-- Rank 3 -->
+                    <div class="donator-card rank-3">
+                        <div class="donator-rank">#3</div>
+                        <div id="skin-container-3" class="skin-container"></div>
+                        <div class="donator-info">
+                            <h3>รอผู้สนับสนุนอันดับ 3</h3>
+                            <p>0.00 บาท</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Recent Donators Card -->
+            <div class="dashboard-card recent-donators-card-new">
+                <h2 class="section-title">💸 เติมเงินล่าสุด</h2>
+                <ul class="recent-list" id="recent-list-container">
+                    <li style="text-align:center; padding: 20px; color: var(--text-muted);">ไม่มีรายการเติมเงินล่าสุด</li>
+                </ul>
             </div>
         </div>
     </main>
@@ -411,6 +457,109 @@
             if (new URLSearchParams(window.location.search).get('login') === 'true' && !App.state.token) {
                 document.getElementById('login-modal')?.classList.add('active');
             }
+
+            // 3D Donators Display logic
+            async function updateDonators() {
+                try {
+                    const res = await fetch('/api/public/donators');
+                    const data = await res.json();
+                    if (data.ok) {
+                        renderTopDonators(data.topDonators || []);
+                        renderRecentDonators(data.recentDonators || []);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch donators info:", e);
+                    renderTopDonators([]);
+                    renderRecentDonators([]);
+                }
+            }
+
+            function renderTopDonators(donators) {
+                const containerMapping = [
+                    { id: 'skin-container-1', rank: 1, defaultSkin: 'Steve', defaultName: 'รอผู้สนับสนุนอันดับ 1' },
+                    { id: 'skin-container-2', rank: 2, defaultSkin: 'Alex', defaultName: 'รอผู้สนับสนุนอันดับ 2' },
+                    { id: 'skin-container-3', rank: 3, defaultSkin: 'Steve', defaultName: 'รอผู้สนับสนุนอันดับ 3' }
+                ];
+
+                const card1 = document.querySelector('.donator-card.rank-1');
+                const card2 = document.querySelector('.donator-card.rank-2');
+                const card3 = document.querySelector('.donator-card.rank-3');
+
+                const cards = [card1, card2, card3];
+
+                containerMapping.forEach((mapping, index) => {
+                    const donator = donators[index];
+                    const card = cards[index];
+                    const el = document.getElementById(mapping.id);
+                    if (!el) return;
+
+                    el.innerHTML = ''; // Clear old canvas
+
+                    let name = mapping.defaultName;
+                    let amountStr = '0.00 บาท';
+                    let skinName = mapping.defaultSkin;
+
+                    if (donator) {
+                        name = donator.name;
+                        amountStr = parseFloat(donator.amount).toFixed(2) + ' บาท';
+                        skinName = donator.name;
+                    }
+
+                    if (card) {
+                        card.querySelector('h3').textContent = name;
+                        card.querySelector('p').textContent = amountStr;
+                    }
+
+                    try {
+                        const viewer = new skinview3d.SkinViewer({
+                            canvas: document.createElement("canvas"),
+                            width: mapping.rank === 1 ? 200 : 160,
+                            height: mapping.rank === 1 ? 300 : 250,
+                            skin: `https://minotar.net/skin/${skinName}`
+                        });
+
+                        el.appendChild(viewer.canvas);
+                        viewer.animation = new skinview3d.WalkingAnimation();
+                        viewer.animation.speed = 0.5;
+                        viewer.controls.enableRotate = true;
+                        viewer.controls.enableZoom = false;
+                        viewer.controls.enablePan = false;
+                    } catch (err) {
+                        console.error(`Failed to load skin for ${skinName}:`, err);
+                    }
+                });
+            }
+
+            function renderRecentDonators(donators) {
+                const container = document.getElementById('recent-list-container');
+                if (!container) return;
+
+                container.innerHTML = '';
+                if (!donators || donators.length === 0) {
+                    container.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">ไม่มีรายการเติมเงินล่าสุด</li>';
+                    return;
+                }
+
+                donators.forEach(d => {
+                    const li = document.createElement('li');
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.style.alignItems = 'center';
+                    li.style.padding = '12px 0';
+                    li.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+
+                    li.innerHTML = `
+                        <span style="display:flex; align-items:center; gap:8px;">
+                            <img src="https://minotar.net/helm/${d.name}/24.png" onerror="this.src='https://minotar.net/helm/Steve/24.png'" style="width:24px; height:24px; border-radius:4px;">
+                            <strong>${d.name}</strong>
+                        </span>
+                        <span style="color: #10b981; font-weight: bold;">+${parseFloat(d.amount).toFixed(2)} บาท</span>
+                    `;
+                    container.appendChild(li);
+                });
+            }
+
+            updateDonators();
         });
     </script>
 </body>
