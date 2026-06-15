@@ -156,4 +156,14 @@ function getConnectedClientCount() {
   return clients.size;
 }
 
-module.exports = { attachBridge, requeueExpiredProcessingJobs, recordDeliveryResult, getConnectedClientCount };
+async function triggerDelivery() {
+  for (const ws of clients) {
+    if (ws.readyState === 1) { // 1 = OPEN
+      sendQueuedJobs(ws).catch((error) => {
+        console.error("Error triggering queued jobs delivery:", error);
+      });
+    }
+  }
+}
+
+module.exports = { attachBridge, requeueExpiredProcessingJobs, recordDeliveryResult, getConnectedClientCount, triggerDelivery };

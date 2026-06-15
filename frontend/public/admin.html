@@ -8,369 +8,725 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .admin-layout { display: flex; min-height: 100vh; background: var(--bg-dark); }
-        .admin-sidebar { width: 250px; background: rgba(0,0,0,0.5); padding: 20px; border-right: 1px solid rgba(255,255,255,0.1); }
-        .admin-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .admin-nav { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
-        .admin-tab-btn { background: transparent; border: none; color: var(--text-light); text-align: left; padding: 12px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
-        .admin-tab-btn:hover { background: rgba(255,255,255,0.1); }
-        .admin-tab-btn.active { background: var(--primary); color: white; }
-        .admin-panel { display: none; }
-        .admin-panel.active { display: block; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; }
-        .admin-table th, .admin-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .admin-table th { background: rgba(0,0,0,0.5); font-weight: 600; color: var(--primary); }
-        .admin-table tr:hover { background: rgba(255,255,255,0.05); }
-        .action-btn { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.9rem; }
-        .btn-edit { background: var(--warning); color: black; }
-        .btn-retry, .btn-approve { background: var(--success); color: white; }
-        .btn-danger, .btn-reject { background: var(--danger); color: white; }
-        
-        .admin-form-group { margin-bottom: 15px; }
-        .admin-form-group label { display: block; margin-bottom: 5px; color: var(--text-muted); }
-        .admin-form-group input, .admin-form-group textarea, .admin-form-group select { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; }
-        
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        :root {
+            --sidebar-width: 260px;
+            --neon-cyan: #06b6d4;
+            --neon-violet: #8b5cf6;
+            --neon-rose: #f43f5e;
+            --glass-bg: rgba(13, 18, 30, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-glow: rgba(139, 92, 246, 0.15);
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #15112f 0%, #070611 75%) !important;
+            font-family: 'Outfit', 'Prompt', sans-serif;
+            color: #f8fafc;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: rgba(8, 7, 18, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .admin-sidebar h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 30px 0;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .admin-tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            text-align: left;
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-tab-btn i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .admin-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #f8fafc;
+        }
+
+        .admin-tab-btn:hover i {
+            transform: translateX(3px);
+        }
+
+        .admin-tab-btn.active {
+            background: linear-gradient(135deg, var(--neon-violet), #6366f1);
+            color: white;
+            box-shadow: 0 4px 20px var(--glass-glow);
+        }
+
+        .admin-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+
+        .admin-panel {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-panel h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #f8fafc;
+            border-left: 4px solid var(--neon-cyan);
+            padding-left: 15px;
+            line-height: 1.2;
+        }
+
+        .admin-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            margin-bottom: 30px;
+        }
+
+        /* Dynamic Status Indicator Pulse */
+        .status-badge-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .pulse-dot.online {
+            background: #10b981;
+            box-shadow: 0 0 12px #10b981;
+            animation: pulse-green 1.8s infinite;
+        }
+
+        .pulse-dot.offline {
+            background: #ef4444;
+            box-shadow: 0 0 12px #ef4444;
+            animation: pulse-red 1.8s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Forms styling */
+        .admin-form-group {
+            margin-bottom: 20px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .admin-form-group input, 
+        .admin-form-group textarea, 
+        .admin-form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .admin-form-group input:focus, 
+        .admin-form-group textarea:focus, 
+        .admin-form-group select:focus {
+            border-color: var(--neon-cyan);
+            outline: none;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Buttons styling */
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit { background: var(--warning); color: #000; }
+        .btn-edit:hover { background: #d97706; transform: translateY(-1px); }
+
+        .btn-retry, .btn-approve { background: #10b981; color: white; }
+        .btn-retry:hover, .btn-approve:hover { background: #059669; transform: translateY(-1px); }
+
+        .btn-danger, .btn-reject { background: #ef4444; color: white; }
+        .btn-danger:hover, .btn-reject:hover { background: #dc2626; transform: translateY(-1px); }
+
+        /* Tables styling */
+        .admin-table-wrapper {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            margin-top: 15px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .admin-table th {
+            background: rgba(0, 0, 0, 0.4);
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .admin-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #0f1322;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transform: scale(0.9);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: white;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
     <div class="admin-layout">
+        <!-- SIDEBAR -->
         <aside class="admin-sidebar">
-            <h2 style="color: var(--primary); text-align:center;">Octo Admin</h2>
+            <h2>Octo Admin</h2>
             <div class="admin-nav">
-                <button class="admin-tab-btn" data-tab="status"><i class="fas fa-server"></i> System Status</button>
+                <button class="admin-tab-btn" data-tab="status"><i class="fas fa-server"></i> System Settings</button>
                 <button class="admin-tab-btn active" data-tab="products"><i class="fas fa-box"></i> Products</button>
                 <button class="admin-tab-btn" data-tab="players"><i class="fas fa-users"></i> Players</button>
                 <button class="admin-tab-btn" data-tab="orders"><i class="fas fa-shopping-cart"></i> Orders</button>
                 <button class="admin-tab-btn" data-tab="delivery"><i class="fas fa-truck"></i> Delivery Jobs</button>
-                <button class="admin-tab-btn" data-tab="wallet"><i class="fas fa-wallet"></i> Wallet</button>
+                <button class="admin-tab-btn" data-tab="wallet"><i class="fas fa-wallet"></i> Wallet Logs</button>
                 <button class="admin-tab-btn" data-tab="topup"><i class="fas fa-gem"></i> Topup Requests</button>
                 <button class="admin-tab-btn" onclick="window.location.href='index.html'" style="margin-top:auto;"><i class="fas fa-arrow-left"></i> Back to Shop</button>
             </div>
         </aside>
 
+        <!-- MAIN CONTENT -->
         <main class="admin-content">
-            <!-- SETTINGS & STATUS PANEL -->
+            
+            <!-- 1. SETTINGS & SYSTEM STATUS -->
             <div id="status" class="admin-panel">
-                <div class="flex-between">
-                    <h2>Settings & System Status</h2>
-                    <button class="submit-login-btn btn-retry" onclick="Admin.loadSystemStatus()" style="width:auto; padding:10px 20px;"><i class="fas fa-sync"></i> Refresh Status</button>
+                <div class="flex-between" style="margin-bottom: 25px;">
+                    <h2>System Status & Settings</h2>
+                    <button class="action-btn btn-retry" onclick="Admin.loadSystemStatus()"><i class="fas fa-sync"></i> Refresh Status</button>
                 </div>
                 
-                <!-- STATUS INDICATORS -->
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:20px;">
-                    <!-- Bridge Connection -->
-                    <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
-                        <h4 style="color:var(--text-light); margin-bottom:15px;"><i class="fas fa-network-wired"></i> WebSocket Bridge</h4>
-                        <div style="display:flex; align-items:center; gap:15px; font-size:1.2rem;">
-                            <i id="status-bridge-icon" class="fas fa-circle" style="color:var(--text-muted);"></i>
+                <!-- Status Row -->
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin-bottom: 30px;">
+                    <!-- WebSocket Bridge -->
+                    <div class="admin-card" style="margin-bottom:0;">
+                        <h4 style="color:#38bdf8; margin: 0 0 15px 0; font-size:1.1rem;"><i class="fas fa-network-wired"></i> WebSocket Bridge</h4>
+                        <div class="status-badge-container">
+                            <span id="status-bridge-icon" class="pulse-dot offline"></span>
                             <span id="status-bridge-text">Checking...</span>
                         </div>
-                        <p style="color:var(--text-muted); font-size:0.85rem; margin-top:10px;">สถานะการเชื่อมต่อระหว่างเว็บไซต์กับเซิร์ฟเวอร์ Minecraft</p>
+                        <p style="color:#94a3b8; font-size:0.85rem; margin:10px 0 0 0;">การเชื่อมต่อสำหรับส่งคำสั่งไปในเซิร์ฟเวอร์ Minecraft (RCON / WebSockets)</p>
                     </div>
 
                     <!-- nLogin Database -->
-                    <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
-                        <h4 style="color:var(--text-light); margin-bottom:15px;"><i class="fas fa-database"></i> nLogin Database</h4>
-                        <div style="display:flex; align-items:center; gap:15px; font-size:1.2rem;">
-                            <i id="status-nlogin-icon" class="fas fa-circle" style="color:var(--text-muted);"></i>
+                    <div class="admin-card" style="margin-bottom:0;">
+                        <h4 style="color:#c084fc; margin: 0 0 15px 0; font-size:1.1rem;"><i class="fas fa-database"></i> nLogin Database</h4>
+                        <div class="status-badge-container">
+                            <span id="status-nlogin-icon" class="pulse-dot offline"></span>
                             <span id="status-nlogin-text">Checking...</span>
                         </div>
-                        <p style="color:var(--text-muted); font-size:0.85rem; margin-top:10px;">สถานะการเชื่อมต่อฐานข้อมูลรหัสผ่านผู้เล่น</p>
+                        <p style="color:#94a3b8; font-size:0.85rem; margin:10px 0 0 0;">การเชื่อมต่อฐานข้อมูลสำหรับดึงข้อมูลรหัสผ่านและประวัติผู้เล่น</p>
                     </div>
                 </div>
 
-                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:30px 0;">
-
-                <!-- SYSTEM CONFIGURATION -->
-                <h2>System Configuration</h2>
-                
-                <!-- Bridge Token -->
-                <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px; margin-top:20px;">
-                    <h4 style="color:var(--text-light); margin-bottom:15px;"><i class="fas fa-key"></i> API Bridge Token</h4>
+                <!-- API Bridge Token -->
+                <div class="admin-card">
+                    <h4 style="color:#f8fafc; margin:0 0 15px 0; font-size:1.1rem;"><i class="fas fa-key"></i> API Bridge Token</h4>
                     <div style="display:flex; gap:10px;">
-                        <input type="text" id="status-bridge-token" readonly style="width:100%; padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.5); color:white; font-family:monospace;">
+                        <input type="text" id="status-bridge-token" readonly style="flex-grow:1; padding:12px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.4); color:white; font-family:monospace; font-size:0.95rem;">
                         <button class="action-btn btn-approve" onclick="navigator.clipboard.writeText(document.getElementById('status-bridge-token').value); App.showToast('Token Copied!')"><i class="fas fa-copy"></i> Copy</button>
                         <button class="action-btn btn-retry" onclick="Admin.regenerateToken()"><i class="fas fa-sync"></i> Regenerate</button>
                     </div>
-                    <p style="color:var(--text-muted); font-size:0.85rem; margin-top:10px;">นำ Token นี้ไปใส่ใน config.yml ของปลั๊กอิน PrintFlow บนเซิร์ฟเวอร์ Minecraft</p>
+                    <p style="color:#94a3b8; font-size:0.85rem; margin:10px 0 0 0;">นำโทเคนนี้ไปตั้งค่าในปลั๊กอิน PrintFlow บนเซิร์ฟเวอร์เพื่อความปลอดภัยของข้อมูล</p>
                 </div>
 
-                <form id="settings-form" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:20px;">
-                    
+                <!-- Settings Form -->
+                <form id="settings-form" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
                     <!-- Server Settings -->
-                    <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
-                        <h4 style="color:var(--text-light); margin-bottom:15px;"><i class="fas fa-server"></i> Minecraft Server Info</h4>
-                        <div class="form-group">
-                            <label>Server IP</label>
+                    <div class="admin-card" style="margin-bottom:0;">
+                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-server"></i> Minecraft Server Info</h4>
+                        <div class="admin-form-group">
+                            <label>Server IP Address</label>
                             <input type="text" id="setting-server-ip" required placeholder="play.example.com">
                         </div>
-                        <div class="form-group">
+                        <div class="admin-form-group">
                             <label>Server Port</label>
                             <input type="number" id="setting-server-port" required placeholder="25565">
                         </div>
                     </div>
 
                     <!-- nLogin DB Settings -->
-                    <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
-                        <h4 style="color:var(--text-light); margin-bottom:15px;"><i class="fas fa-database"></i> nLogin Database Config</h4>
-                        <div class="form-group">
+                    <div class="admin-card" style="margin-bottom:0;">
+                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-database"></i> nLogin Database Config</h4>
+                        <div class="admin-form-group">
                             <label>Host</label>
                             <input type="text" id="setting-nlogin-host" required placeholder="localhost">
                         </div>
-                        <div class="form-group">
-                            <label>Port</label>
-                            <input type="number" id="setting-nlogin-port" required placeholder="3306">
+                        <div class="admin-form-group" style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
+                            <div>
+                                <label>Port</label>
+                                <input type="number" id="setting-nlogin-port" required placeholder="3306">
+                            </div>
+                            <div>
+                                <label>Database Name</label>
+                                <input type="text" id="setting-nlogin-name" required placeholder="nlogin">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Database Name</label>
-                            <input type="text" id="setting-nlogin-name" required placeholder="nlogin">
-                        </div>
-                        <div class="form-group">
+                        <div class="admin-form-group">
                             <label>User</label>
                             <input type="text" id="setting-nlogin-user" required placeholder="root">
                         </div>
-                        <div class="form-group">
+                        <div class="admin-form-group">
                             <label>Password</label>
                             <input type="password" id="setting-nlogin-password" placeholder="Leave blank if no password">
                         </div>
                     </div>
 
+                    <!-- PromptPay & Point Rate Config -->
+                    <div class="admin-card" style="margin-bottom:0;">
+                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-coins"></i> PromptPay & Point Conversion</h4>
+                        <div class="admin-form-group">
+                            <label>เบอร์พร้อมเพย์ หรือเลขบัตรประชาชน (PromptPay Target)</label>
+                            <input type="text" id="setting-promptpay-target" required placeholder="เช่น 0812345678">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>ชื่อบัญชีรับเงิน (PromptPay Account Name)</label>
+                            <input type="text" id="setting-promptpay-name" required placeholder="เช่น นาย ทดสอบ ระบบ">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>อัตราแลกเปลี่ยนพอยท์ (Points per 1 Baht)</label>
+                            <input type="number" step="0.1" id="setting-point-rate" required placeholder="เช่น 1.0">
+                        </div>
+                    </div>
+
                     <div style="grid-column: 1 / -1; text-align: right;">
-                        <button type="button" class="submit-login-btn" onclick="Admin.saveSettings()" style="width: auto; padding: 10px 30px;"><i class="fas fa-save"></i> Save Configuration</button>
+                        <button type="button" class="submit-login-btn btn-retry" onclick="Admin.saveSettings()" style="width: auto; padding: 12px 35px; border-radius: 8px; font-size: 1rem;"><i class="fas fa-save"></i> Save Configuration</button>
                     </div>
                 </form>
             </div>
 
-            <!-- PRODUCTS PANEL -->
+            <!-- 2. PRODUCTS MANAGEMENT -->
             <div id="products" class="admin-panel active">
-                <div class="flex-between">
+                <div class="flex-between" style="margin-bottom: 25px;">
                     <h2>Products Management</h2>
-                    <button class="submit-login-btn" onclick="Admin.openProductModal()" style="width:auto; padding:10px 20px;">+ Create Product</button>
+                    <button class="action-btn btn-retry" onclick="Admin.openProductModal()" style="padding:10px 20px;">+ Create Product</button>
                 </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>SKU</th>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="products-tbody"></tbody>
-                </table>
-            </div>
-
-            <!-- PLAYERS PANEL -->
-            <div id="players" class="admin-panel">
-                <div class="flex-between">
-                    <h2>Player Administration</h2>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" id="player-search-input" placeholder="Search nLogin username..." style="padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.3); color:white;">
-                        <button class="submit-login-btn" onclick="Admin.searchPlayers()" style="width:auto; padding:10px 20px;">Search</button>
-                    </div>
-                </div>
-
-                <!-- Search Results -->
-                <div id="player-search-results" style="margin-top:20px;">
+                <div class="admin-table-wrapper">
                     <table class="admin-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Last Seen</th>
-                                <th>Action</th>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="player-search-tbody">
-                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted)">Search to find players...</td></tr>
-                        </tbody>
+                        <tbody id="products-tbody"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- 3. PLAYERS PANEL -->
+            <div id="players" class="admin-panel">
+                <div class="flex-between" style="margin-bottom: 25px;">
+                    <h2>Player Administration</h2>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="player-search-input" placeholder="Search nLogin username..." style="padding:10px 15px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.3); color:white; font-size:0.95rem;">
+                        <button class="action-btn btn-retry" onclick="Admin.searchPlayers()"><i class="fas fa-search"></i> Search</button>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div id="player-search-results">
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Last Seen</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="player-search-tbody">
+                                <tr><td colspan="5" style="text-align:center; color:#94a3b8">ค้นหาเพื่อแสดงรายชื่อผู้เล่น...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Player Profile View -->
-                <div id="player-profile-view" style="display:none; margin-top:30px;">
-                    <div class="flex-between" style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:15px;">
-                        <h3 id="profile-username" style="color:var(--primary); font-size:1.5rem;">Username</h3>
-                        <button class="submit-login-btn btn-danger" onclick="document.getElementById('player-profile-view').style.display='none'; document.getElementById('player-search-results').style.display='block';" style="width:auto; padding:8px 15px;"><i class="fas fa-times"></i> Close Profile</button>
+                <div id="player-profile-view" style="display:none;" class="admin-card">
+                    <div class="flex-between" style="border-bottom:1px solid var(--glass-border); padding-bottom:15px; margin-bottom:20px;">
+                        <h3 id="profile-username" style="color:var(--neon-cyan); font-size:1.6rem; margin:0;">Username</h3>
+                        <button class="action-btn btn-danger" onclick="document.getElementById('player-profile-view').style.display='none'; document.getElementById('player-search-results').style.display='block';"><i class="fas fa-times"></i> Close Profile</button>
                     </div>
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                        <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
-                            <h4 style="margin-bottom:15px; color:var(--text-light);">nLogin Details</h4>
-                            <p><strong>Email:</strong> <span id="profile-email"></span></p>
-                            <p><strong>Created:</strong> <span id="profile-created"></span></p>
-                            <p><strong>Last Seen:</strong> <span id="profile-lastseen"></span></p>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom: 25px;">
+                        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; border:1px solid var(--glass-border);">
+                            <h4 style="margin: 0 0 15px 0; color:#f8fafc; font-size: 1.1rem;"><i class="fas fa-info-circle"></i> nLogin Details</h4>
+                            <p style="margin:8px 0;"><strong>Email:</strong> <span id="profile-email"></span></p>
+                            <p style="margin:8px 0;"><strong>Created:</strong> <span id="profile-created"></span></p>
+                            <p style="margin:8px 0;"><strong>Last Seen:</strong> <span id="profile-lastseen"></span></p>
                         </div>
-                        <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
-                            <div class="flex-between">
-                                <h4 style="margin-bottom:15px; color:var(--text-light);">Wallet Overview</h4>
-                                <div>
-                                    <button class="action-btn btn-retry" onclick="Admin.openPlayerWalletModal('credit')">Credit</button>
-                                    <button class="action-btn btn-reject" onclick="Admin.openPlayerWalletModal('debit')">Debit</button>
+                        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; border:1px solid var(--glass-border);">
+                            <div class="flex-between" style="margin-bottom:15px;">
+                                <h4 style="margin: 0; color:#f8fafc; font-size:1.1rem;"><i class="fas fa-wallet"></i> Wallet Balance</h4>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="action-btn btn-retry" style="padding:4px 8px; font-size:0.8rem;" onclick="Admin.openPlayerWalletModal('credit')">Credit</button>
+                                    <button class="action-btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="Admin.openPlayerWalletModal('debit')">Debit</button>
                                 </div>
                             </div>
-                            <h2 style="font-size:2.5rem; color:var(--warning);"><i class="fas fa-coins"></i> <span id="profile-balance">0</span></h2>
-                            <p style="color:var(--text-muted); font-size:0.9rem;">Derived from global transactions.</p>
+                            <h2 style="font-size:2.2rem; color:#f59e0b; margin:0;"><i class="fas fa-coins"></i> <span id="profile-balance">0</span></h2>
+                            <p style="color:#94a3b8; font-size:0.8rem; margin:10px 0 0 0;">แต้มสะสมทั้งหมดของผู้เล่นสำหรับใช้จ่ายซื้อยศหรือไอเทม</p>
                         </div>
                     </div>
 
-                    <h4 style="margin-top:30px; color:var(--text-light);">Recent Orders</h4>
-                    <table class="admin-table">
-                        <thead><tr><th>ID</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
-                        <tbody id="profile-orders-tbody"></tbody>
-                    </table>
+                    <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i class="fas fa-shopping-basket"></i> Recent Orders</h4>
+                    <div class="admin-table-wrapper" style="margin-bottom: 25px;">
+                        <table class="admin-table">
+                            <thead><tr><th>ID</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody id="profile-orders-tbody"></tbody>
+                        </table>
+                    </div>
 
-                    <h4 style="margin-top:30px; color:var(--text-light);">Recent Delivery Jobs</h4>
-                    <table class="admin-table">
-                        <thead><tr><th>ID</th><th>Order ID</th><th>Status</th><th>Retries</th><th>Actions</th></tr></thead>
-                        <tbody id="profile-jobs-tbody"></tbody>
-                    </table>
+                    <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i class="fas fa-tasks"></i> Recent Delivery Jobs</h4>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>ID</th><th>Order ID</th><th>Status</th><th>Retries</th><th>Actions</th></tr></thead>
+                            <tbody id="profile-jobs-tbody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- ORDERS PANEL -->
+            <!-- 4. ORDERS PANEL -->
             <div id="orders" class="admin-panel">
                 <h2>Orders Management</h2>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Points</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orders-tbody"></tbody>
-                </table>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Points</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- DELIVERY JOBS PANEL -->
+            <!-- 5. DELIVERY JOBS PANEL -->
             <div id="delivery" class="admin-panel">
                 <h2>Delivery Jobs Management</h2>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Order ID</th>
-                            <th>Status</th>
-                            <th>Retries</th>
-                            <th>Last Error</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="delivery-tbody"></tbody>
-                </table>
-            </div>
-
-            <!-- WALLET PANEL -->
-            <div id="wallet" class="admin-panel">
-                <div class="flex-between">
-                    <h2>Wallet Administration</h2>
-                    <button class="submit-login-btn btn-edit" onclick="Admin.openWalletModal()" style="width:auto; padding:10px 20px;"><i class="fas fa-plus-minus"></i> Credit / Debit</button>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Order ID</th>
+                                <th>Status</th>
+                                <th>Retries</th>
+                                <th>Last Error</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="delivery-tbody"></tbody>
+                    </table>
                 </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Balance After</th>
-                            <th>Ref</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="wallet-tbody"></tbody>
-                </table>
             </div>
 
-            <!-- TOPUP PANEL -->
+            <!-- 6. WALLET PANEL -->
+            <div id="wallet" class="admin-panel">
+                <div class="flex-between" style="margin-bottom: 25px;">
+                    <h2>Wallet Administration</h2>
+                    <button class="action-btn btn-edit" onclick="Admin.openWalletModal()"><i class="fas fa-plus-minus"></i> Credit / Debit Balance</button>
+                </div>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Balance After</th>
+                                <th>Ref</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wallet-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 7. TOPUP PANEL -->
             <div id="topup" class="admin-panel">
                 <h2>Topup Requests</h2>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Amount (Minor)</th>
-                            <th>Points</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="topup-tbody"></tbody>
-                </table>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount (THB)</th>
+                                <th>Points</th>
+                                <th>Status</th>
+                                <th>Slip Image</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topup-tbody"></tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- Product Modal -->
+    <!-- PRODUCT MODAL -->
     <div id="product-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 600px;">
             <button class="close-modal" onclick="document.getElementById('product-modal').classList.remove('active')">&times;</button>
-            <h3 id="product-modal-title">Create Product</h3>
+            <h3 id="product-modal-title" style="margin-top:0; font-size:1.5rem; color:#f8fafc;">Create Product</h3>
             <form id="product-form" onsubmit="Admin.saveProduct(event)">
                 <input type="hidden" id="prod-id">
                 <div class="admin-form-group">
-                    <label>SKU</label>
-                    <input type="text" id="prod-sku" required>
+                    <label>SKU (Product Code)</label>
+                    <input type="text" id="prod-sku" required placeholder="e.g. VIP_30D">
                 </div>
                 <div class="admin-form-group">
                     <label>Name</label>
-                    <input type="text" id="prod-name" required>
+                    <input type="text" id="prod-name" required placeholder="e.g. VIP Rank (30 Days)">
                 </div>
                 <div class="admin-form-group">
                     <label>Description</label>
-                    <textarea id="prod-desc" rows="3"></textarea>
+                    <textarea id="prod-desc" rows="3" placeholder="Describe this item..."></textarea>
                 </div>
                 <div class="admin-form-group">
                     <label>Price Points</label>
-                    <input type="number" id="prod-price" required>
+                    <input type="number" id="prod-price" required placeholder="0">
                 </div>
                 <div class="admin-form-group">
                     <label>Minecraft Command</label>
-                    <input type="text" id="prod-cmd" placeholder="give {player} diamond 1" required>
+                    <input type="text" id="prod-cmd" placeholder="e.g. lp user {player} parent add VIP" required>
+                    <small style="color:#94a3b8; display:block; margin-top:5px;">ใช้ `{player}` แทนชื่อผู้เล่นที่สั่งซื้อสินค้า</small>
                 </div>
                 <div class="admin-form-group">
                     <label>Status</label>
                     <select id="prod-active">
-                        <option value="1">Active</option>
-                        <option value="0">Disabled</option>
+                        <option value="1">Active (เปิดใช้งาน)</option>
+                        <option value="0">Disabled (ปิดใช้งาน)</option>
                     </select>
                 </div>
-                <button type="submit" class="submit-login-btn">Save</button>
+                <div style="text-align: right; margin-top: 25px;">
+                    <button type="submit" class="action-btn btn-retry" style="padding: 10px 25px;">Save Product</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- Wallet Modal -->
+    <!-- WALLET MODAL -->
     <div id="wallet-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 400px;">
             <button class="close-modal" onclick="document.getElementById('wallet-modal').classList.remove('active')">&times;</button>
-            <h3>Credit / Debit Wallet</h3>
+            <h3 style="margin-top:0; font-size:1.5rem; color:#f8fafc;">Credit / Debit Wallet</h3>
             <form id="wallet-form" onsubmit="Admin.saveWallet(event)">
                 <div class="admin-form-group">
                     <label>Username</label>
-                    <input type="text" id="wallet-username" required>
+                    <input type="text" id="wallet-username" required placeholder="Minecraft Username">
                 </div>
                 <div class="admin-form-group">
                     <label>Action</label>
                     <select id="wallet-action">
-                        <option value="credit">Credit (Add)</option>
-                        <option value="debit">Debit (Remove)</option>
+                        <option value="credit">Credit (เพิ่มพอยท์)</option>
+                        <option value="debit">Debit (ลดพอยท์)</option>
                     </select>
                 </div>
                 <div class="admin-form-group">
                     <label>Amount Points</label>
-                    <input type="number" id="wallet-amount" required min="1">
+                    <input type="number" id="wallet-amount" required min="1" placeholder="0">
                 </div>
-                <button type="submit" class="submit-login-btn">Confirm</button>
+                <div style="text-align: right; margin-top: 25px;">
+                    <button type="submit" class="action-btn btn-retry" style="padding: 10px 25px; width: 100%; justify-content:center;">Confirm Action</button>
+                </div>
             </form>
         </div>
     </div>

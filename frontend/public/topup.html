@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top-up - Octo Craft SMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="shop-page">
+    <div class="bubbles" id="bubbles-container"></div>
+
+    <!-- Navbar -->
+    <nav class="shop-nav">
+        <a href="index.html" class="back-home-btn"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="shop-logo-small">
+            <img src="images/logo.png" alt="Octo Craft Logo" onerror="this.style.display='none'; document.getElementById('logo-fallback-small').style.display='block';">
+            <div id="logo-fallback-small" class="logo-fallback" style="font-size: 1.5rem; display:none;">OCTOCRAFT</div>
+        </div>
+        <div class="shop-nav-actions">
+            <div class="user-profile-menu"></div>
+        </div>
+    </nav>
+
+    <!-- Topup Card Section -->
+    <main class="topup-container">
+        <div class="topup-card-wrapper">
+            <div class="topup-slider" id="topup-slider">
+                
+                <!-- Step 1: Select Amount -->
+                <div class="topup-step step-1">
+                    <h2 class="step-title">💎 เติมเงิน (Top-up)</h2>
+                    <p class="step-desc" id="point-rate-desc">สแกนจ่ายผ่านพร้อมเพย์ รับพอยท์อัตโนมัติ (อัตรา 1 บาท = 1 Point)</p>
+                    
+                    <div class="payment-methods">
+                        <div class="method-card active">
+                            <img src="images/PromptPay.png" alt="PromptPay" class="method-icon" style="max-height: 40px; width: auto; object-fit: contain;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/e/e6/PromptPay-logo.png'">
+                        </div>
+                    </div>
+
+                    <div class="amount-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 25px 0;">
+                        <button class="amount-btn modern-btn" onclick="selectAmount(50)"><span class="amt">50 บาท</span></button>
+                        <button class="amount-btn modern-btn" onclick="selectAmount(90)"><span class="amt">90 บาท</span></button>
+                        <button class="amount-btn modern-btn" onclick="selectAmount(150)"><span class="amt">150 บาท</span></button>
+                        <button class="amount-btn modern-btn" onclick="selectAmount(300)"><span class="amt">300 บาท</span></button>
+                        <button class="amount-btn modern-btn" onclick="selectAmount(500)"><span class="amt">500 บาท</span></button>
+                        <button class="amount-btn modern-btn" onclick="selectAmount(1000)"><span class="amt">1000 บาท</span></button>
+                    </div>
+
+                    <div class="custom-amount">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted);">หรือระบุจำนวนเงินเอง (บาท):</label>
+                        <div class="custom-input-wrapper" style="position: relative;">
+                            <input type="number" id="custom-amount-input" placeholder="0" min="1" oninput="calculatePoints()" style="width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-size: 1.1rem;">
+                            <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-weight: 600;">THB</span>
+                        </div>
+                    </div>
+
+                    <div class="points-preview" style="margin: 25px 0; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 8px; text-align: center; font-size: 1.2rem;">
+                        คุณจะได้รับ: <span id="points-preview-val" style="font-weight: 800; color: #f59e0b; font-size: 1.5rem;">0</span> Points
+                    </div>
+
+                    <button class="checkout-btn" id="generate-qr-btn" onclick="goToStep2()" disabled style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 8px; border: none; font-weight: 800; cursor: pointer;">สร้าง QR Code</button>
+                </div>
+
+                <!-- Step 2: Pay and Upload Slip -->
+                <div class="topup-step step-2">
+                    <button class="back-step-btn" onclick="goToStep1()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; margin-bottom: 20px;"><i class="fas fa-chevron-left"></i> ย้อนกลับ / ยกเลิกรายการ</button>
+                    <h2 class="step-title">📱 สแกนชำระเงิน</h2>
+                    <p class="step-desc">กรุณาสแกนคิวอาร์โค้ดด้านล่างเพื่อชำระเงิน และแนบรูปภาพสลิปโอนเงิน</p>
+
+                    <div class="timer-container" style="text-align: center; margin: 15px 0; font-size: 1.2rem; color: #f59e0b; font-weight: bold;">
+                        <i class="far fa-clock"></i> <span id="countdown-timer">05:00</span>
+                    </div>
+
+                    <div class="qr-container" style="background: white; padding: 25px; border-radius: 12px; max-width: 280px; margin: 0 auto 25px auto; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                        <img src="images/PromptPay.png" alt="PromptPay" style="height: 30px; margin-bottom: 15px; object-fit: contain;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/e/e6/PromptPay-logo.png'">
+                        <img src="" alt="PromptPay QR Code" class="qr-image" style="width: 100%; aspect-ratio: 1/1; object-fit: contain; margin-bottom: 15px;">
+                        <div class="qr-amount" id="qr-amount-display" style="color: #0f172a; font-weight: 800; font-size: 1.4rem;">0.00 THB</div>
+                    </div>
+
+                    <div class="slip-upload-section" style="margin-bottom: 25px;">
+                        <label for="slip-upload" class="slip-upload-label" id="slip-label" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(255,255,255,0.2); padding: 25px; border-radius: 8px; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.2);">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; margin-bottom: 10px; color: var(--primary);"></i>
+                            <span id="slip-file-name" style="font-weight: 600;">คลิกเพื่อแนบรูปสลิปโอนเงิน</span>
+                        </label>
+                        <input type="file" id="slip-upload" accept="image/*" onchange="handleSlipUpload(this)" hidden>
+                    </div>
+
+                    <button class="checkout-btn" id="confirm-payment-btn" disabled onclick="submitPayment()" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 8px; border: none; font-weight: 800; cursor: pointer;">ยืนยันการทำรายการ</button>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
+        <p>Made with ❤️ By PondPer</p>
+        <p>© 2026 Octocraft. All Right Reserved.</p>
+    </footer>
+
+    <!-- App / Scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        let currentAmount = 0;
+        let timerInterval;
+        let timeLeft = 300; // 5 minutes
+
+        let promptpayTarget = "";
+        let promptpayName = "";
+        let pointRate = 1.0;
+
+        async function initTopup() {
+            createBubbles();
+            
+            if (!App.state.token) {
+                window.location.href = 'index.html?login=true';
+                return;
+            }
+
+            try {
+                const res = await App.api('/api/topup/config');
+                if (res.ok) {
+                    promptpayTarget = res.promptpayTarget || "";
+                    promptpayName = res.promptpayName || "";
+                    pointRate = parseFloat(res.pointRate) || 1.0;
+                    
+                    document.getElementById('point-rate-desc').innerText = `สแกนจ่ายผ่านพร้อมเพย์ รับพอยท์อัตโนมัติ (อัตรา 1 บาท = ${pointRate.toLocaleString()} Point)`;
+                }
+            } catch (err) {
+                console.error("Failed to load payment config", err);
+            }
+        }
+
+        function createBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const bubbleCount = 20;
+            for (let i = 0; i < bubbleCount; i++) {
+                let bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                let size = Math.random() * 40 + 10;
+                let left = Math.random() * 100;
+                let duration = Math.random() * 10 + 10;
+                let delay = Math.random() * 10;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+                container.appendChild(bubble);
+            }
+        }
+
+        function selectAmount(amount) {
+            document.getElementById('custom-amount-input').value = amount;
+            calculatePoints();
+            
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function calculatePoints() {
+            const input = document.getElementById('custom-amount-input').value;
+            currentAmount = parseFloat(input) || 0;
+            const pointsExpected = Math.round(currentAmount * pointRate);
+            document.getElementById('points-preview-val').innerText = pointsExpected.toLocaleString();
+            
+            const generateBtn = document.getElementById('generate-qr-btn');
+            if (currentAmount > 0) {
+                generateBtn.disabled = false;
+            } else {
+                generateBtn.disabled = true;
+            }
+            
+            // Remove active from amount grid buttons if editing manually
+            if (!event || event.type === 'input') {
+                document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+            }
+        }
+
+        function goToStep2() {
+            if (currentAmount <= 0) return;
+            if (!promptpayTarget) {
+                alert("ระบบเติมเงินพร้อมเพย์ยังไม่ได้ตั้งค่าบัญชีรับเงิน กรุณาติดต่อผู้ดูแลระบบ");
+                return;
+            }
+            
+            document.getElementById('qr-amount-display').innerText = currentAmount.toFixed(2) + ' THB';
+            
+            // Generate dynamic PromptPay QR code image
+            const qrImage = document.querySelector('.qr-image');
+            qrImage.src = `https://promptpay.io/${promptpayTarget}/${currentAmount}.png`;
+            
+            document.getElementById('topup-slider').style.transform = 'translateX(-50%)';
+            
+            startTimer();
+        }
+
+        function goToStep1() {
+            document.getElementById('topup-slider').style.transform = 'translateX(0)';
+            resetTimer();
+            resetUpload();
+        }
+
+        function startTimer() {
+            timeLeft = 300; // 5 minutes
+            updateTimerDisplay();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('หมดเวลาสำหรับทำการโอนเงิน หากสแกนสำเร็จแล้วกรุณาทำรายการใหม่อีกครั้ง');
+                    goToStep1();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 300;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('countdown-timer').innerText = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function handleSlipUpload(input) {
+            const label = document.getElementById('slip-file-name');
+            const confirmBtn = document.getElementById('confirm-payment-btn');
+            const labelContainer = document.getElementById('slip-label');
+            
+            if (input.files && input.files[0]) {
+                label.innerText = `ไฟล์แนบ: ${input.files[0].name}`;
+                labelContainer.style.borderColor = 'var(--success)';
+                labelContainer.style.background = 'rgba(0, 210, 255, 0.05)';
+                confirmBtn.disabled = false;
+            } else {
+                resetUpload();
+            }
+        }
+
+        function resetUpload() {
+            document.getElementById('slip-upload').value = '';
+            document.getElementById('slip-file-name').innerText = 'คลิกเพื่อแนบรูปสลิปโอนเงิน';
+            const labelContainer = document.getElementById('slip-label');
+            labelContainer.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            labelContainer.style.background = 'rgba(0, 0, 0, 0.2)';
+            document.getElementById('confirm-payment-btn').disabled = true;
+        }
+
+        async function submitPayment() {
+            const fileInput = document.getElementById('slip-upload');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert("กรุณาแนบรูปสลิปโอนเงินก่อนยืนยัน");
+                return;
+            }
+            
+            const btn = document.getElementById('confirm-payment-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดข้อมูล...';
+            btn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const slipData = e.target.result;
+                try {
+                    const res = await App.api('/api/topup/verify-slip', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            amount: currentAmount,
+                            points: Math.round(currentAmount * pointRate),
+                            slipData: slipData
+                        })
+                    });
+                    
+                    if (res.ok) {
+                        alert(res.message || "แนบสลิปเรียบร้อย! เจ้าหน้าที่กำลังตรวจสอบข้อมูลการโอนเงินของท่าน");
+                        goToStep1();
+                        document.getElementById('custom-amount-input').value = '';
+                        calculatePoints();
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (res.error || "ไม่สามารถส่งข้อมูลได้"));
+                    }
+                } catch (err) {
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+                    console.error(err);
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for App class to be available
+            setTimeout(() => {
+                App.init();
+                initTopup();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

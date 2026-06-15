@@ -29,7 +29,10 @@ async function initSettings() {
     NLOGIN_DB_USER: env.NLOGIN_DB_USER || "root",
     NLOGIN_DB_PASSWORD: env.NLOGIN_DB_PASSWORD || "",
     SERVER_IP: "127.0.0.1",
-    SERVER_PORT: "25565"
+    SERVER_PORT: "25565",
+    PROMPTPAY_TARGET: "0812345678",
+    PROMPTPAY_NAME: "นาย ทดสอบ ระบบ",
+    POINT_RATE: "1.0"
   };
 
   for (const [key, val] of Object.entries(defaults)) {

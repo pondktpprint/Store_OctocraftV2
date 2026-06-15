@@ -97,6 +97,9 @@ const Admin = {
             document.getElementById('setting-nlogin-name').value = s.NLOGIN_DB_NAME || '';
             document.getElementById('setting-nlogin-user').value = s.NLOGIN_DB_USER || '';
             document.getElementById('setting-nlogin-password').value = s.NLOGIN_DB_PASSWORD || '';
+            document.getElementById('setting-promptpay-target').value = s.PROMPTPAY_TARGET || '';
+            document.getElementById('setting-promptpay-name').value = s.PROMPTPAY_NAME || '';
+            document.getElementById('setting-point-rate').value = s.POINT_RATE || '1.0';
             
         } catch(e) {
             console.error('Failed to load system status', e);
@@ -124,6 +127,9 @@ const Admin = {
             NLOGIN_DB_NAME: document.getElementById('setting-nlogin-name').value,
             NLOGIN_DB_USER: document.getElementById('setting-nlogin-user').value,
             NLOGIN_DB_PASSWORD: document.getElementById('setting-nlogin-password').value,
+            PROMPTPAY_TARGET: document.getElementById('setting-promptpay-target').value,
+            PROMPTPAY_NAME: document.getElementById('setting-promptpay-name').value,
+            POINT_RATE: document.getElementById('setting-point-rate').value,
         };
 
         try {
@@ -413,12 +419,19 @@ const Admin = {
                     <button class="action-btn btn-reject">Reject</button>
                 `;
             }
+            
+            let slipHtml = '-';
+            if (t.provider_reference) {
+                slipHtml = `<a href="${t.provider_reference}" target="_blank" class="action-btn" style="background:#6366f1; color:white;"><i class="fas fa-image"></i> View Slip</a>`;
+            }
+            
             tr.innerHTML = `
                 <td>${t.id}</td>
                 <td>${App.escapeHTML(t.username)}</td>
-                <td>${t.amount_minor}</td>
+                <td>${(t.amount_minor / 100).toFixed(2)} บาท</td>
                 <td>${t.points}</td>
                 <td>${App.escapeHTML(t.status).toUpperCase()}</td>
+                <td>${slipHtml}</td>
                 <td>${new Date(t.created_at).toLocaleString()}</td>
                 <td>${actions}</td>
             `;

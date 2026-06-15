@@ -125,7 +125,7 @@ adminRouter.post("/wallet/debit", asyncHandler(async (req, res) => {
 
 adminRouter.get("/topup", asyncHandler(async (req, res) => {
   const [requests] = await pool.execute(
-    `SELECT tr.id, tr.status, tr.amount_minor, tr.points, tr.created_at, u.username
+    `SELECT tr.id, tr.status, tr.amount_minor, tr.points, tr.provider_reference, tr.created_at, u.username
      FROM topup_requests tr
      JOIN users u ON u.id = tr.user_id
      ORDER BY tr.id DESC
