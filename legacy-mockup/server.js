@@ -9,7 +9,7 @@ try {
   mysql = require("mysql2/promise");
   bcrypt = require("bcryptjs");
 } catch (err) {
-  console.log("MySQL2 or BcryptJS not found locally, will use mockup fallback if not on VPS");
+  console.warn("MySQL2 or BcryptJS is unavailable. Database login will be disabled until dependencies are installed.");
 }
 
 // พยายามโหลด dotenv ถ้ามี
@@ -19,11 +19,14 @@ try {
 
 const PORT = Number(process.env.PORT || 4987);
 const HOST = process.env.HOST || "0.0.0.0";
-const ROOT = path.join(__dirname, "public"); // เปลี่ยนให้ชี้ไปที่โฟลเดอร์ public
+const ROOT = path.join(__dirname, "..", "frontend");
 const DATA_DIR = path.join(__dirname, "data");
 const STATE_FILE = path.join(DATA_DIR, "bridge-state.json");
-const PUBLIC_MINECRAFT_HOST = "sv3.mcsv.me";
-const PUBLIC_MINECRAFT_PORT = 10976;
+const PUBLIC_MINECRAFT_HOST = process.env.PUBLIC_MINECRAFT_HOST || "";
+const PUBLIC_MINECRAFT_PORT = Number(process.env.PUBLIC_MINECRAFT_PORT || 25565);
+const PUBLIC_DISCORD_INVITE = process.env.PUBLIC_DISCORD_INVITE || "";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
 const MIME = {
   ".css": "text/css; charset=utf-8",
@@ -43,19 +46,15 @@ const MIME = {
 const bridgeClients = new Map();
 const pendingRequests = new Map();
 const adminSessions = new Set();
+const userSessions = new Map();
 
 function getSession(req) {
   const auth = req.headers.authorization;
   if (!auth) return null;
   const token = auth.replace(/^Bearer\s+/i, "");
-  if (token.startsWith("user_")) {
-    const parts = token.split("_");
-    if (parts.length >= 3) {
-      return { username: parts[1], role: "user" };
-    }
-  }
+  if (userSessions.has(token)) return userSessions.get(token);
   if (token.startsWith("admin_") && adminSessions.has(token)) {
-    return { username: "Admin", role: "admin" };
+    return { username: ADMIN_USERNAME, role: "admin" };
   }
   return null;
 }
@@ -70,41 +69,32 @@ function defaultState() {
     tokens: [],
     serverConfig: {
       panelUrl: localBridgeUrl(),
-      backend: "nlogin"
+      backend: process.env.AUTH_BACKEND || "nlogin"
     },
     mysqlConfig: {
-      mysqlHost: "db3.mcsv.me",
-      mysqlPort: "3306",
-      mysqlDatabase: "s1244_nlogin",
-      mysqlTable: "nlogin",
-      mysqlUsername: "u1244_JdwWScj8tQ",
-      mysqlPassword: "TotEzTmh!dhRG@xVebJ1RW3q",
+      mysqlHost: process.env.MYSQL_HOST || "",
+      mysqlPort: process.env.MYSQL_PORT || "3306",
+      mysqlDatabase: process.env.MYSQL_DATABASE || "",
+      mysqlTable: process.env.MYSQL_TABLE || "",
+      mysqlUsername: process.env.MYSQL_USER || "",
+      mysqlPassword: process.env.MYSQL_PASSWORD || "",
       columns: {
-        id: "ai",
-        last_name: "username",
-        password: "password",
-        email: "email",
-        creation_date: "creation_date",
-        last_seen: "last_seen"
+        id: process.env.MYSQL_COLUMN_ID || "id",
+        last_name: process.env.MYSQL_COLUMN_USERNAME || "username",
+        password: process.env.MYSQL_COLUMN_PASSWORD || "password",
+        email: process.env.MYSQL_COLUMN_EMAIL || "email",
+        creation_date: process.env.MYSQL_COLUMN_CREATED_AT || "creation_date",
+        last_seen: process.env.MYSQL_COLUMN_LAST_SEEN || "last_seen"
       }
     },
     paymentConfig: {
-      promptpayName: "OctoCraft SMP",
-      promptpayTarget: "",
-      pointRate: "1",
-      easySlipApiKey: ""
+      promptpayName: process.env.PROMPTPAY_NAME || "",
+      promptpayTarget: process.env.PROMPTPAY_TARGET || "",
+      pointRate: process.env.POINT_RATE || "1",
+      easySlipApiKey: process.env.EASYSLIP_API_KEY || ""
     },
-    categories: [
-      { id: "cat_all", icon: "/images/hBm1MPm.png", name: "All", slug: "all", sort: 0 },
-      { id: "cat_rank", icon: "/images/jXUpzNO.png", name: "Rank", slug: "rank", sort: 1 },
-      { id: "cat_keys", icon: "/images/fKSImc7.png", name: "Keys", slug: "keys", sort: 2 },
-      { id: "cat_privillege", icon: "/images/GjmxR0k.png", name: "Privillege", slug: "privillege", sort: 3 }
-    ],
-    items: [
-      { id: "item_vip", category: "rank", icon: "/images/jXUpzNO.png", name: "VIP Rank", price: 350, command: "lp user {player} parent add vip" },
-      { id: "item_myth_key", category: "keys", icon: "/images/fKSImc7.png", name: "Myth Key x5", price: 120, command: "crate key give {player} myth 5" },
-      { id: "item_fly", category: "privillege", icon: "/images/GjmxR0k.png", name: "Fly Privillege", price: 250, command: "lp user {player} permission set essentials.fly true" }
-    ],
+    categories: [],
+    items: [],
     itemCodes: [],
     members: []
   };
@@ -113,7 +103,6 @@ function defaultState() {
 function readState() {
   try {
     const state = { ...defaultState(), ...JSON.parse(fs.readFileSync(STATE_FILE, "utf8")) };
-    cleanMockData(state);
     return state;
   } catch (error) {
     return defaultState();
@@ -152,20 +141,9 @@ function readBody(req) {
 }
 
 function isAdmin(req) {
-  const token = req.headers.authorization;
+  const auth = req.headers.authorization;
+  const token = auth ? auth.replace(/^Bearer\s+/i, "") : "";
   return token && adminSessions.has(token);
-}
-
-function cleanMockData(state) {
-  // If there are mock members like Notch, Steve, clean them up
-  const mockNames = ['Steve', 'Alex', 'Notch', 'Herobrine', 'Dinnerbone', 'Grumm', 'Jeb_', 'Dream'];
-  if (state.members && state.members.length > 0) {
-    const hasMock = state.members.some(m => mockNames.includes(m.name));
-    if (hasMock) {
-      state.members = []; // Reset members entirely as requested
-      writeState(state);
-    }
-  }
 }
 
 function publicMember(member) {
@@ -489,60 +467,46 @@ async function handleApi(req, res) {
         return;
       }
 
-      // ตรวจสอบไอดีแอดมินฮาร์ดโค้ด
-      if (username === "Admin" && password === "491693148qQ") {
+      if (ADMIN_USERNAME && ADMIN_PASSWORD && username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
         const token = "admin_" + crypto.randomBytes(16).toString("hex");
         adminSessions.add(token);
         json(res, 200, {
           ok: true,
           token: token,
-          player: { id: "admin", name: "Admin", role: "admin", points: 999999 }
+          player: { id: "admin", name: ADMIN_USERNAME, role: "admin", points: 0 }
         });
         return;
       }
 
-      // --- NEW nLogin MySQL Auth ---
-      let useFallback = false;
-      if (mysql && bcrypt) {
-        try {
-          const dbConf = state.mysqlConfig;
-          const connection = await mysql.createConnection({
-            host: dbConf.mysqlHost,
-            port: dbConf.mysqlPort,
-            user: dbConf.mysqlUsername,
-            password: dbConf.mysqlPassword,
-            database: dbConf.mysqlDatabase,
-            connectTimeout: 3000
-          });
-
-          const [rows] = await connection.execute(`SELECT * FROM ${dbConf.mysqlTable} WHERE ${dbConf.columns.last_name} = ?`, [username]);
-          await connection.end();
-
-          if (rows.length === 0) {
-            return json(res, 401, { ok: false, error: "ชื่อผู้เล่นไม่ถูกต้อง (ไม่พบในฐานข้อมูล nLogin)" });
-          }
-
-          const userRow = rows[0];
-          const match = await bcrypt.compare(password, userRow[dbConf.columns.password]);
-
-          if (!match) {
-            return json(res, 401, { ok: false, error: "รหัสผ่านไม่ถูกต้อง" });
-          }
-
-        } catch (dbErr) {
-          console.warn("DB Login Error:", dbErr.message);
-          console.warn("Falling back to local mockup mode (use password '1234' to login).");
-          useFallback = true;
-        }
-      } else {
-        useFallback = true;
+      if (!mysql || !bcrypt) {
+        return json(res, 503, { ok: false, error: "database_auth_unavailable" });
       }
 
-      if (useFallback) {
-        // Fallback for local testing without DB or when DB connection fails
-        if (password !== "1234") {
-          return json(res, 401, { ok: false, error: "ฐานข้อมูลเชื่อมต่อไม่ได้ หรือรหัสผ่านทดสอบไม่ถูกต้อง (รหัสทดสอบคือ 1234)" });
-        }
+      const dbConf = state.mysqlConfig;
+      if (!dbConf.mysqlHost || !dbConf.mysqlDatabase || !dbConf.mysqlTable || !dbConf.mysqlUsername) {
+        return json(res, 503, { ok: false, error: "database_auth_not_configured" });
+      }
+
+      const connection = await mysql.createConnection({
+        host: dbConf.mysqlHost,
+        port: dbConf.mysqlPort,
+        user: dbConf.mysqlUsername,
+        password: dbConf.mysqlPassword,
+        database: dbConf.mysqlDatabase,
+        connectTimeout: 3000
+      });
+
+      const [rows] = await connection.execute(`SELECT * FROM ${dbConf.mysqlTable} WHERE ${dbConf.columns.last_name} = ?`, [username]);
+      await connection.end();
+
+      if (rows.length === 0) {
+        return json(res, 401, { ok: false, error: "invalid_credentials" });
+      }
+
+      const userRow = rows[0];
+      const match = await bcrypt.compare(password, userRow[dbConf.columns.password]);
+      if (!match) {
+        return json(res, 401, { ok: false, error: "invalid_credentials" });
       }
 
       // Sync member state
@@ -569,7 +533,8 @@ async function handleApi(req, res) {
       }
       writeState(state);
 
-      const token = "user_" + username + "_" + Date.now();
+      const token = "user_" + crypto.randomBytes(32).toString("hex");
+      userSessions.set(token, { username: member.name, role: "user" });
       json(res, 200, {
         ok: true,
         token: token,
@@ -582,12 +547,26 @@ async function handleApi(req, res) {
     return;
   }
 
+  if (req.method === "GET" && url.pathname === "/api/auth/me") {
+    const session = getSession(req);
+    if (!session) return json(res, 401, { ok: false, error: "not_logged_in" });
+    if (session.role === "admin") {
+      return json(res, 200, { ok: true, player: { id: "admin", name: session.username, role: "admin", points: 0 } });
+    }
+    const state = readState();
+    const member = (state.members || []).find(m => String(m.name).toLowerCase() === String(session.username).toLowerCase());
+    if (!member) return json(res, 404, { ok: false, error: "user_not_found" });
+    return json(res, 200, { ok: true, player: publicMember(member) });
+  }
+
   // ==== API เติม Item Code (Redeem) ====
   if (req.method === "POST" && url.pathname === "/api/shop/redeem") {
     try {
+      const session = getSession(req);
+      if (!session) return json(res, 401, { ok: false, error: "not_logged_in" });
       const state = readState();
       const body = await readBody(req);
-      const username = body.username;
+      const username = session.username;
       const codeInput = String(body.code || "").trim();
 
       if (!username || !codeInput) return json(res, 400, { ok: false, error: "Missing data" });
@@ -619,9 +598,11 @@ async function handleApi(req, res) {
   // ==== เพิ่งเพิ่ม Endpoint สำหรับการซื้อไอเทม (Buy) ====
   if (req.method === "POST" && url.pathname === "/api/shop/buy") {
     try {
+      const session = getSession(req);
+      if (!session) return json(res, 401, { ok: false, error: "not_logged_in" });
       const state = readState();
       const body = await readBody(req);
-      const username = body.username;
+      const username = session.username;
       const itemId = body.itemId;
 
       if (!username || !itemId) {
@@ -665,6 +646,10 @@ async function handleApi(req, res) {
   }
 
   if (req.method === "GET" && url.pathname === "/api/public/server-status") {
+    if (!PUBLIC_MINECRAFT_HOST) {
+      json(res, 200, { ok: true, online: false, host: "", port: PUBLIC_MINECRAFT_PORT, players: { online: 0, max: 0 } });
+      return;
+    }
     try {
       const status = await pingMinecraftServer();
       json(res, 200, {
@@ -692,8 +677,12 @@ async function handleApi(req, res) {
   }
 
   if (req.method === "GET" && url.pathname === "/api/public/discord") {
+    if (!PUBLIC_DISCORD_INVITE) {
+      json(res, 200, { ok: true, online: 0, total: 0 });
+      return;
+    }
     try {
-      const resp = await fetch("https://discord.com/api/v9/invites/dU2wma23f3?with_counts=true");
+      const resp = await fetch(`https://discord.com/api/v9/invites/${encodeURIComponent(PUBLIC_DISCORD_INVITE)}?with_counts=true`);
       const data = await resp.json();
       json(res, 200, { ok: true, online: data.approximate_presence_count, total: data.approximate_member_count });
     } catch(e) {
@@ -732,6 +721,8 @@ async function handleApi(req, res) {
 
   if (req.method === "POST" && url.pathname === "/api/topup/verify-slip") {
     try {
+      const session = getSession(req);
+      if (!session) return json(res, 401, { ok: false, error: "not_logged_in" });
       const state = readState();
       const body = await readBody(req);
       const amount = Number(body.amount || 0);
@@ -748,6 +739,11 @@ async function handleApi(req, res) {
       }
 
       const apiKey = state.paymentConfig && state.paymentConfig.easySlipApiKey;
+      if (!apiKey) {
+        json(res, 503, { ok: false, error: "payment_verification_not_configured" });
+        return;
+      }
+
       if (apiKey) {
         // Real EasySlip API Slip Verification
         let base64Image = body.slipData;
@@ -801,7 +797,7 @@ async function handleApi(req, res) {
         }
 
         if (!state.members) state.members = [];
-        let member = state.members.find(m => String(m.id || m.name) === String(body.playerId));
+        let member = state.members.find(m => String(m.name).toLowerCase() === String(session.username).toLowerCase());
         if (member) {
           member.points = Number(member.points || 0) + points;
           member.totalTopup = Number(member.totalTopup || 0) + amount;
@@ -809,18 +805,8 @@ async function handleApi(req, res) {
           member.topups.push({ date: new Date().toISOString(), amount: amount, points: points, method: "easyslip" });
           member.lastSeen = new Date().toISOString();
         } else {
-          member = {
-            id: String(body.playerId),
-            name: body.playerName || body.playerId,
-            email: "",
-            points: points,
-            totalTopup: amount,
-            totalSpent: 0,
-            firstLogin: new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-            lastSeen: new Date().toISOString()
-          };
-          state.members.push(member);
+          json(res, 404, { ok: false, error: "user_not_found" });
+          return;
         }
         writeState(state);
 
@@ -828,39 +814,6 @@ async function handleApi(req, res) {
           ok: true,
           mode: "easyslip",
           transactionId: result.data.transRef || ("topup_" + Date.now().toString(36)),
-          message: "\u0e15\u0e23\u0e27\u0e0a\u0e2a\u0e2d\u0e1a\u0e2a\u0e25\u0e34\u0e1b\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e0a"
-        });
-        return;
-      } else {
-        // Prototype mode fallback (no API key configured)
-        if (!state.members) state.members = [];
-        let member = state.members.find(m => String(m.id || m.name) === String(body.playerId));
-        if (member) {
-          member.points = Number(member.points || 0) + points;
-          member.totalTopup = Number(member.totalTopup || 0) + amount;
-          if (!member.topups) member.topups = [];
-          member.topups.push({ date: new Date().toISOString(), amount: amount, points: points, method: "truemoney" });
-          member.lastSeen = new Date().toISOString();
-        } else {
-          member = {
-            id: String(body.playerId),
-            name: body.playerName || body.playerId,
-            email: "",
-            points: points,
-            totalTopup: amount,
-            totalSpent: 0,
-            firstLogin: new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-            lastSeen: new Date().toISOString()
-          };
-          state.members.push(member);
-        }
-        writeState(state);
-
-        json(res, 200, {
-          ok: true,
-          mode: "prototype",
-          transactionId: "topup_" + Date.now().toString(36),
           message: "\u0e15\u0e23\u0e27\u0e0a\u0e2a\u0e2d\u0e1a\u0e2a\u0e25\u0e34\u0e1b\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e0a"
         });
         return;
@@ -891,6 +844,21 @@ async function handleApi(req, res) {
     state.tickets.push(newTicket);
     writeState(state);
     return json(res, 200, { ok: true, ticket: newTicket });
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/user/history") {
+    const session = getSession(req);
+    if (!session) return json(res, 401, { ok: false, error: "not_logged_in" });
+    const state = readState();
+    const member = (state.members || []).find(m => String(m.name).toLowerCase() === String(session.username).toLowerCase());
+    if (!member) return json(res, 404, { ok: false, error: "user_not_found" });
+
+    json(res, 200, {
+      ok: true,
+      topups: member.topups || [],
+      purchases: member.purchases || []
+    });
+    return;
   }
 
   if (!isAdmin(req)) {

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - Octo Craft SMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="shop-page">
+    <div class="bubbles" id="bubbles-container"></div>
+
+    <nav class="shop-nav">
+        <a href="index.html" class="back-home-btn"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="shop-logo-small">
+            <img src="images/logo.png" alt="Logo" onerror="this.style.display='none'; document.getElementById('logo-fallback-small').style.display='block';">
+            <div id="logo-fallback-small" class="logo-fallback" style="font-size: 1.5rem; display:none;">OCTOCRAFT</div>
+        </div>
+        <div class="shop-nav-actions">
+            <div class="user-profile-menu"></div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="dashboard-card" style="max-width: 800px; margin: 40px auto; padding: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px;">
+                <h2 style="margin:0;"><i class="fas fa-history"></i> ประวัติการสั่งซื้อ (Order History)</h2>
+            </div>
+            
+            <div class="history-list-container" style="max-height: 500px; overflow-y: auto;">
+                <ul id="order-list" style="list-style: none; padding: 0;">
+                    <li style="text-align:center; color: var(--text-muted); padding: 20px;">กำลังโหลด...</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!App.state.token) {
+                window.location.href = 'index.html?login=true';
+                return;
+            }
+
+            try {
+                const res = await App.api('/api/orders');
+                const list = document.getElementById('order-list');
+                
+                if (res.ok) {
+                    list.innerHTML = '';
+                    if (res.orders.length === 0) {
+                        list.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">ไม่มีประวัติการสั่งซื้อ</li>';
+                    } else {
+                        res.orders.forEach(order => {
+                            const li = document.createElement('li');
+                            li.style.padding = '15px';
+                            li.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                            li.style.display = 'flex';
+                            li.style.justifyContent = 'space-between';
+                            li.style.alignItems = 'center';
+                            
+                            const d = new Date(order.created_at).toLocaleString('th-TH');
+                            
+                            let statusColor = 'var(--text-muted)';
+                            let statusIcon = 'fa-clock';
+                            if (order.status === 'delivered') {
+                                statusColor = 'var(--success)';
+                                statusIcon = 'fa-check-circle';
+                            } else if (order.status === 'delivery_failed') {
+                                statusColor = 'var(--danger)';
+                                statusIcon = 'fa-times-circle';
+                            }
+                            
+                            li.innerHTML = `
+                                <div>
+                                    <div style="font-weight: 600; font-size: 1.1rem; color: var(--warning);">Order #${order.id}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted);">${d}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--danger);">- ${order.total_points} Points</div>
+                                    <div style="font-size: 0.85rem; color: ${statusColor};"><i class="fas ${statusIcon}"></i> สถานะ: ${order.status.toUpperCase()}</div>
+                                </div>
+                            `;
+                            list.appendChild(li);
+                        });
+                    }
+                } else {
+                    list.innerHTML = '<li style="text-align:center; color: var(--danger); padding: 20px;">ไม่สามารถโหลดประวัติได้</li>';
+                }
+            } catch(e) {
+                document.getElementById('order-list').innerHTML = '<li style="text-align:center; color: var(--danger); padding: 20px;">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</li>';
+            }
+        });
+    </script>
+</body>
+</html>

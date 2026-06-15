@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Octo Craft SMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; background: var(--bg-dark); }
+        .admin-sidebar { width: 250px; background: rgba(0,0,0,0.5); padding: 20px; border-right: 1px solid rgba(255,255,255,0.1); }
+        .admin-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .admin-nav { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
+        .admin-tab-btn { background: transparent; border: none; color: var(--text-light); text-align: left; padding: 12px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+        .admin-tab-btn:hover { background: rgba(255,255,255,0.1); }
+        .admin-tab-btn.active { background: var(--primary); color: white; }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; }
+        .admin-table th, .admin-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .admin-table th { background: rgba(0,0,0,0.5); font-weight: 600; color: var(--primary); }
+        .admin-table tr:hover { background: rgba(255,255,255,0.05); }
+        .action-btn { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.9rem; }
+        .btn-edit { background: var(--warning); color: black; }
+        .btn-retry, .btn-approve { background: var(--success); color: white; }
+        .btn-danger, .btn-reject { background: var(--danger); color: white; }
+        
+        .admin-form-group { margin-bottom: 15px; }
+        .admin-form-group label { display: block; margin-bottom: 5px; color: var(--text-muted); }
+        .admin-form-group input, .admin-form-group textarea, .admin-form-group select { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; }
+        
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <h2 style="color: var(--primary); text-align:center;">Octo Admin</h2>
+            <div class="admin-nav">
+                <button class="admin-tab-btn active" data-tab="products"><i class="fas fa-box"></i> Products</button>
+                <button class="admin-tab-btn" data-tab="players"><i class="fas fa-users"></i> Players</button>
+                <button class="admin-tab-btn" data-tab="orders"><i class="fas fa-shopping-cart"></i> Orders</button>
+                <button class="admin-tab-btn" data-tab="delivery"><i class="fas fa-truck"></i> Delivery Jobs</button>
+                <button class="admin-tab-btn" data-tab="wallet"><i class="fas fa-wallet"></i> Wallet</button>
+                <button class="admin-tab-btn" data-tab="topup"><i class="fas fa-gem"></i> Topup Requests</button>
+                <button class="admin-tab-btn" onclick="window.location.href='index.html'" style="margin-top:auto;"><i class="fas fa-arrow-left"></i> Back to Shop</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <!-- PRODUCTS PANEL -->
+            <div id="products" class="admin-panel active">
+                <div class="flex-between">
+                    <h2>Products Management</h2>
+                    <button class="submit-login-btn" onclick="Admin.openProductModal()" style="width:auto; padding:10px 20px;">+ Create Product</button>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- PLAYERS PANEL -->
+            <div id="players" class="admin-panel">
+                <div class="flex-between">
+                    <h2>Player Administration</h2>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="player-search-input" placeholder="Search nLogin username..." style="padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.3); color:white;">
+                        <button class="submit-login-btn" onclick="Admin.searchPlayers()" style="width:auto; padding:10px 20px;">Search</button>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div id="player-search-results" style="margin-top:20px;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Last Seen</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="player-search-tbody">
+                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted)">Search to find players...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Player Profile View -->
+                <div id="player-profile-view" style="display:none; margin-top:30px;">
+                    <div class="flex-between" style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:15px;">
+                        <h3 id="profile-username" style="color:var(--primary); font-size:1.5rem;">Username</h3>
+                        <button class="submit-login-btn btn-danger" onclick="document.getElementById('player-profile-view').style.display='none'; document.getElementById('player-search-results').style.display='block';" style="width:auto; padding:8px 15px;"><i class="fas fa-times"></i> Close Profile</button>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
+                            <h4 style="margin-bottom:15px; color:var(--text-light);">nLogin Details</h4>
+                            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                            <p><strong>Created:</strong> <span id="profile-created"></span></p>
+                            <p><strong>Last Seen:</strong> <span id="profile-lastseen"></span></p>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px;">
+                            <div class="flex-between">
+                                <h4 style="margin-bottom:15px; color:var(--text-light);">Wallet Overview</h4>
+                                <div>
+                                    <button class="action-btn btn-retry" onclick="Admin.openPlayerWalletModal('credit')">Credit</button>
+                                    <button class="action-btn btn-reject" onclick="Admin.openPlayerWalletModal('debit')">Debit</button>
+                                </div>
+                            </div>
+                            <h2 style="font-size:2.5rem; color:var(--warning);"><i class="fas fa-coins"></i> <span id="profile-balance">0</span></h2>
+                            <p style="color:var(--text-muted); font-size:0.9rem;">Derived from global transactions.</p>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top:30px; color:var(--text-light);">Recent Orders</h4>
+                    <table class="admin-table">
+                        <thead><tr><th>ID</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+                        <tbody id="profile-orders-tbody"></tbody>
+                    </table>
+
+                    <h4 style="margin-top:30px; color:var(--text-light);">Recent Delivery Jobs</h4>
+                    <table class="admin-table">
+                        <thead><tr><th>ID</th><th>Order ID</th><th>Status</th><th>Retries</th><th>Actions</th></tr></thead>
+                        <tbody id="profile-jobs-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ORDERS PANEL -->
+            <div id="orders" class="admin-panel">
+                <h2>Orders Management</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Points</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- DELIVERY JOBS PANEL -->
+            <div id="delivery" class="admin-panel">
+                <h2>Delivery Jobs Management</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Order ID</th>
+                            <th>Status</th>
+                            <th>Retries</th>
+                            <th>Last Error</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="delivery-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- WALLET PANEL -->
+            <div id="wallet" class="admin-panel">
+                <div class="flex-between">
+                    <h2>Wallet Administration</h2>
+                    <button class="submit-login-btn btn-edit" onclick="Admin.openWalletModal()" style="width:auto; padding:10px 20px;"><i class="fas fa-plus-minus"></i> Credit / Debit</button>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Balance After</th>
+                            <th>Ref</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wallet-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- TOPUP PANEL -->
+            <div id="topup" class="admin-panel">
+                <h2>Topup Requests</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Amount (Minor)</th>
+                            <th>Points</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topup-tbody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-modal" onclick="document.getElementById('product-modal').classList.remove('active')">&times;</button>
+            <h3 id="product-modal-title">Create Product</h3>
+            <form id="product-form" onsubmit="Admin.saveProduct(event)">
+                <input type="hidden" id="prod-id">
+                <div class="admin-form-group">
+                    <label>SKU</label>
+                    <input type="text" id="prod-sku" required>
+                </div>
+                <div class="admin-form-group">
+                    <label>Name</label>
+                    <input type="text" id="prod-name" required>
+                </div>
+                <div class="admin-form-group">
+                    <label>Description</label>
+                    <textarea id="prod-desc" rows="3"></textarea>
+                </div>
+                <div class="admin-form-group">
+                    <label>Price Points</label>
+                    <input type="number" id="prod-price" required>
+                </div>
+                <div class="admin-form-group">
+                    <label>Minecraft Command</label>
+                    <input type="text" id="prod-cmd" placeholder="give {player} diamond 1" required>
+                </div>
+                <div class="admin-form-group">
+                    <label>Status</label>
+                    <select id="prod-active">
+                        <option value="1">Active</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-login-btn">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div id="wallet-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-modal" onclick="document.getElementById('wallet-modal').classList.remove('active')">&times;</button>
+            <h3>Credit / Debit Wallet</h3>
+            <form id="wallet-form" onsubmit="Admin.saveWallet(event)">
+                <div class="admin-form-group">
+                    <label>Username</label>
+                    <input type="text" id="wallet-username" required>
+                </div>
+                <div class="admin-form-group">
+                    <label>Action</label>
+                    <select id="wallet-action">
+                        <option value="credit">Credit (Add)</option>
+                        <option value="debit">Debit (Remove)</option>
+                    </select>
+                </div>
+                <div class="admin-form-group">
+                    <label>Amount Points</label>
+                    <input type="number" id="wallet-amount" required min="1">
+                </div>
+                <button type="submit" class="submit-login-btn">Confirm</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
