@@ -27,6 +27,52 @@ const apiLimiter = rateLimit({
 app.use("/api", apiLimiter);
 
 app.get("/health", (req, res) => res.json({ ok: true }));
+
+const { pingMinecraftServer } = require("./rcon/ping");
+const { getSettings } = require("./settings/service");
+const { getConnectedClientCount } = require("./rcon/bridge");
+
+app.get("/api/public/server-status", async (req, res) => {
+  try {
+    const settings = await getSettings();
+    const host = settings.SERVER_IP || "127.0.0.1";
+    const port = Number(settings.SERVER_PORT || 25565);
+    
+    const isBridgeConnected = getConnectedClientCount() > 0;
+    if (!isBridgeConnected) {
+      return res.json({
+        ok: true,
+        online: false,
+        host,
+        port,
+        players: { online: 0, max: 0 }
+      });
+    }
+
+    const status = await pingMinecraftServer(host, port);
+    res.json({
+      ok: true,
+      online: true,
+      host,
+      port,
+      version: status.version && status.version.name ? status.version.name : "",
+      players: {
+        online: status.players && Number(status.players.online || 0),
+        max: status.players && Number(status.players.max || 0)
+      }
+    });
+  } catch (error) {
+    res.json({
+      ok: true,
+      online: false,
+      host: "127.0.0.1",
+      port: 25565,
+      players: { online: 0, max: 0 },
+      error: error.message
+    });
+  }
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/wallet", walletRouter);
