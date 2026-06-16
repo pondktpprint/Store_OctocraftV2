@@ -24,6 +24,7 @@ const Admin = {
         this.fetchAdmin('/api/admin/orders').then(res => this.globalData.orders = res.orders).catch(()=>{});
         this.fetchAdmin('/api/admin/delivery-jobs').then(res => this.globalData.jobs = res.jobs).catch(()=>{});
         this.fetchAdmin('/api/admin/wallet').then(res => this.globalData.transactions = res.transactions).catch(()=>{});
+        this.fetchAdmin('/api/admin/topup').then(res => this.globalData.topups = res.requests).catch(()=>{});
     },
 
     bindTabs() {
@@ -158,15 +159,30 @@ const Admin = {
         const tbody = document.getElementById('player-search-tbody');
         tbody.innerHTML = '';
         if (res.players.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No players found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No players found</td></tr>';
             return;
         }
-        res.players.forEach(p => {
+
+        let playersData = res.players.map(p => {
+            const userTxs = this.globalData.transactions ? this.globalData.transactions.filter(t => t.username === p.username) : [];
+            const points = userTxs.length > 0 ? userTxs[0].balance_after : 0;
+            
+            const userTopups = this.globalData.topups ? this.globalData.topups.filter(t => t.username === p.username && t.status === 'approved') : [];
+            const totalTopupTHB = userTopups.reduce((acc, curr) => acc + (curr.amount_minor / 100), 0);
+
+            return { ...p, points, totalTopupTHB };
+        });
+
+        playersData.sort((a, b) => a.username.localeCompare(b.username));
+
+        playersData.forEach(p => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${p.id}</td>
                 <td>${App.escapeHTML(p.username)}</td>
                 <td>${App.escapeHTML(p.email || '-')}</td>
+                <td style="color:#f59e0b; font-weight:bold;">${p.points} <i class="fas fa-coins"></i></td>
+                <td style="color:#10b981; font-weight:bold;">${p.totalTopupTHB.toFixed(2)} บาท</td>
                 <td>${p.last_seen ? new Date(p.last_seen).toLocaleString() : '-'}</td>
                 <td><button class="submit-login-btn btn-view-profile" style="padding:6px 12px; width:auto">View Profile</button></td>
             `;
