@@ -47,7 +47,8 @@ async function initSettings() {
     SERVER_PORT: "25565",
     PROMPTPAY_TARGET: "0812345678",
     PROMPTPAY_NAME: "นาย ทดสอบ ระบบ",
-    POINT_RATE: "1.0"
+    POINT_RATE: "1.0",
+    EASYSLIP_API_KEY: ""
   };
 
   for (const [key, val] of Object.entries(defaults)) {

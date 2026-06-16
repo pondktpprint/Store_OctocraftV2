@@ -105,6 +105,7 @@ const Admin = {
             document.getElementById('setting-promptpay-target').value = s.PROMPTPAY_TARGET || '';
             document.getElementById('setting-promptpay-name').value = s.PROMPTPAY_NAME || '';
             document.getElementById('setting-point-rate').value = s.POINT_RATE || '1.0';
+            document.getElementById('setting-easyslip-key').value = s.EASYSLIP_API_KEY || '';
             
         } catch(e) {
             console.error('Failed to load system status', e);
@@ -135,6 +136,7 @@ const Admin = {
             PROMPTPAY_TARGET: document.getElementById('setting-promptpay-target').value,
             PROMPTPAY_NAME: document.getElementById('setting-promptpay-name').value,
             POINT_RATE: document.getElementById('setting-point-rate').value,
+            EASYSLIP_API_KEY: document.getElementById('setting-easyslip-key').value,
         };
 
         try {

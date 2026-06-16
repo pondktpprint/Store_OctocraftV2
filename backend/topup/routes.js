@@ -1,10 +1,11 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const { pool } = require("../db");
+const { pool, transaction } = require("../db");
 const { HttpError, asyncHandler } = require("../errors");
 const { requireUser } = require("../auth/session");
 const { getSettings } = require("../settings/service");
+const { recordTransaction } = require("../wallet/service");
 
 const topupRouter = express.Router();
 
@@ -78,19 +79,71 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
   // Reference path relative to web server public folder
   const relativePath = `images/slips/${filename}`;
 
-  // Insert into DB
   const amountMinor = Math.round(parsedAmount * 100); // Satang
-  
-  await pool.execute(
-    `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference)
-     VALUES (?, 'pending', ?, ?, ?)`,
-    [req.user.id, amountMinor, parsedPoints, relativePath]
-  );
+  const settings = await getSettings();
 
-  res.json({
-    ok: true,
-    message: "บันทึกข้อมูลและแนบสลิปเรียบร้อยแล้ว กรุณารอทีมงานตรวจสอบความถูกต้อง"
-  });
+  if (settings.EASYSLIP_API_KEY) {
+    // EasySlip verification enabled
+    try {
+      const easySlipRes = await fetch("https://api.easyslip.com/v2/verify/bank", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${settings.EASYSLIP_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          base64: slipData,
+          matchAmount: parsedAmount,
+          checkDuplicate: true
+        })
+      });
+
+      const easySlipData = await easySlipRes.json();
+      
+      if (!easySlipData.success) {
+        fs.unlinkSync(targetPath); // Remove invalid image
+        throw new HttpError(400, "slip_verification_failed", `การตรวจสอบสลิปล้มเหลว: ${easySlipData.message || 'สลิปไม่ถูกต้อง หรือถูกใช้งานไปแล้ว'}`);
+      }
+
+      // Automatically approve and credit points
+      await transaction(async (connection) => {
+        const [result] = await connection.execute(
+          `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference)
+           VALUES (?, 'approved', ?, ?, ?)`,
+          [req.user.id, amountMinor, parsedPoints, relativePath]
+        );
+        
+        await recordTransaction(connection, {
+          userId: req.user.id,
+          type: "credit",
+          amountPoints: parsedPoints,
+          referenceType: "topup",
+          referenceId: result.insertId
+        });
+      });
+
+      res.json({
+        ok: true,
+        message: "ตรวจสอบสลิปสำเร็จ! เติมเงินและรับ Point เรียบร้อยแล้ว"
+      });
+
+    } catch (err) {
+      if (err instanceof HttpError) throw err;
+      throw new HttpError(500, "easyslip_error", "เกิดข้อผิดพลาดในการเชื่อมต่อระบบตรวจสอบสลิป");
+    }
+  } else {
+    // Manual verification fallback
+    await pool.execute(
+      `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference)
+       VALUES (?, 'pending', ?, ?, ?)`,
+      [req.user.id, amountMinor, parsedPoints, relativePath]
+    );
+
+    res.json({
+      ok: true,
+      message: "บันทึกข้อมูลและแนบสลิปเรียบร้อยแล้ว กรุณารอทีมงานตรวจสอบความถูกต้อง"
+    });
+  }
 }));
 
 module.exports = { topupRouter };
