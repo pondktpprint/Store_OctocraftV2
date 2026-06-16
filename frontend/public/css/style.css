@@ -1858,6 +1858,32 @@ body {
         width: 100% !important;
         max-width: 100%;
     }
+    
+    /* Top 3 Donators Mobile */
+    .donators-container {
+        gap: 10px;
+    }
+    .donator-card {
+        flex: 1;
+        min-width: 0;
+        padding: 15px 10px;
+    }
+    .skin-container canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+    .donator-info h3 {
+        font-size: 0.85rem;
+    }
+    .donator-info p {
+        font-size: 0.75rem;
+    }
+    .donator-rank {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+        top: -15px;
+    }
 
     /* Topup Layout */
     .amount-grid {
