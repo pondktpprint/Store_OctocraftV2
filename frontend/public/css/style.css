@@ -18,11 +18,12 @@
 
 body {
     background-color: var(--bg-dark);
-    /* Deep sea gradient */
     background-image: 
-        radial-gradient(circle at 15% 50%, rgba(138, 43, 226, 0.15), transparent 30%),
-        radial-gradient(circle at 85% 30%, rgba(0, 210, 255, 0.15), transparent 30%),
-        linear-gradient(to bottom, #020611 0%, #080f24 50%, #03060f 100%);
+        linear-gradient(rgba(5, 11, 20, 0.8), rgba(2, 6, 17, 0.95)),
+        url('../images/immersive_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--text-main);
     font-family: 'Prompt', 'Outfit', sans-serif;
     min-height: 100vh;
