@@ -246,7 +246,7 @@
 
         function goToStep2() {
             if (currentAmount <= 0) return;
-            if (!App.state.settings || !App.state.settings.PROMPTPAY_TARGET) {
+            if (!promptpayTarget) {
                 Swal.fire({
                     icon: 'error',
                     title: 'ข้อผิดพลาด',
