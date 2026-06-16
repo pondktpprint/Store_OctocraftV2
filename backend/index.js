@@ -76,37 +76,33 @@ app.get("/api/public/server-status", async (req, res) => {
 
 app.get("/api/public/donators", async (req, res) => {
   try {
-    const settings = await require('../settings/service').getSettings();
-    const pointRate = parseFloat(settings.POINT_RATE) || 1;
-
     const [topDonators] = await pool.execute(
-      `SELECT u.username AS name, SUM(wt.amount) AS total_points
-       FROM wallet_transactions wt
-       JOIN users u ON u.id = wt.user_id
-       WHERE wt.type = 'credit'
-       GROUP BY wt.user_id, u.username
-       ORDER BY total_points DESC
+      `SELECT u.username AS name, SUM(tr.amount_minor) AS total_minor
+       FROM topup_requests tr
+       JOIN users u ON u.id = tr.user_id
+       WHERE tr.status = 'approved'
+       GROUP BY tr.user_id, u.username
+       ORDER BY total_minor DESC
        LIMIT 3`
     );
     
-    // Convert points to estimated Baht
     const topDonatorsMapped = topDonators.map(d => ({
       name: d.name,
-      amount: (Number(d.total_points) / pointRate).toFixed(2)
+      amount: (Number(d.total_minor) / 100).toFixed(2)
     }));
 
     const [recentDonators] = await pool.execute(
-      `SELECT u.username AS name, wt.amount AS points, wt.created_at
-       FROM wallet_transactions wt
-       JOIN users u ON u.id = wt.user_id
-       WHERE wt.type = 'credit'
-       ORDER BY wt.id DESC
+      `SELECT u.username AS name, tr.amount_minor, tr.created_at
+       FROM topup_requests tr
+       JOIN users u ON u.id = tr.user_id
+       WHERE tr.status = 'approved'
+       ORDER BY tr.id DESC
        LIMIT 5`
     );
 
     const recentDonatorsMapped = recentDonators.map(d => ({
       name: d.name,
-      amount: (Number(d.points) / pointRate).toFixed(2),
+      amount: (Number(d.amount_minor) / 100).toFixed(2),
       created_at: d.created_at
     }));
 
