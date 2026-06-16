@@ -255,7 +255,39 @@
                 });
                 return;
             }
-            
+            Swal.fire({
+                title: 'ข้อตกลงและเงื่อนไข',
+                html: `
+                    <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #d1d5db; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                        <ul style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 8px;">สินค้าประเภทดิจิทัล (ไอเทม, ยศ, พอยท์) <strong>ไม่สามารถขอคืนเงิน (Refund) ได้ในทุกกรณี</strong></li>
+                            <li style="margin-bottom: 8px;">กรุณาตรวจสอบชื่อตัวละครของคุณให้ถูกต้องก่อนทำรายการ</li>
+                            <li style="margin-bottom: 8px;">หากระบบมีปัญหาหรือพอยท์ไม่เข้า กรุณาเก็บสลิปไว้เป็นหลักฐานเพื่อติดต่อผู้ดูแลระบบ</li>
+                            <li>การกดตกลงถือว่าคุณยอมรับกฎและนโยบายทั้งหมดของเซิร์ฟเวอร์</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'warning',
+                iconColor: '#8a2be2',
+                showCancelButton: true,
+                confirmButtonColor: '#8a2be2',
+                cancelButtonColor: '#4b5563',
+                confirmButtonText: '✅ ฉันอ่านและยอมรับ',
+                cancelButtonText: '❌ ปฏิเสธ',
+                background: '#1a1f2b',
+                color: '#fff',
+                width: 500,
+                customClass: {
+                    popup: 'glass-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    proceedToStep2();
+                }
+            });
+        }
+        
+        function proceedToStep2() {
             document.getElementById('qr-amount-display').innerText = currentAmount.toFixed(2) + ' THB';
             
             // Generate dynamic PromptPay QR code image
