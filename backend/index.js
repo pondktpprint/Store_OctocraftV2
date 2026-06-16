@@ -139,7 +139,7 @@ app.use((error, req, res, next) => {
     return;
   }
   console.error(error);
-  res.status(500).json({ ok: false, error: "internal_error" });
+  res.status(500).json({ ok: false, error: "internal_error", details: error.message || String(error) });
 });
 
 const { initSettings } = require("./settings/service");

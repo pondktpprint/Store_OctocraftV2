@@ -52,7 +52,11 @@ const Admin = {
     async fetchAdmin(path, options) {
         try {
             const res = await App.api(path, options);
-            if (!res.ok) throw new Error(res.error || 'Server error');
+            if (!res.ok) {
+                const errMsg = res.error || 'Server error';
+                const details = res.details ? `\nDetails: ${res.details}` : '';
+                throw new Error(errMsg + details);
+            }
             return res;
         } catch (e) {
             alert('Error: ' + e.message);
