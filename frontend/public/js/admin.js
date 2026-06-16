@@ -111,6 +111,7 @@ const Admin = {
             document.getElementById('setting-promo-title').value = s.PROMO_TITLE || 'เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!';
             document.getElementById('setting-promo-subtitle').value = s.PROMO_SUBTITLE || 'รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!';
             document.getElementById('setting-promo-image').value = s.PROMO_IMAGE || 'images/promo.png';
+            document.getElementById('setting-promo-file').value = '';
             
         } catch(e) {
             console.error('Failed to load system status', e);
@@ -131,6 +132,22 @@ const Admin = {
     },
 
     async saveSettings() {
+        let promoImageVal = document.getElementById('setting-promo-image').value;
+        const promoFile = document.getElementById('setting-promo-file').files[0];
+        if (promoFile) {
+            try {
+                promoImageVal = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(promoFile);
+                });
+            } catch (err) {
+                App.showToast('Error reading promo image file');
+                return;
+            }
+        }
+
         const payload = {
             SERVER_IP: document.getElementById('setting-server-ip').value,
             SERVER_PORT: document.getElementById('setting-server-port').value,
@@ -146,7 +163,7 @@ const Admin = {
             PROMO_BADGE: document.getElementById('setting-promo-badge').value,
             PROMO_TITLE: document.getElementById('setting-promo-title').value,
             PROMO_SUBTITLE: document.getElementById('setting-promo-subtitle').value,
-            PROMO_IMAGE: document.getElementById('setting-promo-image').value
+            PROMO_IMAGE: promoImageVal
         };
 
         try {

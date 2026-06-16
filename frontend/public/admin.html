@@ -624,8 +624,11 @@
                                 <textarea id="setting-promo-subtitle" rows="2" style="width:100%; padding:10px 15px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.3); color:white; font-size:0.95rem;" placeholder="เช่น รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน..."></textarea>
                             </div>
                             <div class="admin-form-group" style="grid-column: 1 / -1;">
-                                <label>ลิงก์รูปภาพโปรโมชั่น (Image URL)</label>
-                                <input type="text" id="setting-promo-image" placeholder="เช่น images/promo.png หรือลิงก์รูปภาพจากเว็บอื่น">
+                                <label>ลิงก์รูปภาพโปรโมชั่น (หรืออัปโหลดรูปใหม่)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="setting-promo-image" placeholder="เช่น images/promo.png" style="flex: 1;">
+                                    <input type="file" id="setting-promo-file" accept="image/*" style="background: rgba(0,0,0,0.4); padding: 10px;">
+                                </div>
                             </div>
                         </div>
                     </div>

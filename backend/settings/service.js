@@ -73,10 +73,30 @@ async function saveSetting(key, value) {
   settingsCache[key] = value;
 }
 
+function savePromoImage(base64Image) {
+  if (!base64Image || !base64Image.startsWith('data:image/')) return null;
+  const matches = base64Image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+  if (!matches || matches.length !== 3) return null;
+  const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+  const buffer = Buffer.from(matches[2], 'base64');
+  const filename = `promo_${Date.now()}.${ext}`;
+  const savePath = require('path').join(__dirname, '../../frontend/public/images/promo', filename);
+  
+  require('fs').mkdirSync(require('path').dirname(savePath), { recursive: true });
+  require('fs').writeFileSync(savePath, buffer);
+  
+  return `images/promo/${filename}`;
+}
+
 async function updateBulkSettings(newSettings) {
   let dbConfigChanged = false;
 
-  for (const [key, value] of Object.entries(newSettings)) {
+  for (let [key, value] of Object.entries(newSettings)) {
+    if (key === "PROMO_IMAGE" && value && value.startsWith('data:image/')) {
+      const savedPath = savePromoImage(value);
+      if (savedPath) value = savedPath;
+    }
+
     if (settingsCache[key] !== value) {
       await saveSetting(key, value);
       if (key.startsWith("NLOGIN_DB_")) {
