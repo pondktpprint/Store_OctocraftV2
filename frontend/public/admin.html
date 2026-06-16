@@ -10,18 +10,21 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --neon-cyan: #06b6d4;
-            --neon-violet: #8b5cf6;
-            --neon-rose: #f43f5e;
-            --glass-bg: rgba(13, 18, 30, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-glow: rgba(139, 92, 246, 0.15);
+            --premium-gold: #d4af37;
+            --premium-gold-dim: #b8972e;
+            --premium-dark: #0a0a0a;
+            --premium-gray: #1a1a1a;
+            --premium-text: #f8fafc;
+            --premium-muted: #94a3b8;
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --glass-glow: rgba(212, 175, 55, 0.05);
         }
 
         body {
-            background: radial-gradient(circle at 50% 0%, #15112f 0%, #070611 75%) !important;
+            background: #050505 !important;
             font-family: 'Outfit', 'Prompt', sans-serif;
-            color: #f8fafc;
+            color: var(--premium-text);
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
@@ -34,10 +37,10 @@
 
         .admin-sidebar {
             width: var(--sidebar-width);
-            background: rgba(8, 7, 18, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border);
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             padding: 30px 20px;
             display: flex;
             flex-direction: column;
@@ -52,14 +55,12 @@
 
         .admin-sidebar h2 {
             font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--premium-gold);
             margin: 0 0 30px 0;
             text-align: center;
-            text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            text-transform: uppercase;
         }
 
         .admin-nav {
@@ -72,38 +73,36 @@
         .admin-tab-btn {
             background: transparent;
             border: none;
-            color: #94a3b8;
+            color: var(--premium-muted);
             text-align: left;
             padding: 14px 18px;
-            border-radius: 12px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s ease;
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 400;
             display: flex;
             align-items: center;
             gap: 12px;
+            border: 1px solid transparent;
         }
 
         .admin-tab-btn i {
             font-size: 1.1rem;
             width: 20px;
             text-align: center;
-            transition: transform 0.3s;
+            transition: color 0.4s ease;
         }
 
         .admin-tab-btn:hover {
-            background: rgba(255, 255, 255, 0.04);
-            color: #f8fafc;
-        }
-
-        .admin-tab-btn:hover i {
-            transform: translateX(3px);
+            background: rgba(212, 175, 55, 0.05);
+            color: var(--premium-gold);
         }
 
         .admin-tab-btn.active {
-            background: linear-gradient(135deg, var(--neon-violet), #6366f1);
-            color: white;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--premium-gold);
+            border: 1px solid var(--glass-border);
             box-shadow: 0 4px 20px var(--glass-glow);
         }
 
@@ -131,23 +130,24 @@
 
         .admin-panel h2 {
             font-size: 2rem;
-            font-weight: 800;
+            font-weight: 400;
             margin-top: 0;
             margin-bottom: 25px;
-            color: #f8fafc;
-            border-left: 4px solid var(--neon-cyan);
+            color: var(--premium-gold);
+            border-left: 2px solid var(--premium-gold);
             padding-left: 15px;
             line-height: 1.2;
+            letter-spacing: 1px;
         }
 
         .admin-card {
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             margin-bottom: 30px;
         }
 
@@ -221,42 +221,44 @@
         .admin-form-group input:focus, 
         .admin-form-group textarea:focus, 
         .admin-form-group select:focus {
-            border-color: var(--neon-cyan);
+            border-color: var(--premium-gold);
             outline: none;
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
-            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 10px var(--glass-glow);
+            background: rgba(15, 15, 15, 0.8);
         }
 
         /* Buttons styling */
         .action-btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: 1px solid transparent;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 600;
-            transition: all 0.3s;
+            letter-spacing: 0.5px;
+            transition: all 0.4s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            text-transform: uppercase;
         }
 
-        .btn-edit { background: var(--warning); color: #000; }
-        .btn-edit:hover { background: #d97706; transform: translateY(-1px); }
+        .btn-edit { background: rgba(255, 255, 255, 0.05); color: var(--premium-gold); border-color: var(--glass-border); }
+        .btn-edit:hover { background: var(--premium-gold); color: #000; }
 
-        .btn-retry, .btn-approve { background: #10b981; color: white; }
-        .btn-retry:hover, .btn-approve:hover { background: #059669; transform: translateY(-1px); }
+        .btn-retry, .btn-approve { background: var(--premium-gold); color: #000; }
+        .btn-retry:hover, .btn-approve:hover { background: var(--premium-gold-dim); box-shadow: 0 5px 15px var(--glass-glow); }
 
-        .btn-danger, .btn-reject { background: #ef4444; color: white; }
-        .btn-danger:hover, .btn-reject:hover { background: #dc2626; transform: translateY(-1px); }
+        .btn-danger, .btn-reject { background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover, .btn-reject:hover { background: #ef4444; color: white; }
 
         /* Tables styling */
         .admin-table-wrapper {
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             margin-top: 15px;
         }
 
@@ -267,17 +269,18 @@
         }
 
         .admin-table th, .admin-table td {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--glass-border);
+            padding: 18px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.9rem;
         }
 
         .admin-table th {
-            background: rgba(0, 0, 0, 0.4);
-            font-weight: 700;
-            color: var(--neon-cyan);
+            background: rgba(0, 0, 0, 0.6);
+            font-weight: 400;
+            color: var(--premium-gold);
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
         }
 
         .admin-table tr:last-child td {
@@ -312,14 +315,14 @@
         }
 
         .modal-content {
-            background: #0f1322;
+            background: #0a0a0a;
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 40px;
             width: 90%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            transform: scale(0.9);
-            transition: all 0.3s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transform: scale(0.95);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             position: relative;
         }
 
@@ -369,10 +372,10 @@
         .admin-mobile-header h2 {
             margin: 0;
             font-size: 1.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 400;
+            color: var(--premium-gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .mobile-menu-btn {
@@ -840,6 +843,11 @@
                         <option value="1">Active (เปิดใช้งาน)</option>
                         <option value="0">Disabled (ปิดใช้งาน)</option>
                     </select>
+                </div>
+                <div class="admin-form-group">
+                    <label>Product Image (รูปภาพสินค้า)</label>
+                    <input type="file" id="prod-image" accept="image/*" style="background: rgba(0,0,0,0.4); padding: 10px;">
+                    <small style="color:var(--premium-muted); display:block; margin-top:5px;">อัปโหลดรูปภาพสินค้าใหม่ หรือปล่อยว่างหากไม่ต้องการเปลี่ยนรูป</small>
                 </div>
                 <div style="text-align: right; margin-top: 25px;">
                     <button type="submit" class="action-btn btn-retry" style="padding: 10px 25px;">Save Product</button>

@@ -384,9 +384,9 @@
                             App.state.user = data.user;
                             App.renderSession();
                             document.getElementById('login-modal').classList.remove('active');
-                            // If they came from another page via login redirect, go to shop. Otherwise just reload.
-                            if (new URLSearchParams(window.location.search).get('login') === 'true') {
-                                window.location.href = 'shop.html';
+                            // Do not redirect to shop. Just stay on the current page.
+                            if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+                                window.location.reload();
                             } else {
                                 window.location.reload();
                             }
