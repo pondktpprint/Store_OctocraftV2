@@ -227,12 +227,11 @@ const App = {
             this.showToast('ไม่มีสินค้าในตะกร้า');
             return;
         }
-        
-        if (!this.state.token) {
-            alert('กรุณาเข้าสู่ระบบก่อนชำระเงิน');
-            window.location.href = 'index.html?login=true';
-            return;
-        }
+                if (!App.state.user) {
+                Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเข้าสู่ระบบก่อนชำระเงิน', background: '#1a1f2b', color: '#fff' });
+                document.getElementById('login-modal').classList.add('active');
+                return;
+            }
 
         const btn = document.querySelector('.checkout-btn');
         const originalText = btn.innerHTML;
@@ -246,19 +245,33 @@ const App = {
                 body: JSON.stringify({ items })
             });
 
-            if (res.ok) {
-                alert('🎉 ชำระเงินสำเร็จ! คำสั่งซื้อของคุณกำลังถูกดำเนินการ');
-                this.state.cart = [];
-                localStorage.removeItem('octo_cart');
-                this.updateCartUI();
-                document.getElementById('cart-sidebar')?.classList.remove('active');
-                document.getElementById('cart-overlay')?.classList.remove('active');
-            } else {
-                alert('❌ ล้มเหลว: ' + res.error);
-            }
-        } catch (err) {
-            alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้');
-        } finally {
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: 'สำเร็จ', text: '🎉 ชำระเงินสำเร็จ! คำสั่งซื้อของคุณกำลังถูกดำเนินการ', background: '#1a1f2b', color: '#fff' }).then(() => {
+                        window.location.href = '/index.html';
+                    });
+                } else {
+                    if (res.error === 'insufficient_points') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'พอยท์ไม่เพียงพอ',
+                            text: 'กรุณาเติมเงินเพื่อซื้อสินค้านี้',
+                            confirmButtonText: 'ไปหน้าเติมเงิน',
+                            showCancelButton: true,
+                            cancelButtonText: 'ยกเลิก',
+                            background: '#1a1f2b', color: '#fff'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/topup.html';
+                            }
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: '❌ ล้มเหลว: ' + res.error, background: '#1a1f2b', color: '#fff' });
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', background: '#1a1f2b', color: '#fff' });
+            } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
         }

@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octo Craft SMP - Webshop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
     <style>
@@ -350,11 +351,15 @@
             event.preventDefault();
             event.stopPropagation();
             navigator.clipboard.writeText('play.octocraft.online');
-            if (typeof App !== 'undefined' && App.showToast) {
-                App.showToast('คัดลอก IP: play.octocraft.online แล้ว!');
-            } else {
-                alert('คัดลอก IP: play.octocraft.online เรียบร้อย!');
-            }
+            Swal.fire({
+                icon: 'success',
+                title: 'คัดลอก IP แล้ว!',
+                text: 'play.octocraft.online',
+                timer: 2000,
+                showConfirmButton: false,
+                background: '#1a1f2b',
+                color: '#fff'
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -384,17 +389,12 @@
                             App.state.user = data.user;
                             App.renderSession();
                             document.getElementById('login-modal').classList.remove('active');
-                            // Do not redirect to shop. Just stay on the current page.
-                            if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-                                window.location.reload();
-                            } else {
-                                window.location.reload();
-                            }
+                            window.location.reload();
                         } else {
-                            alert(data.error || 'เข้าสู่ระบบล้มเหลว');
+                            Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: data.error || 'เข้าสู่ระบบล้มเหลว', background: '#1a1f2b', color: '#fff' });
                         }
                     } catch (err) {
-                        alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้');
+                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', background: '#1a1f2b', color: '#fff' });
                     } finally {
                         btn.textContent = 'เข้าสู่ระบบ';
                         btn.disabled = false;
@@ -557,6 +557,9 @@
             }
 
             updateDonators();
+            
+            // Real-time updates every 15 seconds
+            setInterval(updateDonators, 15000);
         });
     </script>
 </body>

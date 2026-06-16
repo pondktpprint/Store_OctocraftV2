@@ -12,7 +12,7 @@ const Admin = {
         }
 
         if (App.state.user.role !== 'admin') {
-            alert('Access Denied. Admins only.');
+            Swal.fire({ icon: 'error', title: 'ปฏิเสธการเข้าถึง', text: 'เข้าถึงได้เฉพาะแอดมินเท่านั้น', background: '#1a1f2b', color: '#fff' });
             window.location.href = 'index.html';
             return;
         }
@@ -60,7 +60,7 @@ const Admin = {
             }
             return res;
         } catch (e) {
-            alert('Error: ' + e.message);
+            Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'Error: ' + e.message, background: '#1a1f2b', color: '#fff' });
             throw e;
         }
     },
@@ -113,7 +113,8 @@ const Admin = {
     },
 
     async regenerateToken() {
-        if (!confirm('Are you sure? All connected Minecraft servers will be disconnected until they update their config.')) return;
+        const result = await Swal.fire({ title: 'Are you sure?', text: 'All connected Minecraft servers will be disconnected until they update their config.', icon: 'warning', showCancelButton: true, background: '#1a1f2b', color: '#fff' });
+        if (!result.isConfirmed) return;
         try {
             const res = await this.fetchAdmin('/api/admin/settings/regenerate-token', { method: 'POST' });
             document.getElementById('status-bridge-token').value = res.token;
@@ -326,7 +327,8 @@ const Admin = {
     },
 
     async deleteProduct() {
-        if (!confirm('ยืนยันที่จะลบสินค้านี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้')) return;
+        const result = await Swal.fire({ title: 'ยืนยันที่จะลบสินค้านี้ใช่หรือไม่?', text: 'การกระทำนี้ไม่สามารถย้อนกลับได้', icon: 'warning', showCancelButton: true, background: '#1a1f2b', color: '#fff' });
+        if (!result.isConfirmed) return;
         const id = document.getElementById('prod-id').value;
         if (!id) return;
         try {
@@ -422,7 +424,8 @@ const Admin = {
     },
 
     async retryJob(id) {
-        if (!confirm('Are you sure you want to retry this delivery job?')) return;
+        const result = await Swal.fire({ title: 'Are you sure?', text: 'Are you sure you want to retry this delivery job?', icon: 'warning', showCancelButton: true, background: '#1a1f2b', color: '#fff' });
+        if (!result.isConfirmed) return;
         await this.fetchAdmin(`/api/admin/delivery-jobs/${id}/retry`, { method: 'POST' });
         App.showToast('Job queued for retry');
         this.loadDelivery();
@@ -461,13 +464,17 @@ const Admin = {
         const action = document.getElementById('wallet-action').value;
         const amount = parseInt(document.getElementById('wallet-amount').value);
 
-        await this.fetchAdmin(`/api/admin/wallet/${action}`, {
+        const res = await this.fetchAdmin(`/api/admin/wallet/${action}`, {
             method: 'POST',
             body: JSON.stringify({ username, amount_points: amount })
         });
         
+        if (res.ok) {
+            Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'เปลี่ยนสถานะสำเร็จ', timer: 1500, showConfirmButton: false, background: '#1a1f2b', color: '#fff' });
+            Admin.loadOrders();
+        }
+        
         document.getElementById('wallet-modal').classList.remove('active');
-        App.showToast('Wallet updated successfully');
         
         // Refresh global data
         const tRes = await this.fetchAdmin('/api/admin/wallet');

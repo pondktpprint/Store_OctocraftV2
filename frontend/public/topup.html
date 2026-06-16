@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top-up - Octo Craft SMP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="shop-page">
     <div class="bubbles" id="bubbles-container"></div>
@@ -29,7 +30,7 @@
             <div class="topup-slider" id="topup-slider">
                 
                 <!-- Step 1: Select Amount -->
-                <div class="topup-step step-1">
+                <div class="topup-step step-1" id="step1">
                     <h2 class="step-title">💎 เติมเงิน (Top-up)</h2>
                     <p class="step-desc" id="point-rate-desc">สแกนจ่ายผ่านพร้อมเพย์ รับพอยท์อัตโนมัติ (อัตรา 1 บาท = 1 Point)</p>
                     
@@ -128,7 +129,7 @@
                 </div>
 
                 <!-- Step 2: Pay and Upload Slip -->
-                <div class="topup-step step-2">
+                <div class="topup-step step-2" id="step2">
                     <button class="back-step-btn" onclick="goToStep1()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; margin-bottom: 20px;"><i class="fas fa-chevron-left"></i> ย้อนกลับ / ยกเลิกรายการ</button>
                     <h2 class="step-title">📱 สแกนชำระเงิน</h2>
                     <p class="step-desc">กรุณาสแกนคิวอาร์โค้ดด้านล่างเพื่อชำระเงิน และแนบรูปภาพสลิปโอนเงิน</p>
@@ -246,8 +247,13 @@
 
         function goToStep2() {
             if (currentAmount <= 0) return;
-            if (!promptpayTarget) {
-                alert("ระบบเติมเงินพร้อมเพย์ยังไม่ได้ตั้งค่าบัญชีรับเงิน กรุณาติดต่อผู้ดูแลระบบ");
+            if (!App.state.settings || !App.state.settings.PROMPTPAY_TARGET) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาด',
+                    text: 'ระบบเติมเงินพร้อมเพย์ยังไม่ได้ตั้งค่าบัญชีรับเงิน กรุณาติดต่อผู้ดูแลระบบ',
+                    background: '#1a1f2b', color: '#fff'
+                });
                 return;
             }
             
@@ -279,7 +285,12 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    alert('หมดเวลาสำหรับทำการโอนเงิน หากสแกนสำเร็จแล้วกรุณาทำรายการใหม่อีกครั้ง');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'หมดเวลา',
+                        text: 'หมดเวลาสำหรับทำการโอนเงิน หากสแกนสำเร็จแล้วกรุณาทำรายการใหม่อีกครั้ง',
+                        background: '#1a1f2b', color: '#fff'
+                    });
                     goToStep1();
                 }
             }, 1000);
@@ -325,7 +336,12 @@
         async function submitPayment() {
             const fileInput = document.getElementById('slip-upload');
             if (!fileInput.files || !fileInput.files[0]) {
-                alert("กรุณาแนบรูปสลิปโอนเงินก่อนยืนยัน");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'แจ้งเตือน',
+                    text: 'กรุณาแนบรูปสลิปโอนเงินก่อนยืนยัน',
+                    background: '#1a1f2b', color: '#fff'
+                });
                 return;
             }
             
@@ -348,16 +364,30 @@
                     });
                     
                     if (res.ok) {
-                        alert(res.message || "แนบสลิปเรียบร้อย! เจ้าหน้าที่กำลังตรวจสอบข้อมูลการโอนเงินของท่าน");
-                        goToStep1();
-                        document.getElementById('custom-amount-input').value = '';
-                        calculatePoints();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: res.message || "แนบสลิปเรียบร้อย! เจ้าหน้าที่กำลังตรวจสอบข้อมูลการโอนเงินของท่าน",
+                            background: '#1a1f2b', color: '#fff'
+                        }).then(() => {
+                            window.location.reload();
+                        });
                     } else {
-                        alert('เกิดข้อผิดพลาด: ' + (res.error || "ไม่สามารถส่งข้อมูลได้"));
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: res.error || "ไม่สามารถส่งข้อมูลได้",
+                            background: '#1a1f2b', color: '#fff'
+                        });
                     }
                 } catch (err) {
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
-                    console.error(err);
+                    console.error("Slip upload error:", err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
+                        background: '#1a1f2b', color: '#fff'
+                    });
                 } finally {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
