@@ -1843,11 +1843,27 @@ body {
         grid-template-columns: 1fr;
     }
 
+    /* Index layout */
+    .main-menu-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .promo-card {
+        width: 100%;
+    }
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+    .donators-dashboard > div {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
     /* Topup Layout */
     .amount-grid {
         display: grid;
-        grid-template-columns: repeat(6, 1fr) !important;
-        gap: 5px;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px;
     }
     .amount-btn.modern-btn {
         padding: 8px 2px;
@@ -1883,8 +1899,8 @@ body {
 
 @media (max-width: 480px) {
     .amount-grid {
-        grid-template-columns: repeat(6, 1fr) !important;
-        gap: 3px;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 5px;
     }
     .amount-btn.modern-btn {
         padding: 6px 2px;
@@ -1892,6 +1908,7 @@ body {
     .amount-btn.modern-btn .amt {
         font-size: 0.8rem;
     }
+}
 
 /* Modern Button for Topup */
 .amount-btn.modern-btn {
