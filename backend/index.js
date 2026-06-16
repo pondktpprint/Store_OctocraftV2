@@ -61,6 +61,12 @@ app.get("/api/public/server-status", async (req, res) => {
       players: {
         online: status.players && Number(status.players.online || 0),
         max: status.players && Number(status.players.max || 0)
+      },
+      promo: {
+        badge: settings.PROMO_BADGE || "PROMOTION",
+        image: settings.PROMO_IMAGE || "images/promo.png",
+        title: settings.PROMO_TITLE || "เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!",
+        subtitle: settings.PROMO_SUBTITLE || "รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!"
       }
     });
   } catch (error) {
@@ -70,6 +76,12 @@ app.get("/api/public/server-status", async (req, res) => {
       host: "127.0.0.1",
       port: 25565,
       players: { online: 0, max: 0 },
+      promo: {
+        badge: "PROMOTION",
+        image: "images/promo.png",
+        title: "เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!",
+        subtitle: "รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!"
+      },
       error: error.message
     });
   }

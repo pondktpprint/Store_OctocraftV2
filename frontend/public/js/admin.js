@@ -107,6 +107,11 @@ const Admin = {
             document.getElementById('setting-point-rate').value = s.POINT_RATE || '1.0';
             document.getElementById('setting-easyslip-key').value = s.EASYSLIP_API_KEY || '';
             
+            document.getElementById('setting-promo-badge').value = s.PROMO_BADGE || 'PROMOTION';
+            document.getElementById('setting-promo-title').value = s.PROMO_TITLE || 'เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!';
+            document.getElementById('setting-promo-subtitle').value = s.PROMO_SUBTITLE || 'รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!';
+            document.getElementById('setting-promo-image').value = s.PROMO_IMAGE || 'images/promo.png';
+            
         } catch(e) {
             console.error('Failed to load system status', e);
         }
@@ -138,6 +143,10 @@ const Admin = {
             PROMPTPAY_NAME: document.getElementById('setting-promptpay-name').value,
             POINT_RATE: document.getElementById('setting-point-rate').value,
             EASYSLIP_API_KEY: document.getElementById('setting-easyslip-key').value,
+            PROMO_BADGE: document.getElementById('setting-promo-badge').value,
+            PROMO_TITLE: document.getElementById('setting-promo-title').value,
+            PROMO_SUBTITLE: document.getElementById('setting-promo-subtitle').value,
+            PROMO_IMAGE: document.getElementById('setting-promo-image').value
         };
 
         try {

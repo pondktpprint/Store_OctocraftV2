@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Octo Craft SMP</title>
+    <title>Octocraft</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -603,6 +604,29 @@
                         <div class="admin-form-group">
                             <label>EasySlip API Key (สำหรับตรวจสอบสลิปอัตโนมัติ)</label>
                             <input type="password" id="setting-easyslip-key" placeholder="เว้นว่างไว้เพื่อปิดระบบตรวจสอบสลิปอัตโนมัติ">
+                        </div>
+                    </div>
+
+                    <!-- Promotion Config -->
+                    <div class="admin-card" style="margin-bottom:0; grid-column: 1 / -1;">
+                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-bullhorn"></i> การตั้งค่าโปรโมชั่นหน้าแรก</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="admin-form-group">
+                                <label>ข้อความป้ายกำกับ (Badge)</label>
+                                <input type="text" id="setting-promo-badge" placeholder="เช่น PROMOTION หรือ HOT SALE">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>หัวข้อโปรโมชั่น (Title)</label>
+                                <input type="text" id="setting-promo-title" placeholder="เช่น เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!">
+                            </div>
+                            <div class="admin-form-group" style="grid-column: 1 / -1;">
+                                <label>รายละเอียดโปรโมชั่น (Subtitle)</label>
+                                <textarea id="setting-promo-subtitle" rows="2" style="width:100%; padding:10px 15px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.3); color:white; font-size:0.95rem;" placeholder="เช่น รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน..."></textarea>
+                            </div>
+                            <div class="admin-form-group" style="grid-column: 1 / -1;">
+                                <label>ลิงก์รูปภาพโปรโมชั่น (Image URL)</label>
+                                <input type="text" id="setting-promo-image" placeholder="เช่น images/promo.png หรือลิงก์รูปภาพจากเว็บอื่น">
+                            </div>
                         </div>
                     </div>
 

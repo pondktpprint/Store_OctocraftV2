@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Octo Craft SMP - Webshop</title>
+    <title>Octocraft</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -264,12 +265,12 @@
             <!-- Right Column: Promotion Card -->
             <div class="promo-card">
                 <div style="position: absolute; top: 20px; left: 20px; z-index: 5;">
-                    <span class="promo-badge">PROMOTION</span>
+                    <span class="promo-badge" id="promo-badge">PROMOTION</span>
                 </div>
-                <img src="images/promo.png" alt="Promotion" class="promo-image" onerror="this.src='https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=600&h=800'">
+                <img src="images/promo.png" id="promo-image" alt="Promotion" class="promo-image" onerror="this.src='https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=600&h=800'">
                 <div class="promo-overlay">
-                    <h3>เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 8px; font-weight: 400; line-height: 1.4; margin-bottom: 0;">
+                    <h3 id="promo-title">เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!</h3>
+                    <p id="promo-subtitle" style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 8px; font-weight: 400; line-height: 1.4; margin-bottom: 0;">
                         รับคะแนนคูณสองฟรีทุกช่องทางการเติมเงิน ตลอดสัปดาห์นี้เท่านั้น ยศราคาพิเศษลด 20% ทั้งเซิร์ฟเวอร์!
                     </p>
                 </div>
@@ -419,6 +420,14 @@
                         dot.className = 'status-dot online';
                         lbl.innerText = 'Online';
                         players.innerText = `${data.players.online} / ${data.players.max} ผู้เล่น`;
+                        
+                        // Update Promo Card
+                        if (data.promo) {
+                            document.getElementById('promo-badge').innerText = data.promo.badge;
+                            document.getElementById('promo-image').src = data.promo.image;
+                            document.getElementById('promo-title').innerHTML = data.promo.title;
+                            document.getElementById('promo-subtitle').innerHTML = data.promo.subtitle;
+                        }
                     } else {
                         dot.className = 'status-dot offline';
                         lbl.innerText = 'Offline';
