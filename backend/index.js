@@ -32,6 +32,7 @@ app.get("/health", (req, res) => res.json({ ok: true }));
 const { pingMinecraftServer } = require("./rcon/ping");
 const { getSettings } = require("./settings/service");
 const { getConnectedClientCount } = require("./rcon/bridge");
+const { pool } = require("./db");
 
 app.get("/api/public/server-status", async (req, res) => {
   try {
