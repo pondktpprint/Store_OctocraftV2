@@ -637,7 +637,7 @@
                     <h2>Player Administration</h2>
                     <div style="display:flex; gap:10px;">
                         <input type="text" id="player-search-input" placeholder="Search nLogin username..." style="padding:10px 15px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.3); color:white; font-size:0.95rem;">
-                        <button class="action-btn btn-retry" onclick="Admin.searchPlayers()"><i class="fas fa-search"></i> Search</button>
+                        <button class="action-btn btn-retry" onclick="Admin.loadPlayers()"><i class="fas fa-search"></i> Search</button>
                     </div>
                 </div>
 
@@ -849,9 +849,10 @@
                     <input type="file" id="prod-image" accept="image/*" style="background: rgba(0,0,0,0.4); padding: 10px;">
                     <small style="color:var(--premium-muted); display:block; margin-top:5px;">อัปโหลดรูปภาพสินค้าใหม่ หรือปล่อยว่างหากไม่ต้องการเปลี่ยนรูป</small>
                 </div>
-                <div style="text-align: right; margin-top: 25px;">
-                    <button type="submit" class="action-btn btn-retry" style="padding: 10px 25px;">Save Product</button>
-                </div>
+                    <div style="grid-column: 1 / -1; display:flex; justify-content:space-between; margin-top:10px;">
+                        <button type="button" id="btn-delete-product" class="action-btn btn-danger" style="display:none;" onclick="Admin.deleteProduct()"><i class="fas fa-trash"></i> ลบสินค้า</button>
+                        <button type="submit" class="action-btn btn-retry" style="margin-left:auto;"><i class="fas fa-save"></i> Save Product</button>
+                    </div>
             </form>
         </div>
     </div>

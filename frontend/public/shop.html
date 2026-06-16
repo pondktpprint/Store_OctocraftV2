@@ -254,7 +254,7 @@
     <!-- Product Details Modal -->
     <div class="modal-overlay" id="details-modal">
         <div class="modal-content shop-modal-content">
-            <button class="close-modal">&times;</button>
+            <button class="close-modal" onclick="document.getElementById('details-modal').classList.remove('active')">&times;</button>
             <div id="details-modal-body"></div>
         </div>
     </div>
@@ -296,6 +296,7 @@
             }
 
             function getItemIcon(item) {
+                if (item.image) return item.image;
                 if (item.category === 'Rank') return 'https://cdn-icons-png.flaticon.com/512/2838/2838575.png';
                 if (item.category === 'Key') return 'https://cdn-icons-png.flaticon.com/512/3218/3218006.png';
                 if (item.category === 'Privilege') return 'https://cdn-icons-png.flaticon.com/512/3208/3208756.png';

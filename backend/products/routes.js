@@ -92,4 +92,9 @@ productsRouter.patch("/:id", requireUser, requireAdmin, asyncHandler(async (req,
   }
 }));
 
+productsRouter.delete("/:id", requireUser, requireAdmin, asyncHandler(async (req, res) => {
+  await pool.execute("DELETE FROM products WHERE id = ?", [req.params.id]);
+  res.json({ ok: true });
+}));
+
 module.exports = { productsRouter };

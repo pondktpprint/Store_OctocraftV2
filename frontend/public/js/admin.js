@@ -40,7 +40,7 @@ const Admin = {
 
                 if (tabId === 'status') this.loadSystemStatus();
                 if (tabId === 'products') this.loadProducts();
-                if (tabId === 'players') { document.getElementById('player-search-results').style.display='block'; document.getElementById('player-profile-view').style.display='none'; }
+                if (tabId === 'players') { document.getElementById('player-search-results').style.display='block'; document.getElementById('player-profile-view').style.display='none'; this.loadPlayers(); }
                 if (tabId === 'orders') this.loadOrders();
                 if (tabId === 'delivery') this.loadDelivery();
                 if (tabId === 'wallet') this.loadWallet();
@@ -149,10 +149,12 @@ const Admin = {
     },
 
     // --- PLAYERS ---
-    async searchPlayers() {
+    async loadPlayers() {
         const q = document.getElementById('player-search-input').value.trim();
-        if (!q) return;
-        const res = await this.fetchAdmin(`/api/admin/players/search?q=${encodeURIComponent(q)}`);
+        let url = '/api/admin/players';
+        if (q) url = `/api/admin/players/search?q=${encodeURIComponent(q)}`;
+        
+        const res = await this.fetchAdmin(url);
         const tbody = document.getElementById('player-search-tbody');
         tbody.innerHTML = '';
         if (res.players.length === 0) {
@@ -286,6 +288,7 @@ const Admin = {
         document.getElementById('prod-active').value = '1';
         document.getElementById('prod-image').value = '';
         document.getElementById('product-modal-title').innerText = 'Create Product';
+        document.getElementById('btn-delete-product').style.display = 'none';
         document.getElementById('product-modal').classList.add('active');
     },
 
@@ -300,7 +303,22 @@ const Admin = {
         document.getElementById('prod-active').value = p.active;
         document.getElementById('prod-image').value = '';
         document.getElementById('product-modal-title').innerText = 'Edit Product';
+        document.getElementById('btn-delete-product').style.display = 'inline-flex';
         document.getElementById('product-modal').classList.add('active');
+    },
+
+    async deleteProduct() {
+        if (!confirm('ยืนยันที่จะลบสินค้านี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้')) return;
+        const id = document.getElementById('prod-id').value;
+        if (!id) return;
+        try {
+            await this.fetchAdmin(`/api/products/${id}`, { method: 'DELETE' });
+            document.getElementById('product-modal').classList.remove('active');
+            App.showToast('ลบสินค้าเรียบร้อยแล้ว');
+            this.loadProducts();
+        } catch (e) {
+            console.error(e);
+        }
     },
 
     async saveProduct(e) {

@@ -84,9 +84,22 @@ async function verifyNLoginPassword(username, password) {
   }
 }
 
+async function getAllPlayers() {
+  const pool = getNLoginPool();
+  const [rows] = await pool.query(
+    `SELECT ??, ??, ??, ??, ?? FROM ?? ORDER BY ?? DESC LIMIT 200`,
+    [
+      COL_ID, COL_USERNAME, COL_EMAIL, COL_CREATED, COL_LAST_SEEN,
+      TBL, COL_CREATED
+    ]
+  );
+  return rows.map(mapSafePlayer);
+}
+
 module.exports = {
   checkHealth,
   searchPlayers,
   getPlayerByUsername,
-  verifyNLoginPassword
+  verifyNLoginPassword,
+  getAllPlayers
 };

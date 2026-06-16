@@ -16,10 +16,16 @@ playersRouter.get("/health", asyncHandler(async (req, res) => {
   res.json({ ok: true, status: "connected" });
 }));
 
+playersRouter.get("/", asyncHandler(async (req, res) => {
+  const players = await require("./service").getAllPlayers();
+  res.json({ ok: true, players });
+}));
+
 playersRouter.get("/search", asyncHandler(async (req, res) => {
   const query = req.query.q;
   if (!query) {
-    return res.json({ ok: true, players: [] });
+    const players = await require("./service").getAllPlayers();
+    return res.json({ ok: true, players });
   }
   const players = await searchPlayers(query);
   res.json({ ok: true, players });
