@@ -47,6 +47,7 @@ function attachBridge(server) {
 
   // Auto-retry stuck or queued jobs every 30 seconds
   setInterval(() => {
+    console.log(`[Bridge] Auto-retry running. Connected clients: ${clients.size}`);
     triggerDelivery().catch(e => console.error("[Bridge] Auto-retry error:", e));
   }, 30000);
 }
@@ -94,10 +95,12 @@ async function sendQueuedJobs(ws) {
     
     console.log(`[Bridge] Sending job ${job.id} to plugin: ${job.command_payload}`);
     ws.send(JSON.stringify({
+      requestId: messageId,
       type: "execute_command",
-      message_id: messageId,
-      job_id: job.id,
-      command: job.command_payload
+      payload: {
+        job_id: job.id,
+        command: job.command_payload
+      }
     }));
   }
 }
@@ -120,7 +123,7 @@ async function recordDeliveryResult(message) {
   await transaction(async (connection) => {
     const [jobs] = await connection.execute(
       "SELECT id, order_id, status FROM delivery_jobs WHERE bridge_message_id = ? FOR UPDATE",
-      [String(message.message_id || "")]
+      [String(message.requestId || "")]
     );
     if (!jobs.length) return;
 
