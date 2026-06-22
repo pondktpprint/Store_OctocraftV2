@@ -60,7 +60,7 @@ async function handleBridgeMessage(ws, raw) {
     await sendQueuedJobs(ws);
     return;
   }
-  if (message.type === "delivery_result") {
+  if (message.type === "delivery_result" || message.type === "execute_command") {
     await recordDeliveryResult(message);
     await sendQueuedJobs(ws);
   }
