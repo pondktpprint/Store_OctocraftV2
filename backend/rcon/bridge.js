@@ -44,6 +44,11 @@ function attachBridge(server) {
       ws.send(JSON.stringify({ type: "error", error: error.message }));
     });
   });
+
+  // Auto-retry stuck or queued jobs every 30 seconds
+  setInterval(() => {
+    triggerDelivery().catch(e => console.error("[Bridge] Auto-retry error:", e));
+  }, 30000);
 }
 
 async function handleBridgeMessage(ws, raw) {
