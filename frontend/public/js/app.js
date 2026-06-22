@@ -25,6 +25,29 @@ const App = {
             .replace(/'/g, '&#39;');
     },
 
+    translateError(errCode) {
+        if (!errCode) return 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+        const errors = {
+            'insufficient_points': 'พอยท์ไม่เพียงพอ',
+            'insufficient_funds': 'ยอดเงินไม่เพียงพอ',
+            'product_not_found': 'ไม่พบสินค้านี้ในระบบ',
+            'product_inactive': 'สินค้านี้ถูกปิดการขายชั่วคราว',
+            'invalid_credentials': 'ชื่อตัวละครหรือรหัสผ่านไม่ถูกต้อง',
+            'too_many_requests': 'ทำรายการถี่เกินไป กรุณารอสักครู่',
+            'auth_required': 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+            'admin_required': 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้',
+            'slip_verification_failed': 'สลิปไม่ถูกต้อง หรือถูกใช้งานไปแล้ว',
+            'missing_required_fields': 'กรุณากรอกข้อมูลให้ครบถ้วน',
+            'invalid_amount': 'จำนวนเงินไม่ถูกต้อง',
+            'user_not_found': 'ไม่พบชื่อผู้ใช้นี้ในระบบ',
+            'unsupported_image_type': 'ไฟล์รูปภาพไม่รองรับ (รับเฉพาะ PNG, JPG, WEBP)',
+            'file_too_large': 'ไฟล์ขนาดใหญ่เกินไป (สูงสุด 10MB)',
+            'invalid_payload': 'ข้อมูลที่ส่งมาไม่ถูกต้อง',
+            'out_of_stock': 'สินค้าหมด'
+        };
+        return errors[errCode] || errCode;
+    },
+
     bindEvents() {
         document.body.addEventListener('click', (e) => {
             // Profile dropdown
@@ -265,7 +288,7 @@ const App = {
                             }
                         });
                     } else {
-                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: '❌ ล้มเหลว: ' + res.error, background: '#1a1f2b', color: '#fff' });
+                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: '❌ ล้มเหลว: ' + this.translateError(res.error), background: '#1a1f2b', color: '#fff' });
                     }
                 }
             } catch (err) {

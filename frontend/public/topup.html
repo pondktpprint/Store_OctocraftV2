@@ -408,7 +408,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'เกิดข้อผิดพลาด',
-                            text: res.error || "ไม่สามารถส่งข้อมูลได้",
+                            text: App.translateError(res.error) || "ไม่สามารถส่งข้อมูลได้",
                             background: '#1a1f2b', color: '#fff'
                         });
                     }

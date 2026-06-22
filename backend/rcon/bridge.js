@@ -52,7 +52,9 @@ function attachBridge(server) {
 }
 
 async function handleBridgeMessage(ws, raw) {
-  const message = JSON.parse(raw.toString("utf8"));
+  const rawStr = raw.toString("utf8");
+  console.log("[Bridge] Received message:", rawStr);
+  const message = JSON.parse(rawStr);
   if (message.type === "ready") {
     await sendQueuedJobs(ws);
     return;

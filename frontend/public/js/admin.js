@@ -54,7 +54,7 @@ const Admin = {
         try {
             const res = await App.api(path, options);
             if (!res.ok) {
-                const errMsg = res.error || 'Server error';
+                const errMsg = App.translateError(res.error);
                 const details = res.details ? `\nDetails: ${res.details}` : '';
                 throw new Error(errMsg + details);
             }
