@@ -91,6 +91,8 @@ async function sendQueuedJobs(ws) {
       [leaseExpiresAt, messageId, job.id]
     );
     if (!result.affectedRows) continue;
+    
+    console.log(`[Bridge] Sending job ${job.id} to plugin: ${job.command_payload}`);
     ws.send(JSON.stringify({
       type: "execute_command",
       message_id: messageId,
