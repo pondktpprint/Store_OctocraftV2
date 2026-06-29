@@ -382,50 +382,79 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดข้อมูล...';
             btn.disabled = true;
 
+            const file = fileInput.files[0];
             const reader = new FileReader();
-            reader.onload = async function(e) {
-                const slipData = e.target.result;
-                try {
-                    const res = await App.api('/api/topup/verify-slip', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            amount: currentAmount,
-                            points: Math.round(currentAmount * pointRate),
-                            slipData: slipData
-                        })
-                    });
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = async function() {
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
                     
-                    if (res.ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'สำเร็จ!',
-                            text: res.message || "แนบสลิปเรียบร้อย! เจ้าหน้าที่กำลังตรวจสอบข้อมูลการโอนเงินของท่าน",
-                            background: '#1a1f2b', color: '#fff'
-                        }).then(() => {
-                            window.location.reload();
+                    if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                        const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+                        width = width * ratio;
+                        height = height * ratio;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Compress to JPEG with 70% quality (drastically reduces mobile upload sizes)
+                    const slipData = canvas.toDataURL('image/jpeg', 0.7);
+
+                    try {
+                        const res = await App.api('/api/topup/verify-slip', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                amount: currentAmount,
+                                points: Math.round(currentAmount * pointRate),
+                                slipData: slipData
+                            })
                         });
-                    } else {
+                        
+                        if (res.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ!',
+                                text: res.message || "แนบสลิปเรียบร้อย! เจ้าหน้าที่กำลังตรวจสอบข้อมูลการโอนเงินของท่าน",
+                                background: '#1a1f2b', color: '#fff'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: App.translateError(res.error) || "ไม่สามารถส่งข้อมูลได้",
+                                background: '#1a1f2b', color: '#fff'
+                            });
+                        }
+                    } catch (err) {
+                        console.error("Slip upload error:", err);
                         Swal.fire({
                             icon: 'error',
                             title: 'เกิดข้อผิดพลาด',
-                            text: App.translateError(res.error) || "ไม่สามารถส่งข้อมูลได้",
+                            text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
                             background: '#1a1f2b', color: '#fff'
                         });
+                    } finally {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     }
-                } catch (err) {
-                    console.error("Slip upload error:", err);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'เกิดข้อผิดพลาด',
-                        text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
-                        background: '#1a1f2b', color: '#fff'
-                    });
-                } finally {
+                };
+                img.onerror = function() {
+                    Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไฟล์รูปภาพไม่ถูกต้อง', background: '#1a1f2b', color: '#fff' });
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                }
+                };
+                img.src = event.target.result;
             };
-            reader.readAsDataURL(fileInput.files[0]);
+            reader.readAsDataURL(file);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
