@@ -100,26 +100,36 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
 
       const easySlipData = await easySlipRes.json();
       
-      if (!easySlipData.success) {
+      if (easySlipData.success !== true && easySlipData.status !== 200) {
         fs.unlinkSync(targetPath); // Remove invalid image
         throw new HttpError(400, "slip_verification_failed", `การตรวจสอบสลิปล้มเหลว: ${easySlipData.message || 'สลิปไม่ถูกต้อง หรือถูกใช้งานไปแล้ว'}`);
       }
+      
+      const transRef = easySlipData.data?.transRef || easySlipData.data?.ref1 || easySlipData.data?.payload || null;
 
       // Automatically approve and credit points
       await transaction(async (connection) => {
-        const [result] = await connection.execute(
-          `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference)
-           VALUES (?, 'approved', ?, ?, ?)`,
-          [req.user.id, amountMinor, parsedPoints, relativePath]
-        );
-        
-        await recordTransaction(connection, {
-          userId: req.user.id,
-          type: "credit",
-          amountPoints: parsedPoints,
-          referenceType: "topup",
-          referenceId: result.insertId
-        });
+        try {
+          const [result] = await connection.execute(
+            `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference, trans_ref)
+             VALUES (?, 'approved', ?, ?, ?, ?)`,
+            [req.user.id, amountMinor, parsedPoints, relativePath, transRef]
+          );
+          
+          await recordTransaction(connection, {
+            userId: req.user.id,
+            type: "credit",
+            amountPoints: parsedPoints,
+            referenceType: "topup",
+            referenceId: result.insertId
+          });
+        } catch (dbErr) {
+          if (dbErr.code === 'ER_DUP_ENTRY') {
+             if (fs.existsSync(targetPath)) fs.unlinkSync(targetPath);
+             throw new HttpError(400, "duplicate_slip", "ระบบป้องกันการโกง: สลิปนี้ถูกใช้งานเติมเงินไปแล้วในระบบของเรา");
+          }
+          throw dbErr;
+        }
       });
 
       res.json({

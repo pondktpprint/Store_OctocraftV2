@@ -99,9 +99,11 @@ CREATE TABLE topup_requests (
   amount_minor BIGINT UNSIGNED NOT NULL,
   points BIGINT UNSIGNED NOT NULL,
   provider_reference VARCHAR(120) NULL,
+  trans_ref VARCHAR(120) NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+  UNIQUE KEY topup_requests_trans_ref_idx (trans_ref),
   KEY topup_requests_user_idx (user_id),
   CONSTRAINT topup_requests_user_fk FOREIGN KEY (user_id) REFERENCES users (id)
 );
