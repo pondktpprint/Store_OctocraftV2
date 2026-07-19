@@ -1,4 +1,5 @@
 const express = require("express");
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { pool, transaction } = require("../db");
@@ -8,6 +9,19 @@ const { getSettings } = require("../settings/service");
 const { recordTransaction } = require("../wallet/service");
 
 const topupRouter = express.Router();
+
+function removeFileIfExists(filePath) {
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+}
+
+function normalizeSlipReference(value) {
+  if (!value) return null;
+  const str = String(value);
+  if (str.length <= 120) return str;
+  return crypto.createHash("sha256").update(str).digest("hex");
+}
 
 // Helper to parse base64 image data
 function parseBase64Image(dataString) {
@@ -101,11 +115,21 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
       const easySlipData = await easySlipRes.json();
       
       if (easySlipData.success !== true && easySlipData.status !== 200) {
-        fs.unlinkSync(targetPath); // Remove invalid image
+        console.error("[EasySlip] Slip verification failed:", {
+          httpStatus: easySlipRes.status,
+          apiStatus: easySlipData.status,
+          code: easySlipData.code,
+          message: easySlipData.message
+        });
+        removeFileIfExists(targetPath); // Remove invalid image
         throw new HttpError(400, "slip_verification_failed", `การตรวจสอบสลิปล้มเหลว: ${easySlipData.message || 'สลิปไม่ถูกต้อง หรือถูกใช้งานไปแล้ว'}`);
       }
       
-      const transRef = easySlipData.data?.transRef || easySlipData.data?.ref1 || easySlipData.data?.payload || null;
+      const transRef = normalizeSlipReference(
+        easySlipData.data?.transRef ||
+        easySlipData.data?.ref1 ||
+        easySlipData.data?.payload
+      );
 
       // Automatically approve and credit points
       await transaction(async (connection) => {
@@ -125,7 +149,7 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
           });
         } catch (dbErr) {
           if (dbErr.code === 'ER_DUP_ENTRY') {
-             if (fs.existsSync(targetPath)) fs.unlinkSync(targetPath);
+             removeFileIfExists(targetPath);
              throw new HttpError(400, "duplicate_slip", "ระบบป้องกันการโกง: สลิปนี้ถูกใช้งานเติมเงินไปแล้วในระบบของเรา");
           }
           throw dbErr;
@@ -139,6 +163,14 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
 
     } catch (err) {
       if (err instanceof HttpError) throw err;
+      console.error("[Topup] EasySlip passed but topup failed:", {
+        code: err.code,
+        errno: err.errno,
+        sqlMessage: err.sqlMessage,
+        message: err.message,
+        stack: err.stack
+      });
+      removeFileIfExists(targetPath);
       throw new HttpError(500, "easyslip_error", "เกิดข้อผิดพลาดในการเชื่อมต่อระบบตรวจสอบสลิป");
     }
   } else {
