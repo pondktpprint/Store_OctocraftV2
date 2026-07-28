@@ -2292,4 +2292,192 @@ body:not(.shop-page) .container,
     }
 }
 
+/* MOBILE ONLY: tidy, touch-friendly navigation and page spacing */
+@media (max-width: 760px) {
+    .landing-nav,
+    .shop-nav {
+        width: calc(100% - 16px) !important;
+        margin-top: 8px !important;
+        padding: 10px !important;
+        border-radius: 22px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-areas:
+            "brand actions"
+            "menu menu" !important;
+        align-items: center !important;
+        gap: 10px !important;
+        overflow: visible !important;
+    }
+
+    .landing-nav .nav-brand,
+    .shop-nav .shop-logo-small {
+        grid-area: brand !important;
+        justify-self: start !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        min-width: 0;
+    }
+
+    .landing-nav .nav-brand img,
+    .shop-nav .shop-logo-small img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    .landing-nav .nav-brand span,
+    .shop-nav .shop-logo-small::after {
+        max-width: 136px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.94rem !important;
+    }
+
+    .landing-nav .user-profile-menu,
+    .shop-nav .shop-nav-actions {
+        grid-area: actions !important;
+        justify-self: end !important;
+        width: auto !important;
+        min-width: 0;
+    }
+
+    .landing-nav .nav-links,
+    .secondary-nav-links {
+        grid-area: menu !important;
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    .landing-nav .nav-links a,
+    .secondary-nav-links a {
+        width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 0 10px !important;
+        justify-content: center !important;
+        border-radius: 16px !important;
+        font-size: 0.84rem !important;
+        gap: 7px !important;
+    }
+
+    .landing-nav .nav-links a .lucide,
+    .secondary-nav-links a .lucide {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .landing-nav .login-btn,
+    .shop-nav .login-btn,
+    .landing-nav .user-profile-btn,
+    .shop-nav .user-profile-btn,
+    .cart-toggle-btn {
+        height: 40px !important;
+        min-height: 40px !important;
+        padding: 0 10px !important;
+        border-radius: 999px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .landing-nav .user-avatar,
+    .shop-nav .user-avatar {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .landing-nav .user-details,
+    .shop-nav .user-details {
+        max-width: 78px;
+        min-width: 0;
+    }
+
+    .landing-nav .user-name,
+    .shop-nav .user-name {
+        max-width: 78px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.82rem !important;
+    }
+
+    .landing-nav .dropdown-icon,
+    .shop-nav .dropdown-icon {
+        margin-left: 0 !important;
+    }
+
+    .landing-nav .profile-dropdown,
+    .shop-nav .profile-dropdown {
+        position: absolute !important;
+        top: calc(100% + 10px) !important;
+        right: 0 !important;
+        width: min(280px, calc(100vw - 20px)) !important;
+        max-height: min(70vh, 420px) !important;
+        overflow-y: auto !important;
+    }
+
+    .secondary-nav-left {
+        display: contents !important;
+    }
+
+    .secondary-nav-left .back-home-btn {
+        display: none !important;
+    }
+
+    body:not(.shop-page) .container,
+    .shop-container,
+    .topup-container,
+    .account-container {
+        width: calc(100% - 18px) !important;
+        padding-top: 18px !important;
+    }
+
+    .landing-hero,
+    .shop-hero,
+    .topup-hero,
+    .account-hero,
+    .topup-card-wrapper,
+    .account-card,
+    .dashboard-card,
+    .promo-card,
+    .shop-sidebar,
+    .item-card {
+        border-radius: 20px !important;
+    }
+
+    .landing-hero,
+    .shop-hero,
+    .topup-hero,
+    .account-hero {
+        padding: 22px 18px !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .landing-nav .nav-brand span,
+    .shop-nav .shop-logo-small::after {
+        max-width: 104px;
+    }
+
+    .landing-nav .user-details,
+    .shop-nav .user-details {
+        display: none !important;
+    }
+
+    .landing-nav .user-profile-btn,
+    .shop-nav .user-profile-btn {
+        gap: 6px !important;
+        padding: 0 8px !important;
+    }
+
+    .landing-nav .nav-links a,
+    .secondary-nav-links a {
+        font-size: 0.78rem !important;
+    }
+}
+
 
