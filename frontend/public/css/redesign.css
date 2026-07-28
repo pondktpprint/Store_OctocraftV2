@@ -1882,4 +1882,159 @@ body:not(.shop-page) .container,
     }
 }
 
+/* REQUESTED SECONDARY PAGE LEFT / RIGHT LAYOUT
+   Header: back button on the left, account/cart actions on the right.
+   Top-up: hero on the left and form card on the right on desktop. */
+.shop-nav {
+    width: min(1180px, calc(100% - 18px)) !important;
+    min-height: 62px !important;
+    margin: 6px auto 0 !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+}
+
+.shop-nav .shop-logo-small {
+    display: none !important;
+}
+
+.shop-nav .back-home-btn,
+.shop-nav .login-btn,
+.shop-nav .user-profile-btn,
+.cart-toggle-btn {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 15px !important;
+    border-radius: 999px !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+}
+
+.shop-nav .back-home-btn {
+    flex: 0 0 auto;
+}
+
+.shop-nav .shop-nav-actions {
+    margin-left: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    min-width: 0;
+}
+
+.topup-container {
+    width: min(1180px, calc(100% - 32px)) !important;
+    max-width: 1180px !important;
+    padding-top: 36px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+    align-items: start;
+    gap: 24px;
+}
+
+.topup-hero {
+    width: 100% !important;
+    min-height: 520px;
+    grid-template-columns: 1fr !important;
+    align-items: center !important;
+    margin-bottom: 0 !important;
+    padding: clamp(34px, 4.5vw, 44px) !important;
+}
+
+.topup-hero h1 {
+    max-width: 620px !important;
+    font-size: clamp(2.75rem, 4.7vw, 4.05rem) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.04em !important;
+}
+
+.topup-hero p {
+    max-width: 600px !important;
+    font-size: 1rem !important;
+}
+
+.topup-hero-steps {
+    width: 100%;
+    grid-template-columns: 1fr !important;
+}
+
+.topup-hero-steps div {
+    min-height: 88px !important;
+    padding: 18px 24px !important;
+}
+
+.topup-card-wrapper {
+    width: 100% !important;
+    max-width: 520px !important;
+    margin: 0 !important;
+    justify-self: stretch !important;
+}
+
+.step-title {
+    font-size: clamp(1.7rem, 3vw, 2.05rem) !important;
+}
+
+.premium-amount-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 980px) {
+    .shop-nav {
+        width: calc(100% - 18px) !important;
+    }
+
+    .topup-container {
+        width: min(980px, calc(100% - 24px)) !important;
+        display: block !important;
+    }
+
+    .topup-hero {
+        min-height: auto;
+        margin-bottom: 24px !important;
+    }
+
+    .topup-hero h1 {
+        font-size: clamp(2.55rem, 8vw, 3.55rem) !important;
+    }
+
+    .topup-card-wrapper {
+        margin: 0 auto !important;
+    }
+}
+
+@media (max-width: 720px) {
+    .shop-nav {
+        width: calc(100% - 14px) !important;
+        min-height: 58px !important;
+    }
+
+    .shop-nav .back-home-btn,
+    .shop-nav .login-btn,
+    .shop-nav .user-profile-btn,
+    .cart-toggle-btn {
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 0 12px !important;
+        font-size: 0.84rem !important;
+    }
+
+    .topup-container {
+        width: min(100% - 18px, 980px) !important;
+        padding-top: 18px !important;
+    }
+
+    .topup-hero h1 {
+        font-size: clamp(2.15rem, 11vw, 3rem) !important;
+        line-height: 1.04 !important;
+    }
+
+    .topup-hero-steps div {
+        min-height: 74px !important;
+        padding: 16px !important;
+    }
+}
+
 
