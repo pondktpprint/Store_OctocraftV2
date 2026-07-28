@@ -2037,4 +2037,135 @@ body:not(.shop-page) .container,
     }
 }
 
+/* GLOBAL SECONDARY NAV MENU
+   Makes the main navigation available on every secondary page and keeps it mobile-safe. */
+.secondary-nav-left {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    min-width: 0;
+}
+
+.secondary-nav-links {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0;
+}
+
+.secondary-nav-links a {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 13px !important;
+    border-radius: 999px !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    text-decoration: none;
+    font-size: 0.86rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap;
+}
+
+.secondary-nav-links a:hover,
+.secondary-nav-links a.active {
+    color: #ffffff !important;
+    background: rgba(59, 130, 246, 0.18) !important;
+    border-color: rgba(59, 130, 246, 0.42) !important;
+}
+
+.secondary-nav-links .lucide {
+    width: 17px !important;
+    height: 17px !important;
+}
+
+.shop-nav {
+    overflow: visible !important;
+}
+
+.shop-nav .user-profile-menu {
+    z-index: 250;
+}
+
+.shop-nav .profile-dropdown,
+.landing-nav .profile-dropdown {
+    z-index: 300;
+    right: 0;
+    width: min(260px, calc(100vw - 24px)) !important;
+    max-height: min(72vh, 420px);
+    overflow-y: auto;
+}
+
+@media (max-width: 980px) {
+    .secondary-nav-links a {
+        padding: 0 10px !important;
+    }
+}
+
+@media (max-width: 720px) {
+    .shop-nav {
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        overflow: visible !important;
+    }
+
+    .secondary-nav-left {
+        order: 1;
+        flex: 1 1 calc(100% - 150px);
+        min-width: 0;
+    }
+
+    .shop-nav .shop-nav-actions {
+        order: 2;
+        flex: 0 0 auto;
+        margin-left: auto !important;
+    }
+
+    .secondary-nav-links {
+        order: 3;
+        flex: 1 0 100%;
+        width: 100%;
+        margin-top: 8px;
+        padding-bottom: 2px;
+        overflow-x: auto;
+        overflow-y: visible;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .secondary-nav-links::-webkit-scrollbar {
+        display: none;
+    }
+
+    .secondary-nav-links a {
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 11px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .shop-nav .user-name {
+        max-width: 82px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .shop-nav .profile-dropdown {
+        top: calc(100% + 8px);
+        right: 0;
+    }
+}
+
+@media (max-width: 460px) {
+    .secondary-nav-left {
+        flex: 1 1 100%;
+    }
+
+    .shop-nav .shop-nav-actions {
+        width: 100%;
+        justify-content: flex-end !important;
+    }
+}
+
 
