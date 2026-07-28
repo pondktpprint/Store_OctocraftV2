@@ -1212,4 +1212,606 @@ body:has(.admin-layout) {
     }
 }
 
+/* FINAL UI CONSISTENCY PASS
+   Keeps every page on the same visual scale after the redesign overrides. */
+:root {
+    --ui-page-max: 1180px;
+    --ui-radius-xl: 30px;
+    --ui-radius-lg: 24px;
+    --ui-radius-md: 16px;
+    --ui-gap: clamp(16px, 2vw, 24px);
+    --ui-card-pad: clamp(20px, 3vw, 32px);
+    --ui-control-h: 46px;
+    --ui-text-sm: 0.9rem;
+    --ui-text: 1rem;
+    --ui-text-lg: 1.08rem;
+    --ui-title: clamp(1.45rem, 2.2vw, 1.9rem);
+    --ui-hero-title: clamp(2.25rem, 5vw, 4.45rem);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    text-rendering: optimizeLegibility;
+}
+
+body.shop-page,
+body:not(.shop-page) {
+    color: var(--smp-text, #f8fafc);
+}
+
+body:not(.shop-page) .container,
+.shop-container,
+.topup-container,
+.account-container {
+    width: min(var(--ui-page-max), calc(100% - 32px));
+}
+
+.shop-container,
+.topup-container,
+.account-container {
+    display: block !important;
+}
+
+.landing-nav,
+.shop-nav {
+    min-height: 64px;
+}
+
+.landing-nav a,
+.shop-nav a,
+.shop-nav button,
+.login-btn,
+.user-profile-btn,
+.cart-toggle-btn,
+.back-home-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    min-height: var(--ui-control-h);
+    font-size: var(--ui-text-sm) !important;
+}
+
+.landing-nav .user-profile-btn,
+.shop-nav .user-profile-btn {
+    padding: 7px 12px !important;
+}
+
+.user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+.profile-dropdown {
+    min-width: 240px;
+    border-radius: 18px !important;
+}
+
+.dropdown-item {
+    min-height: 42px;
+    font-size: 0.92rem !important;
+}
+
+.landing-hero,
+.shop-hero,
+.topup-hero,
+.account-hero,
+.dashboard-card,
+.promo-card,
+.topup-card-wrapper,
+.account-card,
+.admin-panel,
+.admin-card,
+.shop-sidebar,
+.item-card,
+.shop-modal-content,
+.modal-content {
+    border-radius: var(--ui-radius-lg) !important;
+}
+
+.landing-hero,
+.shop-hero,
+.topup-hero,
+.account-hero {
+    padding: clamp(26px, 4vw, 42px) !important;
+}
+
+.hero-copy h1,
+.shop-hero h1,
+.topup-hero h1,
+.account-hero h1 {
+    font-size: var(--ui-hero-title) !important;
+    line-height: 1.04 !important;
+    letter-spacing: -0.045em !important;
+    max-width: 760px;
+}
+
+.hero-copy p,
+.shop-hero p,
+.topup-hero p,
+.account-hero p,
+.card-content p,
+.step-desc {
+    font-size: clamp(0.95rem, 1.5vw, 1.06rem) !important;
+    line-height: 1.72 !important;
+}
+
+.hero-actions,
+.shop-hero-stats,
+.topup-hero-steps,
+.status-grid,
+.menu-grid,
+.donators-dashboard,
+.premium-amount-grid,
+.items-grid {
+    gap: var(--ui-gap) !important;
+}
+
+.hero-btn,
+.copy-ip-action-btn,
+.join-discord-action-btn,
+.action-btn,
+.submit-login-btn,
+.checkout-btn,
+.details-btn,
+.add-cart-btn,
+#generate-qr-btn,
+#confirm-payment-btn {
+    min-height: var(--ui-control-h) !important;
+    padding: 0 18px !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-size: 0.95rem !important;
+    line-height: 1.2 !important;
+    white-space: nowrap;
+}
+
+#generate-qr-btn,
+#confirm-payment-btn,
+.submit-login-btn,
+.checkout-btn {
+    width: 100%;
+}
+
+.section-title,
+.step-title,
+.admin-panel h2,
+.account-card h2,
+.cart-header h2 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    color: #ffffff !important;
+    font-size: var(--ui-title) !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.025em !important;
+}
+
+.step-title {
+    margin-bottom: 10px !important;
+}
+
+.status-card-new,
+.job-card,
+.dashboard-card,
+.mini-stat,
+.topup-hero-steps div,
+.account-card,
+.admin-card,
+#tx-list li,
+#order-list li {
+    padding: var(--ui-card-pad) !important;
+}
+
+.status-card-new {
+    min-height: 106px;
+}
+
+.status-card-info h3,
+.card-content h2,
+.donator-info h3,
+.item-name,
+.details-title,
+.admin-card h4,
+.admin-panel h3,
+.admin-panel h4 {
+    font-size: clamp(1rem, 1.5vw, 1.18rem) !important;
+    line-height: 1.35 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.status-details,
+.players-online,
+.mini-stat span,
+.topup-hero-steps span,
+.item-info-shop .badge,
+.cat-count,
+.admin-panel table,
+.admin-table,
+.admin-panel input,
+.admin-panel select,
+.admin-panel textarea {
+    font-size: var(--ui-text-sm) !important;
+}
+
+.status-icon-container,
+.card-icon,
+.cat-icon-wrap,
+.mini-stat > .lucide,
+.topup-hero-steps > div > .lucide {
+    flex: 0 0 auto;
+}
+
+.status-icon-container {
+    width: 48px !important;
+    height: 48px !important;
+}
+
+.card-icon {
+    width: 56px !important;
+    height: 56px !important;
+}
+
+.lucide {
+    width: 18px;
+    height: 18px;
+}
+
+.hero-btn .lucide,
+.section-title .lucide,
+.step-title .lucide,
+.card-icon .lucide,
+.status-icon-container .lucide {
+    width: 22px;
+    height: 22px;
+}
+
+.card-icon .lucide,
+.status-icon-container .lucide,
+.mini-stat > .lucide,
+.topup-hero-steps > div > .lucide {
+    color: var(--smp-blue);
+}
+
+.shop-layout-wrapper {
+    gap: var(--ui-gap) !important;
+}
+
+.shop-sidebar {
+    flex-basis: 280px !important;
+    padding: 18px !important;
+}
+
+.sidebar-category-btn {
+    min-height: 54px !important;
+    height: auto !important;
+    padding: 12px 14px !important;
+    border-radius: var(--ui-radius-md) !important;
+    font-size: 0.94rem !important;
+}
+
+.items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+}
+
+.item-card {
+    min-height: 372px !important;
+    padding: 18px !important;
+}
+
+.item-img-container {
+    min-height: 118px !important;
+    margin-bottom: 16px !important;
+}
+
+.item-image {
+    width: 72px !important;
+    height: 72px !important;
+}
+
+.item-price,
+.details-price,
+.cart-total #cart-total-price,
+#points-preview-val,
+.qr-amount,
+#profile-balance {
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem) !important;
+    line-height: 1.25 !important;
+}
+
+.item-actions .action-btns {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px !important;
+}
+
+.qty-selector,
+.qty-selector button,
+.qty-selector input {
+    min-height: 42px !important;
+    height: 42px !important;
+}
+
+.topup-step {
+    min-height: 520px;
+}
+
+.premium-amount-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.premium-amount-btn {
+    min-height: 70px !important;
+    height: auto !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+}
+
+.premium-amount-btn .amt {
+    font-size: 1.22rem !important;
+}
+
+.custom-input-wrapper input {
+    min-height: var(--ui-control-h);
+    font-size: var(--ui-text) !important;
+}
+
+.points-preview {
+    padding: 18px !important;
+    border-radius: 18px !important;
+    font-size: var(--ui-text) !important;
+}
+
+.qr-container {
+    width: min(100%, 292px);
+    padding: 20px !important;
+}
+
+.slip-upload-label {
+    min-height: 150px;
+    padding: 24px !important;
+}
+
+.slip-upload-label .lucide {
+    width: 42px !important;
+    height: 42px !important;
+}
+
+.account-card-header {
+    align-items: center;
+}
+
+.history-list-container {
+    max-height: min(62vh, 560px);
+}
+
+.admin-layout {
+    min-height: 100vh;
+}
+
+.admin-content {
+    padding: clamp(18px, 2.8vw, 32px) !important;
+}
+
+.admin-panel {
+    padding: clamp(18px, 2.5vw, 28px) !important;
+}
+
+.admin-card-grid,
+.admin-grid {
+    gap: var(--ui-gap) !important;
+}
+
+.admin-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-table th,
+.admin-table td,
+.admin-panel table th,
+.admin-panel table td {
+    padding: 12px 14px !important;
+    vertical-align: middle !important;
+}
+
+.admin-panel input,
+.admin-panel select,
+.admin-panel textarea,
+.input-group input {
+    min-height: 44px !important;
+    border-radius: 12px !important;
+}
+
+.modal-content,
+.shop-modal-content {
+    width: min(94vw, 520px) !important;
+    padding: clamp(22px, 3vw, 30px) !important;
+}
+
+.details-img-bg {
+    width: 76px !important;
+    height: 76px !important;
+}
+
+.details-image {
+    width: 52px !important;
+    height: 52px !important;
+}
+
+.site-footer {
+    margin-top: 42px;
+    padding: 24px 16px;
+}
+
+@media (min-width: 1180px) {
+    .items-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .landing-nav,
+    .shop-nav {
+        width: calc(100% - 20px) !important;
+    }
+
+    .landing-hero,
+    .shop-hero,
+    .topup-hero {
+        grid-template-columns: 1fr !important;
+    }
+
+    .status-grid,
+    .donators-dashboard {
+        grid-template-columns: 1fr !important;
+    }
+
+    .shop-layout-wrapper {
+        flex-direction: column !important;
+    }
+
+    .shop-sidebar {
+        width: 100% !important;
+        flex-basis: auto !important;
+        position: static !important;
+    }
+
+    .sidebar-category-menu {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow: visible !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html {
+        font-size: 15px;
+    }
+
+    body:not(.shop-page) .container,
+    .shop-container,
+    .topup-container,
+    .account-container {
+        width: min(100% - 18px, var(--ui-page-max));
+        padding-top: 18px !important;
+    }
+
+    .landing-nav,
+    .shop-nav {
+        min-height: auto;
+        padding: 9px !important;
+        gap: 8px !important;
+    }
+
+    .nav-links {
+        gap: 6px !important;
+    }
+
+    .nav-links a,
+    .back-home-btn,
+    .cart-toggle-btn,
+    .shop-nav .login-btn {
+        min-height: 40px !important;
+        padding: 0 12px !important;
+    }
+
+    .landing-hero,
+    .shop-hero,
+    .topup-hero,
+    .account-hero,
+    .topup-card-wrapper,
+    .account-card,
+    .dashboard-card,
+    .promo-card {
+        border-radius: 22px !important;
+    }
+
+    .hero-copy h1,
+    .shop-hero h1,
+    .topup-hero h1,
+    .account-hero h1 {
+        font-size: clamp(2rem, 11vw, 3rem) !important;
+        letter-spacing: -0.035em !important;
+    }
+
+    .hero-actions,
+    .item-actions .action-btns {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero-btn,
+    .details-btn,
+    .add-cart-btn {
+        width: 100% !important;
+    }
+
+    .status-card-new,
+    .job-card,
+    .mini-stat,
+    .topup-hero-steps div {
+        padding: 16px !important;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .premium-amount-grid,
+    .sidebar-category-menu {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .items-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .item-card {
+        min-height: auto !important;
+    }
+
+    .cart-sidebar {
+        width: min(100%, 390px) !important;
+        border-radius: 22px 0 0 22px !important;
+    }
+
+    .admin-content {
+        padding: 14px !important;
+    }
+
+    .admin-sidebar {
+        width: min(86vw, 300px) !important;
+    }
+}
+
+@media (max-width: 460px) {
+    .premium-amount-grid,
+    .sidebar-category-menu {
+        grid-template-columns: 1fr !important;
+    }
+
+    .status-card-new,
+    .mini-stat,
+    .topup-hero-steps div,
+    .account-card-header {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+
+    .status-details {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+}
+
 

@@ -279,7 +279,7 @@ const App = {
             });
 
                 if (res.ok) {
-                    Swal.fire({ icon: 'success', title: 'สำเร็จ', text: '🎉 ชำระเงินสำเร็จ! คำสั่งซื้อของคุณกำลังถูกดำเนินการ', background: '#1a1f2b', color: '#fff' }).then(() => {
+                    Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'ชำระเงินสำเร็จ! คำสั่งซื้อของคุณกำลังถูกดำเนินการ', background: '#1a1f2b', color: '#fff' }).then(() => {
                         window.location.href = '/index.html';
                     });
                 } else {
@@ -298,7 +298,7 @@ const App = {
                             }
                         });
                     } else {
-                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: '❌ ล้มเหลว: ' + this.translateError(res.error), background: '#1a1f2b', color: '#fff' });
+                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: 'ล้มเหลว: ' + this.translateError(res.error), background: '#1a1f2b', color: '#fff' });
                     }
                 }
             } catch (err) {
