@@ -2480,4 +2480,679 @@ body:not(.shop-page) .container,
     }
 }
 
+/* MOBILE FINAL RESPONSIVE SWEEP
+   Desktop/tablet-wide designs above are intentionally left untouched.
+   This last layer only normalizes small screens across every public page. */
+@media (max-width: 820px) {
+    html {
+        font-size: 15px;
+        overflow-x: hidden;
+    }
+
+    body {
+        overflow-x: hidden !important;
+        min-width: 0 !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+        max-width: 100%;
+    }
+
+    .landing-nav,
+    .shop-nav {
+        position: sticky !important;
+        top: 8px !important;
+        z-index: 500 !important;
+        width: calc(100% - 16px) !important;
+        max-width: calc(100% - 16px) !important;
+        margin: 8px auto 0 !important;
+        padding: 10px !important;
+        border-radius: 22px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-areas:
+            "brand actions"
+            "menu menu" !important;
+        gap: 9px !important;
+        align-items: center !important;
+        overflow: visible !important;
+    }
+
+    .landing-nav .nav-brand,
+    .shop-nav .shop-logo-small {
+        grid-area: brand !important;
+        display: inline-flex !important;
+        justify-self: start !important;
+        align-items: center !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .landing-nav .nav-brand img,
+    .shop-nav .shop-logo-small img {
+        width: 30px !important;
+        height: 30px !important;
+        flex: 0 0 30px !important;
+    }
+
+    .landing-nav .nav-brand span,
+    .shop-nav .shop-logo-small::after {
+        display: inline-block !important;
+        max-width: min(34vw, 150px) !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 0.94rem !important;
+        line-height: 1 !important;
+    }
+
+    .landing-nav .user-profile-menu,
+    .shop-nav .shop-nav-actions {
+        grid-area: actions !important;
+        justify-self: end !important;
+        width: auto !important;
+        min-width: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .landing-nav .nav-links,
+    .secondary-nav-links {
+        grid-area: menu !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    .landing-nav .nav-links a,
+    .secondary-nav-links a {
+        width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 0 10px !important;
+        border-radius: 16px !important;
+        justify-content: center !important;
+        gap: 7px !important;
+        font-size: 0.84rem !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    .landing-nav .nav-links a .lucide,
+    .secondary-nav-links a .lucide,
+    .hero-btn .lucide,
+    .action-btn .lucide,
+    .cart-toggle-btn .lucide {
+        width: 16px !important;
+        height: 16px !important;
+        flex: 0 0 16px !important;
+    }
+
+    .secondary-nav-left {
+        display: contents !important;
+    }
+
+    .secondary-nav-left .back-home-btn {
+        display: none !important;
+    }
+
+    .landing-nav .login-btn,
+    .shop-nav .login-btn,
+    .landing-nav .user-profile-btn,
+    .shop-nav .user-profile-btn,
+    .cart-toggle-btn {
+        height: 40px !important;
+        min-height: 40px !important;
+        padding: 0 10px !important;
+        border-radius: 999px !important;
+        gap: 7px !important;
+        font-size: 0.82rem !important;
+        white-space: nowrap !important;
+    }
+
+    .landing-nav .user-avatar,
+    .shop-nav .user-avatar {
+        width: 28px !important;
+        height: 28px !important;
+        flex: 0 0 28px !important;
+    }
+
+    .landing-nav .user-details,
+    .shop-nav .user-details {
+        max-width: 78px !important;
+        min-width: 0 !important;
+    }
+
+    .landing-nav .user-name,
+    .shop-nav .user-name {
+        max-width: 78px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    .landing-nav .profile-dropdown,
+    .shop-nav .profile-dropdown {
+        position: absolute !important;
+        top: calc(100% + 10px) !important;
+        right: 0 !important;
+        left: auto !important;
+        width: min(300px, calc(100vw - 20px)) !important;
+        max-height: min(72vh, 430px) !important;
+        overflow-y: auto !important;
+        z-index: 900 !important;
+    }
+
+    body:not(.shop-page) .container,
+    .shop-container,
+    .topup-container,
+    .account-container {
+        width: calc(100% - 18px) !important;
+        max-width: calc(100% - 18px) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-top: 18px !important;
+    }
+
+    .landing-hero,
+    .shop-hero,
+    .topup-hero,
+    .account-hero {
+        grid-template-columns: 1fr !important;
+        gap: 22px !important;
+        padding: 22px 18px !important;
+        border-radius: 22px !important;
+        min-height: auto !important;
+    }
+
+    .hero-copy,
+    .shop-hero-copy,
+    .topup-hero-copy,
+    .account-hero {
+        min-width: 0 !important;
+    }
+
+    .hero-copy h1,
+    .shop-hero h1,
+    .topup-hero h1,
+    .account-hero h1 {
+        font-size: clamp(2.05rem, 11vw, 3rem) !important;
+        line-height: 0.98 !important;
+        letter-spacing: -0.04em !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .hero-copy p,
+    .shop-hero p,
+    .topup-hero p,
+    .account-hero p,
+    .step-desc {
+        font-size: 0.95rem !important;
+        line-height: 1.75 !important;
+    }
+
+    .hero-brand,
+    .logo-container {
+        min-height: auto !important;
+    }
+
+    .logo-container .logo,
+    .hero-brand .logo {
+        width: min(56vw, 210px) !important;
+        height: auto !important;
+    }
+
+    .hero-actions,
+    .status-grid,
+    .menu-grid,
+    .donators-dashboard,
+    .shop-layout-wrapper,
+    .topup-container,
+    .account-card-header {
+        grid-template-columns: 1fr !important;
+        flex-direction: column !important;
+    }
+
+    .hero-actions {
+        display: grid !important;
+        gap: 10px !important;
+    }
+
+    .hero-btn,
+    .copy-ip-action-btn,
+    .details-btn,
+    .add-cart-btn,
+    .submit-login-btn,
+    .action-btn {
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: center !important;
+    }
+
+    .status-card-new,
+    .job-card,
+    .dashboard-card,
+    .promo-card,
+    .topup-card-wrapper,
+    .account-card,
+    .shop-sidebar,
+    .item-card,
+    .mini-stat,
+    .topup-hero-steps div {
+        border-radius: 20px !important;
+    }
+
+    .status-card-new,
+    .job-card,
+    .dashboard-card,
+    .topup-card-wrapper,
+    .account-card {
+        padding: 18px !important;
+    }
+
+    .promo-card {
+        min-height: 300px !important;
+    }
+
+    .donators-container {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .donator-card {
+        min-height: auto !important;
+        transform: none !important;
+    }
+
+    .shop-hero-stats,
+    .topup-hero-steps {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .shop-layout-wrapper {
+        display: flex !important;
+        gap: 18px !important;
+        margin-top: 0 !important;
+    }
+
+    .shop-sidebar {
+        position: static !important;
+        width: 100% !important;
+        flex: none !important;
+        padding: 14px !important;
+    }
+
+    .sidebar-category-menu,
+    .premium-amount-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+        overflow: visible !important;
+    }
+
+    .sidebar-category-btn,
+    .premium-amount-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 52px !important;
+        height: auto !important;
+        padding: 10px 12px !important;
+        border-radius: 16px !important;
+        font-size: 0.9rem !important;
+        transform: none !important;
+    }
+
+    .cat-icon-wrap {
+        margin-right: 8px !important;
+    }
+
+    .cat-text {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    .items-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .item-card {
+        min-height: auto !important;
+        padding: 16px !important;
+    }
+
+    .item-img-container {
+        min-height: 104px !important;
+    }
+
+    .item-actions .action-btns {
+        grid-template-columns: 1fr !important;
+    }
+
+    .cart-sidebar {
+        width: min(100vw, 390px) !important;
+        max-width: calc(100vw - 10px) !important;
+        border-radius: 22px 0 0 22px !important;
+        z-index: 850 !important;
+    }
+
+    .cart-content,
+    .cart-items {
+        min-width: 0 !important;
+    }
+
+    .topup-container {
+        display: block !important;
+    }
+
+    .topup-card-wrapper {
+        width: 100% !important;
+        margin-top: 18px !important;
+        overflow: hidden !important;
+    }
+
+    .topup-slider {
+        min-width: 0 !important;
+    }
+
+    .topup-step {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 0 !important;
+    }
+
+    .method-card,
+    .payment-methods {
+        width: 100% !important;
+    }
+
+    .qr-container {
+        width: min(100%, 280px) !important;
+        padding: 18px !important;
+    }
+
+    .slip-upload-label {
+        min-height: 138px !important;
+        padding: 20px 14px !important;
+        text-align: center !important;
+    }
+
+    .custom-input-wrapper input,
+    .input-group input,
+    .admin-panel input,
+    .admin-panel select,
+    .admin-panel textarea {
+        width: 100% !important;
+        min-height: 44px !important;
+        font-size: 16px !important;
+    }
+
+    .account-card-header {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .history-list-container {
+        max-height: min(62vh, 520px) !important;
+        overflow-x: hidden !important;
+    }
+
+    .history-item,
+    .transaction-item,
+    .order-item {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        align-items: start !important;
+        padding: 14px !important;
+    }
+
+    .modal-content,
+    .shop-modal-content,
+    .swal2-popup {
+        width: min(94vw, 520px) !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100vh - 24px) !important;
+        overflow-y: auto !important;
+        padding: 22px !important;
+        border-radius: 22px !important;
+    }
+
+    .modal-actions,
+    .checkout-actions,
+    .cart-footer {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .admin-mobile-header {
+        display: flex !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 650 !important;
+        min-height: 58px !important;
+        padding: 10px 14px !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
+    }
+
+    .admin-layout {
+        display: block !important;
+        min-height: 100vh !important;
+    }
+
+    .admin-sidebar {
+        width: min(86vw, 300px) !important;
+        max-width: calc(100vw - 24px) !important;
+        height: 100dvh !important;
+        transform: translateX(-105%) !important;
+        transition: transform 0.24s ease !important;
+        z-index: 800 !important;
+        padding: 68px 14px 16px !important;
+        overflow-y: auto !important;
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0) !important;
+    }
+
+    .admin-sidebar .mobile-menu-btn {
+        display: inline-flex !important;
+    }
+
+    .admin-content {
+        margin-left: 0 !important;
+        padding: 16px 10px 28px !important;
+        min-width: 0 !important;
+    }
+
+    .admin-panel {
+        padding: 0 !important;
+    }
+
+    .admin-panel h2 {
+        font-size: clamp(1.4rem, 8vw, 1.9rem) !important;
+        line-height: 1.15 !important;
+    }
+
+    .admin-card {
+        padding: 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .flex-between {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+
+    .admin-table-wrapper {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 16px !important;
+    }
+
+    .admin-table,
+    .admin-panel table {
+        min-width: 680px !important;
+        font-size: 0.86rem !important;
+    }
+
+    .admin-table th,
+    .admin-table td,
+    .admin-panel table th,
+    .admin-panel table td {
+        padding: 10px 12px !important;
+        white-space: nowrap !important;
+    }
+
+    .site-footer {
+        margin-top: 32px !important;
+        padding: 22px 14px !important;
+        text-align: center !important;
+    }
+}
+
+@media (max-width: 520px) {
+    .landing-nav,
+    .shop-nav {
+        width: calc(100% - 12px) !important;
+        max-width: calc(100% - 12px) !important;
+        border-radius: 20px !important;
+        padding: 9px !important;
+    }
+
+    .landing-nav .nav-brand span,
+    .shop-nav .shop-logo-small::after {
+        max-width: 112px !important;
+    }
+
+    .landing-nav .nav-links,
+    .secondary-nav-links {
+        gap: 7px !important;
+    }
+
+    .landing-nav .nav-links a,
+    .secondary-nav-links a {
+        height: 40px !important;
+        min-height: 40px !important;
+        padding: 0 8px !important;
+        border-radius: 14px !important;
+        font-size: 0.78rem !important;
+    }
+
+    body:not(.shop-page) .container,
+    .shop-container,
+    .topup-container,
+    .account-container {
+        width: calc(100% - 14px) !important;
+        max-width: calc(100% - 14px) !important;
+    }
+
+    .landing-hero,
+    .shop-hero,
+    .topup-hero,
+    .account-hero,
+    .dashboard-card,
+    .topup-card-wrapper,
+    .account-card {
+        padding: 18px 14px !important;
+        border-radius: 18px !important;
+    }
+
+    .hero-copy h1,
+    .shop-hero h1,
+    .topup-hero h1,
+    .account-hero h1 {
+        font-size: clamp(1.85rem, 12vw, 2.65rem) !important;
+    }
+
+    .status-card-new {
+        grid-template-columns: auto 1fr !important;
+        align-items: center !important;
+    }
+
+    .premium-amount-grid,
+    .sidebar-category-menu {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+    }
+
+    .premium-amount-btn .amt {
+        font-size: 1.08rem !important;
+    }
+
+    .premium-amount-btn .cur {
+        font-size: 0.76rem !important;
+    }
+
+    .cart-sidebar {
+        width: calc(100vw - 8px) !important;
+    }
+
+    .modal-content,
+    .shop-modal-content,
+    .swal2-popup {
+        width: calc(100vw - 16px) !important;
+        padding: 18px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .landing-nav .user-details,
+    .shop-nav .user-details {
+        display: none !important;
+    }
+
+    .landing-nav .login-btn,
+    .shop-nav .login-btn,
+    .landing-nav .user-profile-btn,
+    .shop-nav .user-profile-btn,
+    .cart-toggle-btn {
+        padding: 0 8px !important;
+    }
+
+    .landing-nav .nav-links a,
+    .secondary-nav-links a {
+        font-size: 0.72rem !important;
+        gap: 5px !important;
+    }
+
+    .landing-nav .nav-links a .lucide,
+    .secondary-nav-links a .lucide {
+        width: 14px !important;
+        height: 14px !important;
+        flex-basis: 14px !important;
+    }
+
+    .premium-amount-grid,
+    .sidebar-category-menu {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 
