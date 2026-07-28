@@ -13,6 +13,13 @@ const App = {
             if (!this.state.user) this.fetchProfile();
             this.updateNavPoints();
         }
+        this.renderIcons();
+    },
+
+    renderIcons() {
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     },
 
     escapeHTML(str) {
@@ -26,24 +33,24 @@ const App = {
     },
 
     translateError(errCode) {
-        if (!errCode) return 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+        if (!errCode) return 'à¹€à¸à¸´à¸”à¸à¹à¸­à¸œà¸´à¸”à¸žà¸¥à¸²à¸”à¸—à¸µà¹à¹à¸¡à¹à¸—à¸£à¸²à¸šà¸ªà¸²à¹€à¸«à¸•à¸¸';
         const errors = {
-            'insufficient_points': 'พอยท์ไม่เพียงพอ',
-            'insufficient_funds': 'ยอดเงินไม่เพียงพอ',
-            'product_not_found': 'ไม่พบสินค้านี้ในระบบ',
-            'product_inactive': 'สินค้านี้ถูกปิดการขายชั่วคราว',
-            'invalid_credentials': 'ชื่อตัวละครหรือรหัสผ่านไม่ถูกต้อง',
-            'too_many_requests': 'ทำรายการถี่เกินไป กรุณารอสักครู่',
-            'auth_required': 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-            'admin_required': 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้',
-            'slip_verification_failed': 'สลิปไม่ถูกต้อง หรือถูกใช้งานไปแล้ว',
-            'missing_required_fields': 'กรุณากรอกข้อมูลให้ครบถ้วน',
-            'invalid_amount': 'จำนวนเงินไม่ถูกต้อง',
-            'user_not_found': 'ไม่พบชื่อผู้ใช้นี้ในระบบ',
-            'unsupported_image_type': 'ไฟล์รูปภาพไม่รองรับ (รับเฉพาะ PNG, JPG, WEBP)',
-            'file_too_large': 'ไฟล์ขนาดใหญ่เกินไป (สูงสุด 10MB)',
-            'invalid_payload': 'ข้อมูลที่ส่งมาไม่ถูกต้อง',
-            'out_of_stock': 'สินค้าหมด'
+            'insufficient_points': 'à¸žà¸­à¸¢à¸—à¹Œà¹à¸¡à¹à¹€à¸žà¸µà¸¢à¸‡à¸žà¸­',
+            'insufficient_funds': 'à¸¢à¸­à¸”à¹€à¸‡à¸´à¸™à¹à¸¡à¹à¹€à¸žà¸µà¸¢à¸‡à¸žà¸­',
+            'product_not_found': 'à¹à¸¡à¹à¸žà¸šà¸ªà¸´à¸™à¸„à¹à¸²à¸™à¸µà¹‰à¹ƒà¸™à¸£à¸°à¸šà¸š',
+            'product_inactive': 'à¸ªà¸´à¸™à¸„à¹à¸²à¸™à¸µà¹‰à¸–à¸¹à¸à¸›à¸´à¸”à¸à¸²à¸£à¸‚à¸²à¸¢à¸Šà¸±à¹à¸§à¸„à¸£à¸²à¸§',
+            'invalid_credentials': 'à¸Šà¸·à¹à¸­à¸•à¸±à¸§à¸¥à¸°à¸„à¸£à¸«à¸£à¸·à¸­à¸£à¸«à¸±à¸ªà¸œà¹à¸²à¸™à¹à¸¡à¹à¸–à¸¹à¸à¸•à¹à¸­à¸‡',
+            'too_many_requests': 'à¸—à¸³à¸£à¸²à¸¢à¸à¸²à¸£à¸–à¸µà¹à¹€à¸à¸´à¸™à¹à¸› à¸à¸£à¸¸à¸“à¸²à¸£à¸­à¸ªà¸±à¸à¸„à¸£à¸¹à¹',
+            'auth_required': 'à¸à¸£à¸¸à¸“à¸²à¹€à¸à¹à¸²à¸ªà¸¹à¹à¸£à¸°à¸šà¸šà¸à¹à¸­à¸™à¸—à¸³à¸£à¸²à¸¢à¸à¸²à¸£',
+            'admin_required': 'à¸„à¸¸à¸“à¹à¸¡à¹à¸¡à¸µà¸ªà¸´à¸—à¸˜à¸´à¹Œà¹€à¸à¹à¸²à¸–à¸¶à¸‡à¸ªà¹à¸§à¸™à¸™à¸µà¹‰',
+            'slip_verification_failed': 'à¸ªà¸¥à¸´à¸›à¹à¸¡à¹à¸–à¸¹à¸à¸•à¹à¸­à¸‡ à¸«à¸£à¸·à¸­à¸–à¸¹à¸à¹ƒà¸Šà¹à¸‡à¸²à¸™à¹à¸›à¹à¸¥à¹à¸§',
+            'missing_required_fields': 'à¸à¸£à¸¸à¸“à¸²à¸à¸£à¸­à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¹ƒà¸«à¹à¸„à¸£à¸šà¸–à¹à¸§à¸™',
+            'invalid_amount': 'à¸ˆà¸³à¸™à¸§à¸™à¹€à¸‡à¸´à¸™à¹à¸¡à¹à¸–à¸¹à¸à¸•à¹à¸­à¸‡',
+            'user_not_found': 'à¹à¸¡à¹à¸žà¸šà¸Šà¸·à¹à¸­à¸œà¸¹à¹à¹ƒà¸Šà¹à¸™à¸µà¹‰à¹ƒà¸™à¸£à¸°à¸šà¸š',
+            'unsupported_image_type': 'à¹à¸Ÿà¸¥à¹Œà¸£à¸¹à¸›à¸ à¸²à¸žà¹à¸¡à¹à¸£à¸­à¸‡à¸£à¸±à¸š (à¸£à¸±à¸šà¹€à¸‰à¸žà¸²à¸° PNG, JPG, WEBP)',
+            'file_too_large': 'à¹à¸Ÿà¸¥à¹Œà¸à¸™à¸²à¸”à¹ƒà¸«à¸à¹à¹€à¸à¸´à¸™à¹à¸› (à¸ªà¸¹à¸‡à¸ªà¸¸à¸” 10MB)',
+            'invalid_payload': 'à¸à¹à¸­à¸¡à¸¹à¸¥à¸—à¸µà¹à¸ªà¹à¸‡à¸¡à¸²à¹à¸¡à¹à¸–à¸¹à¸à¸•à¹à¸­à¸‡',
+            'out_of_stock': 'à¸ªà¸´à¸™à¸„à¹à¸²à¸«à¸¡à¸”'
         };
         return errors[errCode] || errCode;
     },
@@ -143,27 +150,28 @@ const App = {
                     <div class="user-details">
                         <span class="user-name">${this.escapeHTML(this.state.user.username)}</span>
                     </div>
-                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                    <i data-lucide="chevron-down" class="dropdown-icon"></i>
                 </div>
                 
                 <div class="profile-dropdown" id="profile-dropdown">
                     ${isAdmin ? `
-                    <a href="admin.html" class="dropdown-item" style="color: #00d2ff;"><i class="fas fa-user-shield" style="color: #00d2ff;"></i> ระบบหลังบ้าน (Admin)</a>
+                    <a href="admin.html" class="dropdown-item" style="color: #00d2ff;"><i data-lucide="shield-check" style="color: #00d2ff;"></i> à¸£à¸°à¸šà¸šà¸«à¸¥à¸±à¸‡à¸šà¹à¸²à¸™ (Admin)</a>
                     <div class="dropdown-divider"></div>
                     ` : ''}
                     <div class="dropdown-item" style="cursor: default; color: #f59e0b; font-weight: bold;">
-                        <i class="fas fa-coins"></i> Point: <span id="dropdown-points">...</span>
+                        <i data-lucide="coins"></i> Point: <span id="dropdown-points">...</span>
                     </div>
-                    <a href="#" class="dropdown-item" onclick="App.openTopupHistoryModal(); return false;"><i class="fas fa-wallet"></i> ประวัติการเติมเงิน</a>
-                    <a href="#" class="dropdown-item" onclick="App.openPurchaseHistoryModal(); return false;"><i class="fas fa-history"></i> ประวัติการสั่งซื้อ</a>
+                    <a href="#" class="dropdown-item" onclick="App.openTopupHistoryModal(); return false;"><i data-lucide="wallet"></i> à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¹€à¸•à¸´à¸¡à¹€à¸‡à¸´à¸™</a>
+                    <a href="#" class="dropdown-item" onclick="App.openPurchaseHistoryModal(); return false;"><i data-lucide="history"></i> à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­</a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item logout-item" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                    <a href="#" class="dropdown-item logout-item" style="color: #ef4444;"><i data-lucide="log-out"></i> à¸­à¸­à¸à¸à¸²à¸à¸£à¸°à¸šà¸š</a>
                 </div>
             `;
             profileMenu.innerHTML = profileHtml;
         } else {
-            profileMenu.innerHTML = `<button class="login-btn" onclick="window.location.href='index.html?login=true'"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>`;
+            profileMenu.innerHTML = `<button class="login-btn" onclick="window.location.href='index.html?login=true'"><i data-lucide="log-in"></i> à¹€à¸à¹à¸²à¸ªà¸¹à¹à¸£à¸°à¸šà¸š</button>`;
         }
+        this.renderIcons();
     },
 
     logout() {
@@ -195,7 +203,7 @@ const App = {
         
         localStorage.setItem('octo_cart', JSON.stringify(this.state.cart));
         this.updateCartUI();
-        this.showToast('เพิ่มลงตะกร้าแล้ว!');
+        this.showToast('à¹€à¸žà¸´à¹à¸¡à¸¥à¸‡à¸•à¸°à¸à¸£à¹à¸²à¹à¸¥à¹à¸§!');
     },
 
     removeFromCart(productId) {
@@ -215,7 +223,7 @@ const App = {
         let totalPrice = 0;
         
         if (this.state.cart.length === 0) {
-            container.innerHTML = '<div class="empty-cart-msg">ยังไม่มีสินค้าในตะกร้า</div>';
+            container.innerHTML = '<div class="empty-cart-msg">à¸¢à¸±à¸‡à¹à¸¡à¹à¸¡à¸µà¸ªà¸´à¸™à¸„à¹à¸²à¹ƒà¸™à¸•à¸°à¸à¸£à¹à¸²</div>';
             badge.innerText = '0';
             badge.style.display = 'none';
             totalEl.innerText = '0 Points';
@@ -236,22 +244,23 @@ const App = {
                     <h4>${this.escapeHTML(item.name)}</h4>
                     <div class="cart-item-price">${this.escapeHTML(item.price)} Points x ${this.escapeHTML(item.quantity)}</div>
                 </div>
-                <button class="remove-item-btn" onclick="App.removeFromCart(${item.product_id})"><i class="fas fa-trash"></i></button>
+                <button class="remove-item-btn" onclick="App.removeFromCart(${item.product_id})"><i data-lucide="trash-2"></i></button>
             `;
             container.appendChild(div);
         });
         
         badge.innerText = totalQty;
         totalEl.innerText = totalPrice.toLocaleString() + ' Points';
+        this.renderIcons();
     },
 
     async checkout() {
         if (this.state.cart.length === 0) {
-            this.showToast('ไม่มีสินค้าในตะกร้า');
+            this.showToast('à¹à¸¡à¹à¸¡à¸µà¸ªà¸´à¸™à¸„à¹à¸²à¹ƒà¸™à¸•à¸°à¸à¸£à¹à¸²');
             return;
         }
                 if (!App.state.user) {
-                Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเข้าสู่ระบบก่อนชำระเงิน', background: '#1a1f2b', color: '#fff' });
+                Swal.fire({ icon: 'warning', title: 'à¹à¸à¹à¸‡à¹€à¸•à¸·à¸­à¸™', text: 'à¸à¸£à¸¸à¸“à¸²à¹€à¸à¹à¸²à¸ªà¸¹à¹à¸£à¸°à¸šà¸šà¸à¹à¸­à¸™à¸Šà¸³à¸£à¸°à¹€à¸‡à¸´à¸™', background: '#1a1f2b', color: '#fff' });
                 document.getElementById('login-modal').classList.add('active');
                 return;
             }
@@ -259,7 +268,8 @@ const App = {
         const btn = document.querySelector('.checkout-btn');
         const originalText = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังชำระเงิน...';
+        btn.innerHTML = '<i data-lucide="loader-circle" class="icon-spin"></i> à¸à¸³à¸¥à¸±à¸‡à¸Šà¸³à¸£à¸°à¹€à¸‡à¸´à¸™...';
+        this.renderIcons();
 
         try {
             const items = this.state.cart.map(i => ({ product_id: i.product_id, quantity: i.quantity }));
@@ -269,18 +279,18 @@ const App = {
             });
 
                 if (res.ok) {
-                    Swal.fire({ icon: 'success', title: 'สำเร็จ', text: '🎉 ชำระเงินสำเร็จ! คำสั่งซื้อของคุณกำลังถูกดำเนินการ', background: '#1a1f2b', color: '#fff' }).then(() => {
+                    Swal.fire({ icon: 'success', title: 'à¸ªà¸³à¹€à¸£à¹‡à¸', text: 'ðŸŽ‰ à¸Šà¸³à¸£à¸°à¹€à¸‡à¸´à¸™à¸ªà¸³à¹€à¸£à¹‡à¸! à¸„à¸³à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­à¸à¸­à¸‡à¸„à¸¸à¸“à¸à¸³à¸¥à¸±à¸‡à¸–à¸¹à¸à¸”à¸³à¹€à¸™à¸´à¸™à¸à¸²à¸£', background: '#1a1f2b', color: '#fff' }).then(() => {
                         window.location.href = '/index.html';
                     });
                 } else {
                     if (res.error === 'insufficient_points') {
                         Swal.fire({
                             icon: 'error',
-                            title: 'พอยท์ไม่เพียงพอ',
-                            text: 'กรุณาเติมเงินเพื่อซื้อสินค้านี้',
-                            confirmButtonText: 'ไปหน้าเติมเงิน',
+                            title: 'à¸žà¸­à¸¢à¸—à¹Œà¹à¸¡à¹à¹€à¸žà¸µà¸¢à¸‡à¸žà¸­',
+                            text: 'à¸à¸£à¸¸à¸“à¸²à¹€à¸•à¸´à¸¡à¹€à¸‡à¸´à¸™à¹€à¸žà¸·à¹à¸­à¸‹à¸·à¹à¸­à¸ªà¸´à¸™à¸„à¹à¸²à¸™à¸µà¹‰',
+                            confirmButtonText: 'à¹à¸›à¸«à¸™à¹à¸²à¹€à¸•à¸´à¸¡à¹€à¸‡à¸´à¸™',
                             showCancelButton: true,
-                            cancelButtonText: 'ยกเลิก',
+                            cancelButtonText: 'à¸¢à¸à¹€à¸¥à¸´à¸',
                             background: '#1a1f2b', color: '#fff'
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -288,12 +298,12 @@ const App = {
                             }
                         });
                     } else {
-                        Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: '❌ ล้มเหลว: ' + this.translateError(res.error), background: '#1a1f2b', color: '#fff' });
+                        Swal.fire({ icon: 'error', title: 'à¸¥à¹à¸¡à¹€à¸«à¸¥à¸§', text: 'âŒ à¸¥à¹à¸¡à¹€à¸«à¸¥à¸§: ' + this.translateError(res.error), background: '#1a1f2b', color: '#fff' });
                     }
                 }
             } catch (err) {
                 console.error(err);
-                Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', background: '#1a1f2b', color: '#fff' });
+                Swal.fire({ icon: 'error', title: 'à¸¥à¹à¸¡à¹€à¸«à¸¥à¸§', text: 'à¹€à¸à¸·à¹à¸­à¸¡à¸•à¹à¸­à¹€à¸à¸´à¸£à¹Œà¸à¹€à¸§à¸­à¸£à¹Œà¹à¸¡à¹à¹à¸”à¹', background: '#1a1f2b', color: '#fff' });
             } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -309,16 +319,17 @@ const App = {
             div.innerHTML = `
                 <div class="modal-content" style="max-width: 500px; padding: 25px; border-radius: 16px; background: rgba(10, 15, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);">
                     <button class="close-modal" onclick="document.getElementById('topup-history-modal').classList.remove('active')">&times;</button>
-                    <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i class="fas fa-wallet" style="color:#00d2ff;"></i> ประวัติการเติมเงิน</h3>
+                    <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i data-lucide="wallet" style="color:#00d2ff;"></i> à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¹€à¸•à¸´à¸¡à¹€à¸‡à¸´à¸™</h3>
                     <div style="max-height: 300px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
                         <ul id="topup-popup-tx-list" style="list-style: none; padding: 0; margin: 0;">
-                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">กำลังโหลด...</li>
+                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">à¸à¸³à¸¥à¸±à¸‡à¹‚à¸«à¸¥à¸”...</li>
                         </ul>
                     </div>
                 </div>
             `;
             document.body.appendChild(div);
             modal = div;
+            this.renderIcons();
         }
 
         modal.classList.add('active');
@@ -335,7 +346,7 @@ const App = {
                 listEl.innerHTML = '';
                 const topups = res.transactions.filter(tx => tx.type === 'credit');
                 if (topups.length === 0) {
-                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการเติมเงิน</li>';
+                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">à¹à¸¡à¹à¸¡à¸µà¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¹€à¸•à¸´à¸¡à¹€à¸‡à¸´à¸™</li>';
                 } else {
                     topups.forEach(tx => {
                         const li = document.createElement('li');
@@ -349,23 +360,23 @@ const App = {
                         
                         li.innerHTML = `
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem; color: #ffffff;">เติมเงินเข้าสู่ระบบ</div>
+                                <div style="font-weight: 600; font-size: 0.9rem; color: #ffffff;">à¹€à¸•à¸´à¸¡à¹€à¸‡à¸´à¸™à¹€à¸à¹à¸²à¸ªà¸¹à¹à¸£à¸°à¸šà¸š</div>
                                 <div style="font-size: 0.75rem; color: var(--text-muted);">${d}</div>
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 1rem; font-weight: bold; color: #00ff88;">+${tx.amount_points} Points</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">ยอดคงเหลือ: ${tx.balance_after}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">à¸¢à¸­à¸”à¸„à¸‡à¹€à¸«à¸¥à¸·à¸­: ${tx.balance_after}</div>
                             </div>
                         `;
                         listEl.appendChild(li);
                     });
                 }
             } else {
-                listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">ไม่สามารถโหลดประวัติได้</li>';
+                listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">à¹à¸¡à¹à¸ªà¸²à¸¡à¸²à¸£à¸–à¹‚à¸«à¸¥à¸”à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¹à¸”à¹</li>';
             }
         } catch(e) {
             const listEl = document.getElementById('topup-popup-tx-list');
-            if (listEl) listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</li>';
+            if (listEl) listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">à¹€à¸à¸·à¹à¸­à¸¡à¸•à¹à¸­à¹€à¸à¸´à¸£à¹Œà¸à¹€à¸§à¸­à¸£à¹Œà¹à¸¡à¹à¹à¸”à¹</li>';
         }
     },
 
@@ -378,16 +389,17 @@ const App = {
             div.innerHTML = `
                 <div class="modal-content" style="max-width: 500px; padding: 25px; border-radius: 16px; background: rgba(10, 15, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);">
                     <button class="close-modal" onclick="document.getElementById('purchase-history-modal').classList.remove('active')">&times;</button>
-                    <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i class="fas fa-history" style="color:#00d2ff;"></i> ประวัติการสั่งซื้อ</h3>
+                    <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i data-lucide="history" style="color:#00d2ff;"></i> à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­</h3>
                     <div style="max-height: 300px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
                         <ul id="purchase-popup-list" style="list-style: none; padding: 0; margin: 0;">
-                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">กำลังโหลด...</li>
+                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">à¸à¸³à¸¥à¸±à¸‡à¹‚à¸«à¸¥à¸”...</li>
                         </ul>
                     </div>
                 </div>
             `;
             document.body.appendChild(div);
             modal = div;
+            this.renderIcons();
         }
 
         modal.classList.add('active');
@@ -403,7 +415,7 @@ const App = {
             if (res.ok) {
                 listEl.innerHTML = '';
                 if (res.orders.length === 0) {
-                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการสั่งซื้อ</li>';
+                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">à¹à¸¡à¹à¸¡à¸µà¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­</li>';
                 } else {
                     res.orders.forEach(order => {
                         const li = document.createElement('li');
@@ -416,9 +428,9 @@ const App = {
                         const d = new Date(order.created_at).toLocaleDateString('th-TH') + ' ' + new Date(order.created_at).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
                         
                         let statusHtml = '';
-                        if (order.status === 'delivered') statusHtml = '<span style="color:#00ff88; font-size:0.8rem;">จัดส่งแล้ว</span>';
-                        else if (order.status === 'pending_delivery') statusHtml = '<span style="color:#f59e0b; font-size:0.8rem;">กำลังดำเนินการ</span>';
-                        else statusHtml = '<span style="color:#ff4d4d; font-size:0.8rem;">ล้มเหลว</span>';
+                        if (order.status === 'delivered') statusHtml = '<span style="color:#00ff88; font-size:0.8rem;">à¸à¸±à¸”à¸ªà¹à¸‡à¹à¸¥à¹à¸§</span>';
+                        else if (order.status === 'pending_delivery') statusHtml = '<span style="color:#f59e0b; font-size:0.8rem;">à¸à¸³à¸¥à¸±à¸‡à¸”à¸³à¹€à¸™à¸´à¸™à¸à¸²à¸£</span>';
+                        else statusHtml = '<span style="color:#ff4d4d; font-size:0.8rem;">à¸¥à¹à¸¡à¹€à¸«à¸¥à¸§</span>';
 
                         li.innerHTML = `
                             <div>
@@ -434,11 +446,11 @@ const App = {
                     });
                 }
             } else {
-                listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">ไม่สามารถโหลดประวัติได้</li>';
+                listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">à¹à¸¡à¹à¸ªà¸²à¸¡à¸²à¸£à¸–à¹‚à¸«à¸¥à¸”à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¹à¸”à¹</li>';
             }
         } catch(e) {
             const listEl = document.getElementById('purchase-popup-list');
-            if (listEl) listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</li>';
+            if (listEl) listEl.innerHTML = '<li style="text-align:center; color: #ff4d4d; padding: 15px; font-size:0.9rem;">à¹€à¸à¸·à¹à¸­à¸¡à¸•à¹à¸­à¹€à¸à¸´à¸£à¹Œà¸à¹€à¸§à¸­à¸£à¹Œà¹à¸¡à¹à¹à¸”à¹</li>';
         }
     },
 
@@ -452,8 +464,9 @@ const App = {
         }
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> <span>${this.escapeHTML(message)}</span>`;
+        toast.innerHTML = `<i data-lucide="circle-check"></i> <span>${this.escapeHTML(message)}</span>`;
         container.appendChild(toast);
+        this.renderIcons();
         setTimeout(() => toast.remove(), 3000);
     }
 };
