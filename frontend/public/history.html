@@ -14,7 +14,7 @@
     <div class="bubbles" id="bubbles-container"></div>
 
     <nav class="shop-nav">
-        <a href="index.html" class="back-home-btn"><i data-lucide="arrow-left"></i> à¸à¸¥à¸±à¸šà¸«à¸™à¹à¸²à¸«à¸¥à¸±à¸</a>
+        <a href="index.html" class="back-home-btn"><i data-lucide="arrow-left"></i> กลับหน้าหลัก</a>
         <div class="shop-logo-small">
             <img src="images/logo.png" alt="Logo" onerror="this.style.display='none'; document.getElementById('logo-fallback-small').style.display='block';">
             <div id="logo-fallback-small" class="logo-fallback" style="font-size: 1.5rem; display:none;">OCTOCRAFT</div>
@@ -27,25 +27,25 @@
     <main class="account-container">
         <section class="account-hero smp-panel">
             <span class="eyebrow"><i data-lucide="history"></i> Order History</span>
-            <h1>à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­</h1>
-            <p>à¸•à¸´à¸”à¸•à¸²à¸¡à¸£à¸²à¸¢à¸à¸²à¸£à¸‹à¸·à¹à¸­à¸ªà¸´à¸™à¸„à¹à¸² à¸ªà¸–à¸²à¸™à¸°à¸à¸²à¸£à¸ˆà¸±à¸”à¸ªà¹à¸‡ à¹à¸¥à¸°à¸¢à¸­à¸”à¸žà¸­à¸¢à¸•à¹Œà¸—à¸µà¹à¸–à¸¹à¸à¹à¸à¹à¹à¸™à¹à¸•à¹à¸¥à¸°à¸„à¸³à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­à¸à¸­à¸‡à¸„à¸¸à¸“</p>
+            <h1>ประวัติการสั่งซื้อ</h1>
+            <p>ติดตามรายการซื้อสินค้า สถานะการจัดส่ง และยอดพอยต์ที่ถูกใช้ในแต่ละคำสั่งซื้อของคุณ</p>
         </section>
 
         <div class="dashboard-card account-card">
             <div class="account-card-header">
-            <h2 style="margin:0;"><i data-lucide="history"></i> à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­ (Order History)</h2>
+            <h2 style="margin:0;"><i data-lucide="history"></i> ประวัติการสั่งซื้อ (Order History)</h2>
             </div>
             
             <div class="history-list-container" style="max-height: 500px; overflow-y: auto;">
                 <ul id="order-list" style="list-style: none; padding: 0;">
-                    <li style="text-align:center; color: var(--text-muted); padding: 20px;">à¸à¸³à¸¥à¸±à¸‡à¹‚à¸«à¸¥à¸”...</li>
+                    <li style="text-align:center; color: var(--text-muted); padding: 20px;">กำลังโหลด...</li>
                 </ul>
             </div>
         </div>
     </main>
 
     <footer class="site-footer">
-        <p>à¹€à¸£à¸²à¹à¸¡à¹à¸¡à¸µà¸ªà¹à¸§à¸™à¹€à¸à¸µà¹à¸¢à¸§à¸à¹à¸­à¸‡à¸à¸±à¸š Mojang AB.</p>
+        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
         <p>&copy; 2026 Octocraft. All Right Reserved.</p>
     </footer>
     <script src="js/app.js"></script>
@@ -63,7 +63,7 @@
                 if (res.ok) {
                     list.innerHTML = '';
                     if (res.orders.length === 0) {
-                        list.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">à¹à¸¡à¹à¸¡à¸µà¸›à¸£à¸°à¸§à¸±à¸•à¸´à¸à¸²à¸£à¸ªà¸±à¹à¸‡à¸‹à¸·à¹à¸­</li>';
+                        list.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">ไม่มีประวัติการสั่งซื้อ</li>';
                     } else {
                         res.orders.forEach(order => {
                             const li = document.createElement('li');
@@ -92,7 +92,7 @@
                                 </div>
                                 <div style="text-align: right;">
                                     <div style="font-size: 1.2rem; font-weight: bold; color: var(--danger);">- ${order.total_points} Points</div>
-                                <div style="font-size: 0.85rem; color: ${statusColor};"><i data-lucide="${statusIcon}"></i> à¸ªà¸–à¸²à¸™à¸°: ${order.status.toUpperCase()}</div>
+                                <div style="font-size: 0.85rem; color: ${statusColor};"><i data-lucide="${statusIcon}"></i> สถานะ: ${order.status.toUpperCase()}</div>
                                 </div>
                             `;
                             list.appendChild(li);
@@ -100,10 +100,10 @@
                         App.renderIcons();
                     }
                 } else {
-                    list.innerHTML = '<li style="text-align:center; color: var(--danger); padding: 20px;">à¹à¸¡à¹à¸ªà¸²à¸¡à¸²à¸£à¸–à¹‚à¸«à¸¥à¸”à¸›à¸£à¸°à¸§à¸±à¸•à¸´à¹à¸”à¹</li>';
+                    list.innerHTML = '<li style="text-align:center; color: var(--danger); padding: 20px;">ไม่สามารถโหลดประวัติได้</li>';
                 }
             } catch(e) {
-                document.getElementById('order-list').innerHTML = '<li style="text-align:center; color: var(--danger); padding: 20px;">à¹€à¸à¸·à¹à¸­à¸¡à¸•à¹à¸­à¹€à¸à¸´à¸£à¹Œà¸à¹€à¸§à¸­à¸£à¹Œà¹à¸¡à¹à¹à¸”à¹</li>';
+                document.getElementById('order-list').innerHTML = '<li style="text-align:center; color: var(--danger); padding: 20px;">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</li>';
             }
         });
     </script>

@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octocraft</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/redesign.css">
 </head>
 <body class="shop-page">
     <div class="bubbles" id="bubbles-container"></div>
 
     <nav class="shop-nav">
-        <a href="index.html" class="back-home-btn"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
+        <a href="index.html" class="back-home-btn"><i data-lucide="arrow-left"></i> กลับหน้าหลัก</a>
         <div class="shop-logo-small">
             <img src="images/logo.png" alt="Octo Craft Logo" onerror="this.style.display='none'; document.getElementById('logo-fallback-small').style.display='block';">
             <div id="logo-fallback-small" class="logo-fallback" style="font-size: 1.5rem; display:none;">OCTOCRAFT</div>
@@ -22,13 +23,38 @@
         <div class="shop-nav-actions">
             <div class="user-profile-menu"></div>
             <button class="cart-toggle-btn" id="cart-open-btn">
-                <i class="fas fa-shopping-cart"></i>
+            <i data-lucide="shopping-cart"></i>
                 <span class="cart-badge" id="cart-badge" style="display:none;">0</span>
             </button>
         </div>
     </nav>
 
     <main class="shop-container">
+        <section class="shop-hero smp-panel">
+            <div class="shop-hero-copy">
+                <span class="eyebrow"><i data-lucide="sparkles"></i> Octocraft Store</span>
+                <h1>ร้านค้า Survival Economy</h1>
+                <p>เลือกยศ กุญแจ และสิทธิพิเศษสำหรับการผจญภัยในเซิร์ฟเวอร์ เติมความสนุกแบบรวดเร็ว ปลอดภัย และพร้อมใช้งานในเกม</p>
+            </div>
+            <div class="shop-hero-stats">
+                <div class="mini-stat">
+                    <i data-lucide="package-check"></i>
+                    <span>สินค้าอัตโนมัติ</span>
+                    <strong>Instant</strong>
+                </div>
+                <div class="mini-stat">
+                    <i data-lucide="shield-check"></i>
+                    <span>ระบบเชื่อมต่อ</span>
+                    <strong>Bridge</strong>
+                </div>
+                <div class="mini-stat">
+                    <i data-lucide="coins"></i>
+                    <span>จ่ายด้วยพอยต์</span>
+                    <strong>Points</strong>
+                </div>
+            </div>
+        </section>
+
         <style>
             .shop-layout-wrapper {
                 display: flex;
@@ -199,26 +225,26 @@
             <!-- Category Sidebar (Left) -->
             <div class="shop-sidebar">
                 <h2 class="shop-sidebar-title">
-                    <i class="fas fa-layer-group"></i> หมวดหมู่สินค้า
+                <i data-lucide="layers"></i> หมวดหมู่สินค้า
                 </h2>
                 <div class="sidebar-category-menu">
                     <button class="sidebar-category-btn category-btn active" onclick="filterByCategory('all')">
-                        <span class="cat-icon-wrap"><i class="fas fa-cubes"></i></span>
+                    <span class="cat-icon-wrap"><i data-lucide="boxes"></i></span>
                         <span class="cat-text">ทั้งหมด</span>
                         <span class="cat-count" id="count-all">0</span>
                     </button>
                     <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Rank')">
-                        <span class="cat-icon-wrap"><i class="fas fa-crown"></i></span>
+                    <span class="cat-icon-wrap"><i data-lucide="crown"></i></span>
                         <span class="cat-text">ยศ (Rank)</span>
                         <span class="cat-count" id="count-Rank">0</span>
                     </button>
                     <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Key')">
-                        <span class="cat-icon-wrap"><i class="fas fa-key"></i></span>
+                    <span class="cat-icon-wrap"><i data-lucide="key-round"></i></span>
                         <span class="cat-text">กุญแจ (Key)</span>
                         <span class="cat-count" id="count-Key">0</span>
                     </button>
                     <button class="sidebar-category-btn category-btn" onclick="filterByCategory('Privilege')">
-                        <span class="cat-icon-wrap"><i class="fas fa-gem"></i></span>
+                    <span class="cat-icon-wrap"><i data-lucide="gem"></i></span>
                         <span class="cat-text">สิทธิพิเศษ</span>
                         <span class="cat-count" id="count-Privilege">0</span>
                     </button>
@@ -237,7 +263,7 @@
     <!-- Cart Sidebar -->
     <div class="cart-sidebar" id="cart-sidebar">
         <div class="cart-header">
-            <h2><i class="fas fa-shopping-cart"></i> ตะกร้าสินค้า</h2>
+        <h2><i data-lucide="shopping-cart"></i> ตะกร้าสินค้า</h2>
             <button class="close-cart-btn" id="close-cart-btn">&times;</button>
         </div>
         <div class="cart-items" id="cart-items-container">
@@ -328,7 +354,7 @@
                         <div class="item-info-shop">
                             <span class="badge" style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.08); display: inline-block; margin-bottom: 8px;">${item.category || 'Rank'}</span>
                             <h3 class="item-name" style="margin-top:0;">${item.name}</h3>
-                            <div class="item-price"><i class="fas fa-coins"></i> ${item.price_points.toLocaleString()} Points</div>
+                    <div class="item-price"><i data-lucide="coins"></i> ${item.price_points.toLocaleString()} Points</div>
                         </div>
                         <div class="item-actions" style="margin-top:15px; display:flex; flex-direction:column; gap:12px;">
                             <div class="qty-selector" style="display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); border-radius:8px; overflow:hidden;">
@@ -337,13 +363,14 @@
                                 <button onclick="updateLocalQty('${item.id}', 1)" style="background:none; border:none; color:white; width:35px; height:35px; font-size:1.2rem; cursor:pointer;">+</button>
                             </div>
                             <div class="action-btns" style="display:flex; gap:10px;">
-                                <button class="details-btn" onclick="openProductDetails(${item.id})" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; cursor:pointer; font-weight:600;"><i class="fas fa-info-circle"></i> รายละเอียด</button>
-                                <button class="add-cart-btn" onclick="addToCartLocal(event, ${item.id})" style="flex:1.2; padding:10px; border-radius:8px; border:none; background:var(--primary); color:white; cursor:pointer; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fas fa-shopping-cart"></i> ใส่ตะกร้า</button>
+                        <button class="details-btn" onclick="openProductDetails(${item.id})" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; cursor:pointer; font-weight:600;"><i data-lucide="info"></i> รายละเอียด</button>
+                        <button class="add-cart-btn" onclick="addToCartLocal(event, ${item.id})" style="flex:1.2; padding:10px; border-radius:8px; border:none; background:var(--primary); color:white; cursor:pointer; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px;"><i data-lucide="shopping-cart"></i> ใส่ตะกร้า</button>
                             </div>
                         </div>
                     `;
                     grid.appendChild(card);
                 });
+                App.renderIcons();
             }
 
             window.filterByCategory = (category) => {
@@ -380,9 +407,10 @@
                 
                 const btn = event.currentTarget;
                 const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.innerHTML = '<i data-lucide="check"></i>';
+            App.renderIcons();
                 btn.style.background = '#00ff88';
-                setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 800);
+                setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; App.renderIcons(); }, 800);
             };
 
             window.openProductDetails = (id) => {
@@ -395,15 +423,16 @@
                         </div>
                         <span class="badge" style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); display: inline-block; margin-bottom: 10px;">${item.category || 'Rank'}</span>
                         <h2 class="details-title" style="margin:0; font-size:1.6rem; color:white;">${item.name}</h2>
-                        <div class="details-price" style="font-size: 1.3rem; font-weight: bold; color: #f59e0b; margin-top: 5px;"><i class="fas fa-coins"></i> ${item.price_points.toLocaleString()} Points</div>
+                <div class="details-price" style="font-size: 1.3rem; font-weight: bold; color: #f59e0b; margin-top: 5px;"><i data-lucide="coins"></i> ${item.price_points.toLocaleString()} Points</div>
                     </div>
                     <div class="details-desc" style="color:var(--text-muted); line-height:1.6; margin-bottom:25px;">
                         <p>${item.description || 'ไม่มีคำอธิบายเพิ่มเติมสำหรับสินค้านี้'}</p>
                         <p style="font-size:0.85rem;"><small>SKU: ${item.sku}</small></p>
                     </div>
-                    <button class="checkout-btn" onclick="App.addToCart({id: ${item.id}, name: '${item.name}', price_points: ${item.price_points}}, 1); document.getElementById('details-modal').classList.remove('active');" style="width:100%; padding:15px; border-radius:8px; border:none; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fas fa-cart-plus"></i> เพิ่มลงตะกร้า 1 ชิ้น</button>
+            <button class="checkout-btn" onclick="App.addToCart({id: ${item.id}, name: '${item.name}', price_points: ${item.price_points}}, 1); document.getElementById('details-modal').classList.remove('active');" style="width:100%; padding:15px; border-radius:8px; border:none; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:8px;"><i data-lucide="shopping-cart"></i> เพิ่มลงตะกร้า 1 ชิ้น</button>
                 `;
                 document.getElementById('details-modal').classList.add('active');
+                App.renderIcons();
             };
         });
     </script>

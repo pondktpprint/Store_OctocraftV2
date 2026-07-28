@@ -210,7 +210,7 @@ const Admin = {
                 <td>${p.id}</td>
                 <td>${App.escapeHTML(p.username)}</td>
                 <td>${App.escapeHTML(p.email || '-')}</td>
-                <td style="color:#f59e0b; font-weight:bold;">${p.points} <i class="fas fa-coins"></i></td>
+                <td style="color:#f59e0b; font-weight:bold;">${p.points} <i data-lucide="coins"></i></td>
                 <td style="color:#10b981; font-weight:bold;">${p.totalTopupTHB.toFixed(2)} บาท</td>
                 <td>${p.last_seen ? new Date(p.last_seen).toLocaleString() : '-'}</td>
                 <td><button class="submit-login-btn btn-view-profile" style="padding:6px 12px; width:auto">View Profile</button></td>
@@ -218,6 +218,7 @@ const Admin = {
             tr.querySelector('.btn-view-profile').onclick = () => Admin.viewPlayerProfile(p.username);
             tbody.appendChild(tr);
         });
+        App.renderIcons();
     },
 
     async viewPlayerProfile(username) {
@@ -533,7 +534,7 @@ const Admin = {
             
             let slipHtml = '-';
             if (t.provider_reference) {
-                slipHtml = `<a href="${t.provider_reference}" target="_blank" class="action-btn" style="background:#6366f1; color:white;"><i class="fas fa-image"></i> View Slip</a>`;
+                slipHtml = `<a href="${t.provider_reference}" target="_blank" class="action-btn" style="background:#6366f1; color:white;"><i data-lucide="image"></i> View Slip</a>`;
             }
             
             tr.innerHTML = `
@@ -552,6 +553,7 @@ const Admin = {
             }
             tbody.appendChild(tr);
         });
+        App.renderIcons();
     },
 
     async actionTopup(id, action) {

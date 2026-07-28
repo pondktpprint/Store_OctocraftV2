@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octocraft</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;800&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/redesign.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -475,7 +476,7 @@
     <div class="admin-mobile-header">
         <h2>Octo Admin</h2>
         <button class="mobile-menu-btn" onclick="document.querySelector('.admin-sidebar').classList.toggle('open')">
-            <i class="fas fa-bars"></i>
+            <i data-lucide="menu"></i>
         </button>
     </div>
 
@@ -484,19 +485,19 @@
         <aside class="admin-sidebar">
             <h2>Octo Admin</h2>
             <div class="admin-nav">
-                <button class="admin-tab-btn" data-tab="status"><i class="fas fa-server"></i> System Settings</button>
-                <button class="admin-tab-btn active" data-tab="products"><i class="fas fa-box"></i> Products</button>
-                <button class="admin-tab-btn" data-tab="players"><i class="fas fa-users"></i> Players</button>
-                <button class="admin-tab-btn" data-tab="orders"><i class="fas fa-shopping-cart"></i> Orders</button>
-                <button class="admin-tab-btn" data-tab="delivery"><i class="fas fa-truck"></i> Delivery Jobs</button>
-                <button class="admin-tab-btn" data-tab="wallet"><i class="fas fa-wallet"></i> Wallet Logs</button>
-                <button class="admin-tab-btn" data-tab="topup"><i class="fas fa-gem"></i> Topup Requests</button>
-                <button class="admin-tab-btn" onclick="window.location.href='index.html'" style="margin-top:auto;"><i class="fas fa-arrow-left"></i> Back to Shop</button>
+            <button class="admin-tab-btn" data-tab="status"><i data-lucide="server"></i> System Settings</button>
+            <button class="admin-tab-btn active" data-tab="products"><i data-lucide="package"></i> Products</button>
+            <button class="admin-tab-btn" data-tab="players"><i data-lucide="users"></i> Players</button>
+            <button class="admin-tab-btn" data-tab="orders"><i data-lucide="shopping-cart"></i> Orders</button>
+            <button class="admin-tab-btn" data-tab="delivery"><i data-lucide="truck"></i> Delivery Jobs</button>
+            <button class="admin-tab-btn" data-tab="wallet"><i data-lucide="wallet"></i> Wallet Logs</button>
+            <button class="admin-tab-btn" data-tab="topup"><i data-lucide="gem"></i> Topup Requests</button>
+            <button class="admin-tab-btn" onclick="window.location.href='index.html'" style="margin-top:auto;"><i data-lucide="arrow-left"></i> Back to Shop</button>
             </div>
             
             <!-- Mobile Sidebar Overlay (optional but good for UX) -->
             <button class="mobile-menu-btn" style="position: absolute; top: 15px; right: 15px; display: none;" onclick="document.querySelector('.admin-sidebar').classList.remove('open')">
-                <i class="fas fa-times"></i>
+            <i data-lucide="x"></i>
             </button>
         </aside>
 
@@ -507,14 +508,14 @@
             <div id="status" class="admin-panel">
                 <div class="flex-between" style="margin-bottom: 25px;">
                     <h2>System Status & Settings</h2>
-                    <button class="action-btn btn-retry" onclick="Admin.loadSystemStatus()"><i class="fas fa-sync"></i> Refresh Status</button>
+                <button class="action-btn btn-retry" onclick="Admin.loadSystemStatus()"><i data-lucide="refresh-cw"></i> Refresh Status</button>
                 </div>
                 
                 <!-- Status Row -->
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin-bottom: 30px;">
                     <!-- WebSocket Bridge -->
                     <div class="admin-card" style="margin-bottom:0;">
-                        <h4 style="color:#38bdf8; margin: 0 0 15px 0; font-size:1.1rem;"><i class="fas fa-network-wired"></i> WebSocket Bridge</h4>
+                            <h4 style="color:#38bdf8; margin: 0 0 15px 0; font-size:1.1rem;"><i data-lucide="network"></i> WebSocket Bridge</h4>
                         <div class="status-badge-container">
                             <span id="status-bridge-icon" class="pulse-dot offline"></span>
                             <span id="status-bridge-text">Checking...</span>
@@ -524,7 +525,7 @@
 
                     <!-- nLogin Database -->
                     <div class="admin-card" style="margin-bottom:0;">
-                        <h4 style="color:#c084fc; margin: 0 0 15px 0; font-size:1.1rem;"><i class="fas fa-database"></i> nLogin Database</h4>
+                            <h4 style="color:#c084fc; margin: 0 0 15px 0; font-size:1.1rem;"><i data-lucide="database"></i> nLogin Database</h4>
                         <div class="status-badge-container">
                             <span id="status-nlogin-icon" class="pulse-dot offline"></span>
                             <span id="status-nlogin-text">Checking...</span>
@@ -535,11 +536,11 @@
 
                 <!-- API Bridge Token -->
                 <div class="admin-card">
-                    <h4 style="color:#f8fafc; margin:0 0 15px 0; font-size:1.1rem;"><i class="fas fa-key"></i> API Bridge Token</h4>
+                        <h4 style="color:#f8fafc; margin:0 0 15px 0; font-size:1.1rem;"><i data-lucide="key-round"></i> API Bridge Token</h4>
                     <div style="display:flex; gap:10px;">
                         <input type="text" id="status-bridge-token" readonly style="flex-grow:1; padding:12px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.4); color:white; font-family:monospace; font-size:0.95rem;">
-                        <button class="action-btn btn-approve" onclick="navigator.clipboard.writeText(document.getElementById('status-bridge-token').value); App.showToast('Token Copied!')"><i class="fas fa-copy"></i> Copy</button>
-                        <button class="action-btn btn-retry" onclick="Admin.regenerateToken()"><i class="fas fa-sync"></i> Regenerate</button>
+                            <button class="action-btn btn-approve" onclick="navigator.clipboard.writeText(document.getElementById('status-bridge-token').value); App.showToast('Token Copied!')"><i data-lucide="copy"></i> Copy</button>
+                            <button class="action-btn btn-retry" onclick="Admin.regenerateToken()"><i data-lucide="refresh-cw"></i> Regenerate</button>
                     </div>
                     <p style="color:#94a3b8; font-size:0.85rem; margin:10px 0 0 0;">นำโทเคนนี้ไปตั้งค่าในปลั๊กอิน PrintFlow บนเซิร์ฟเวอร์เพื่อความปลอดภัยของข้อมูล</p>
                 </div>
@@ -548,7 +549,7 @@
                 <form id="settings-form" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
                     <!-- Server Settings -->
                     <div class="admin-card" style="margin-bottom:0;">
-                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-server"></i> Minecraft Server Info</h4>
+                    <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i data-lucide="server"></i> Minecraft Server Info</h4>
                         <div class="admin-form-group">
                             <label>Server IP Address</label>
                             <input type="text" id="setting-server-ip" required placeholder="play.example.com">
@@ -561,7 +562,7 @@
 
                     <!-- nLogin DB Settings -->
                     <div class="admin-card" style="margin-bottom:0;">
-                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-database"></i> nLogin Database Config</h4>
+                    <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i data-lucide="database"></i> nLogin Database Config</h4>
                         <div class="admin-form-group">
                             <label>Host</label>
                             <input type="text" id="setting-nlogin-host" required placeholder="localhost">
@@ -588,7 +589,7 @@
 
                     <!-- PromptPay & Point Rate Config -->
                     <div class="admin-card" style="margin-bottom:0;">
-                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-coins"></i> PromptPay & Point Conversion</h4>
+                    <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i data-lucide="coins"></i> PromptPay & Point Conversion</h4>
                         <div class="admin-form-group">
                             <label>เบอร์พร้อมเพย์ หรือเลขบัตรประชาชน (PromptPay Target)</label>
                             <input type="text" id="setting-promptpay-target" required placeholder="เช่น 0812345678">
@@ -609,7 +610,7 @@
 
                     <!-- Promotion Config -->
                     <div class="admin-card" style="margin-bottom:0; grid-column: 1 / -1;">
-                        <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i class="fas fa-bullhorn"></i> การตั้งค่าโปรโมชั่นหน้าแรก</h4>
+                    <h4 style="color:#f8fafc; margin-bottom:20px; font-size:1.1rem;"><i data-lucide="megaphone"></i> การตั้งค่าโปรโมชั่นหน้าแรก</h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                             <div class="admin-form-group">
                                 <label>ข้อความป้ายกำกับ (Badge)</label>
@@ -634,7 +635,7 @@
                     </div>
 
                     <div style="grid-column: 1 / -1; text-align: right;">
-                        <button type="button" class="submit-login-btn btn-retry" onclick="Admin.saveSettings()" style="width: auto; padding: 12px 35px; border-radius: 8px; font-size: 1rem;"><i class="fas fa-save"></i> Save Configuration</button>
+                <button type="button" class="submit-login-btn btn-retry" onclick="Admin.saveSettings()" style="width: auto; padding: 12px 35px; border-radius: 8px; font-size: 1rem;"><i data-lucide="save"></i> Save Configuration</button>
                     </div>
                 </form>
             </div>
@@ -669,7 +670,7 @@
                     <h2>Player Administration</h2>
                     <div style="display:flex; gap:10px;">
                         <input type="text" id="player-search-input" placeholder="Search nLogin username..." style="padding:10px 15px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.3); color:white; font-size:0.95rem;">
-                        <button class="action-btn btn-retry" onclick="Admin.loadPlayers()"><i class="fas fa-search"></i> Search</button>
+                        <button class="action-btn btn-retry" onclick="Admin.loadPlayers()"><i data-lucide="search"></i> Search</button>
                     </div>
                 </div>
 
@@ -699,30 +700,30 @@
                 <div id="player-profile-view" style="display:none;" class="admin-card">
                     <div class="flex-between" style="border-bottom:1px solid var(--glass-border); padding-bottom:15px; margin-bottom:20px;">
                         <h3 id="profile-username" style="color:var(--neon-cyan); font-size:1.6rem; margin:0;">Username</h3>
-                        <button class="action-btn btn-danger" onclick="document.getElementById('player-profile-view').style.display='none'; document.getElementById('player-search-results').style.display='block';"><i class="fas fa-times"></i> Close Profile</button>
+                <button class="action-btn btn-danger" onclick="document.getElementById('player-profile-view').style.display='none'; document.getElementById('player-search-results').style.display='block';"><i data-lucide="x"></i> Close Profile</button>
                     </div>
 
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom: 25px;">
                         <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; border:1px solid var(--glass-border);">
-                            <h4 style="margin: 0 0 15px 0; color:#f8fafc; font-size: 1.1rem;"><i class="fas fa-info-circle"></i> nLogin Details</h4>
+                    <h4 style="margin: 0 0 15px 0; color:#f8fafc; font-size: 1.1rem;"><i data-lucide="info"></i> nLogin Details</h4>
                             <p style="margin:8px 0;"><strong>Email:</strong> <span id="profile-email"></span></p>
                             <p style="margin:8px 0;"><strong>Created:</strong> <span id="profile-created"></span></p>
                             <p style="margin:8px 0;"><strong>Last Seen:</strong> <span id="profile-lastseen"></span></p>
                         </div>
                         <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; border:1px solid var(--glass-border);">
                             <div class="flex-between" style="margin-bottom:15px;">
-                                <h4 style="margin: 0; color:#f8fafc; font-size:1.1rem;"><i class="fas fa-wallet"></i> Wallet Balance</h4>
+                    <h4 style="margin: 0; color:#f8fafc; font-size:1.1rem;"><i data-lucide="wallet"></i> Wallet Balance</h4>
                                 <div style="display:flex; gap:8px;">
                                     <button class="action-btn btn-retry" style="padding:4px 8px; font-size:0.8rem;" onclick="Admin.openPlayerWalletModal('credit')">Credit</button>
                                     <button class="action-btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="Admin.openPlayerWalletModal('debit')">Debit</button>
                                 </div>
                             </div>
-                            <h2 style="font-size:2.2rem; color:#f59e0b; margin:0;"><i class="fas fa-coins"></i> <span id="profile-balance">0</span></h2>
+                    <h2 style="font-size:2.2rem; color:#f59e0b; margin:0;"><i data-lucide="coins"></i> <span id="profile-balance">0</span></h2>
                             <p style="color:#94a3b8; font-size:0.8rem; margin:10px 0 0 0;">แต้มสะสมทั้งหมดของผู้เล่นสำหรับใช้จ่ายซื้อยศหรือไอเทม</p>
                         </div>
                     </div>
 
-                    <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i class="fas fa-gem"></i> Recent Topup / Wallet History</h4>
+                <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i data-lucide="gem"></i> Recent Topup / Wallet History</h4>
                     <div class="admin-table-wrapper" style="margin-bottom: 25px;">
                         <table class="admin-table">
                             <thead><tr><th>ID</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Date</th></tr></thead>
@@ -730,7 +731,7 @@
                         </table>
                     </div>
 
-                    <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i class="fas fa-shopping-basket"></i> Recent Orders</h4>
+                <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i data-lucide="shopping-basket"></i> Recent Orders</h4>
                     <div class="admin-table-wrapper" style="margin-bottom: 25px;">
                         <table class="admin-table">
                             <thead><tr><th>ID</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
@@ -738,7 +739,7 @@
                         </table>
                     </div>
 
-                    <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i class="fas fa-tasks"></i> Recent Delivery Jobs</h4>
+                <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i data-lucide="list-checks"></i> Recent Delivery Jobs</h4>
                     <div class="admin-table-wrapper">
                         <table class="admin-table">
                             <thead><tr><th>ID</th><th>Order ID</th><th>Status</th><th>Retries</th><th>Actions</th></tr></thead>
@@ -791,7 +792,7 @@
             <div id="wallet" class="admin-panel">
                 <div class="flex-between" style="margin-bottom: 25px;">
                     <h2>Wallet Administration</h2>
-                    <button class="action-btn btn-edit" onclick="Admin.openWalletModal()"><i class="fas fa-plus-minus"></i> Credit / Debit Balance</button>
+                    <button class="action-btn btn-edit" onclick="Admin.openWalletModal()"><i data-lucide="plus-minus"></i> Credit / Debit Balance</button>
                 </div>
                 <div class="admin-table-wrapper">
                     <table class="admin-table">
@@ -884,8 +885,8 @@
                     <small style="color:var(--premium-muted); display:block; margin-top:5px;">อัปโหลดรูปภาพสินค้าใหม่ หรือปล่อยว่างหากไม่ต้องการเปลี่ยนรูป</small>
                 </div>
                     <div style="grid-column: 1 / -1; display:flex; justify-content:space-between; margin-top:10px;">
-                        <button type="button" id="btn-delete-product" class="action-btn btn-danger" style="display:none;" onclick="Admin.deleteProduct()"><i class="fas fa-trash"></i> ลบสินค้า</button>
-                        <button type="submit" class="action-btn btn-retry" style="margin-left:auto;"><i class="fas fa-save"></i> Save Product</button>
+                    <button type="button" id="btn-delete-product" class="action-btn btn-danger" style="display:none;" onclick="Admin.deleteProduct()"><i data-lucide="trash-2"></i> ลบสินค้า</button>
+                    <button type="submit" class="action-btn btn-retry" style="margin-left:auto;"><i data-lucide="save"></i> Save Product</button>
                     </div>
             </form>
         </div>

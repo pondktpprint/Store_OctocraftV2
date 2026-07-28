@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octocraft</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/redesign.css">
     <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
     <style>
         .status-grid {
@@ -169,22 +170,44 @@
 <body>
     <div class="bubbles" id="bubbles-container"></div>
 
-    <nav class="top-nav">
+    <nav class="top-nav landing-nav">
+        <a href="index.html" class="nav-brand">
+            <img src="images/logo.png" alt="Octocraft" onerror="this.style.display='none';">
+            <span>Octocraft</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="active"><i data-lucide="home"></i> หน้าหลัก</a>
+            <a href="shop.html"><i data-lucide="shopping-cart"></i> ร้านค้า</a>
+            <a href="topup.html"><i data-lucide="gem"></i> เติมเงิน</a>
+            <a href="https://discord.gg/dU2wma23f3" target="_blank"><i data-lucide="message-circle"></i> Discord</a>
+        </div>
         <div class="user-profile-menu"></div>
     </nav>
 
     <main class="container">
-        <div class="logo-container">
-            <img src="images/logo.png" alt="Octo Craft SMP Logo" class="logo" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
-            <div id="logo-fallback" class="logo-fallback">OCTO CRAFT SMP</div>
-        </div>
+        <section class="landing-hero">
+            <div class="hero-copy">
+                <span class="hero-kicker">OCTOCRAFT SMP</span>
+                <h1>Octocraft: Minecraft Survival Economy</h1>
+                <p>สัมผัสเซิร์ฟเวอร์เอาชีวิตรอดที่มีระบบร้านค้า เติมพอยต์ และชุมชนพร้อมลุยกับคุณตลอด 24 ชั่วโมง</p>
+                <div class="hero-actions">
+                    <a href="shop.html" class="hero-btn primary"><i data-lucide="shopping-cart"></i> เข้าร้านค้า</a>
+                    <a href="topup.html" class="hero-btn secondary"><i data-lucide="gem"></i> เติมพอยต์</a>
+                </div>
+            </div>
+            <div class="hero-brand">
+                <div class="logo-container">
+                    <img src="images/logo.png" alt="Octo Craft SMP Logo" class="logo" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+                    <div id="logo-fallback" class="logo-fallback">OCTO CRAFT SMP</div>
+                </div>
+            </div>
         
-        <!-- 2-Column Status Section -->
-        <div class="status-grid">
+            <!-- 2-Column Status Section -->
+            <div class="status-grid">
             <!-- Server Status Card -->
             <div class="status-card-new" id="server-status-card" onclick="copyServerIP(event)">
                 <div class="status-icon-container">
-                    <i class="fas fa-server"></i>
+                    <i data-lucide="server"></i>
                 </div>
                 <div class="status-card-info">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -195,7 +218,7 @@
                         </div>
                     </div>
                     <div class="status-details" style="margin-top: 2px;">
-                        <span style="color: #00d2ff; font-weight: 600; font-size: 0.85rem;"><i class="fas fa-copy"></i> play.octocraft.online</span>
+                        <span style="color: #00d2ff; font-weight: 600; font-size: 0.85rem;"><i data-lucide="copy"></i> play.octocraft.online</span>
                         <span class="players-online" id="server-players" style="font-size: 0.85rem;">0 / 0 ผู้เล่น</span>
                     </div>
                 </div>
@@ -204,7 +227,7 @@
             <!-- Discord Status Card -->
             <a href="https://discord.gg/dU2wma23f3" target="_blank" class="status-card-new discord-card">
                 <div class="status-icon-container discord">
-                    <i class="fab fa-discord"></i>
+                    <i data-lucide="message-circle"></i>
                 </div>
                 <div class="status-card-info">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -216,11 +239,12 @@
                     </div>
                     <div class="status-details" style="margin-top: 2px;">
                         <span id="discord-members" style="font-size: 0.85rem; color: var(--text-muted);">กำลังโหลด...</span>
-                        <span style="color: #7289da; font-weight: 600; font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> เข้าร่วม</span>
+                        <span style="color: #7289da; font-weight: 600; font-size: 0.85rem;"><i data-lucide="external-link"></i> เข้าร่วม</span>
                     </div>
                 </div>
             </a>
-        </div>
+            </div>
+        </section>
 
         <!-- Bottom Layout: Left (Shop, Topup, Contact) | Right (Promotion) -->
         <div class="main-menu-container">
@@ -228,7 +252,7 @@
             <div class="menu-grid">
                 <!-- Shop Card -->
                 <a href="shop.html" class="job-card">
-                    <div class="card-icon">🛒</div>
+                    <div class="card-icon"><i data-lucide="shopping-cart"></i></div>
                     <div class="card-content">
                         <h2>ร้านค้า (Shop)</h2>
                         <p>เลือกซื้อไอเทมกล่องสุ่มและยศพิเศษต่างๆ ในเกม</p>
@@ -237,7 +261,7 @@
 
                 <!-- Topup Card -->
                 <a href="topup.html" class="job-card">
-                    <div class="card-icon">💎</div>
+                    <div class="card-icon"><i data-lucide="gem"></i></div>
                     <div class="card-content">
                         <h2>เติมเงิน (Topup)</h2>
                         <p>เติมพอยท์ผ่านคิวอาร์โค้ดระบบอัตโนมัติ 24 ชม.</p>
@@ -246,16 +270,16 @@
 
                 <!-- Contact Card -->
                 <div class="job-card" style="cursor: default;">
-                    <div class="card-icon">💬</div>
+                    <div class="card-icon"><i data-lucide="messages-square"></i></div>
                     <div class="card-content">
                         <h2>ติดต่อเรา (Contact)</h2>
                         <p>พบปัญหาการใช้งาน ติดต่อทีมงานช่วยเหลือได้ตลอดเวลา</p>
                         <div style="display: flex; gap: 15px; margin-top: 12px; flex-wrap: wrap;">
                             <a href="https://discord.gg/dU2wma23f3" target="_blank" class="copy-ip-action-btn" style="text-decoration:none; margin-top:0;">
-                                <i class="fab fa-discord"></i> Discord Invite
+                                <i data-lucide="message-circle"></i> Discord Invite
                             </a>
                             <a href="https://facebook.com" target="_blank" class="copy-ip-action-btn" style="text-decoration:none; margin-top:0; background:rgba(24,119,242,0.15); border-color:rgba(24,119,242,0.3); color:#1877f2;">
-                                <i class="fab fa-facebook"></i> Facebook Page
+                                <i data-lucide="external-link"></i> Facebook Page
                             </a>
                         </div>
                     </div>
@@ -281,7 +305,7 @@
         <div class="donators-dashboard">
             <!-- Left: Top 3 Donators Card -->
             <div class="dashboard-card top-donators-card">
-                <h2 class="section-title">🏆 ผู้สนับสนุนสูงสุด 🏆</h2>
+                <h2 class="section-title"><i data-lucide="trophy"></i> ผู้สนับสนุนสูงสุด</h2>
                 <div class="donators-container">
                     <!-- Rank 2 -->
                     <div class="donator-card rank-2">
@@ -315,7 +339,7 @@
 
             <!-- Right: Recent Donators Card -->
             <div class="dashboard-card recent-donators-card-new">
-                <h2 class="section-title">💸 เติมเงินล่าสุด</h2>
+                <h2 class="section-title"><i data-lucide="wallet-cards"></i> เติมเงินล่าสุด</h2>
                 <ul class="recent-list" id="recent-list-container">
                     <li style="text-align:center; padding: 20px; color: var(--text-muted);">ไม่มีรายการเติมเงินล่าสุด</li>
                 </ul>
@@ -368,6 +392,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+
             const loginForm = document.getElementById('login-form');
             if (loginForm) {
                 loginForm.addEventListener('submit', async (e) => {
