@@ -2,7 +2,15 @@ const Admin = {
     globalData: {
         orders: [],
         jobs: [],
-        transactions: []
+        transactions: [],
+        topups: []
+    },
+
+    manualTopup: {
+        pointRate: null,
+        player: null,
+        lookupRequest: 0,
+        submitting: false
     },
     
     init() {
@@ -192,26 +200,25 @@ const Admin = {
             return;
         }
 
-        let playersData = res.players.map(p => {
-            const userTxs = this.globalData.transactions ? this.globalData.transactions.filter(t => t.username === p.username) : [];
-            const points = userTxs.length > 0 ? userTxs[0].balance_after : 0;
-            
-            const userTopups = this.globalData.topups ? this.globalData.topups.filter(t => t.username === p.username && t.status === 'approved') : [];
-            const totalTopupTHB = userTopups.reduce((acc, curr) => acc + (curr.amount_minor / 100), 0);
-
-            return { ...p, points, totalTopupTHB };
-        });
+        const playersData = res.players.map(p => ({
+            ...p,
+            points: Number(p.balance_points) || 0,
+            totalTopupTHB: (Number(p.total_topup_minor) || 0) / 100
+        }));
 
         playersData.sort((a, b) => a.username.localeCompare(b.username));
 
         playersData.forEach(p => {
             const tr = document.createElement('tr');
+            const registrationHint = p.registered_on_web
+                ? ''
+                : '<small style="display:block; color:#f59e0b; margin-top:3px;">ยังไม่ผูกบัญชีหน้าเว็บ</small>';
             tr.innerHTML = `
                 <td>${p.id}</td>
-                <td>${App.escapeHTML(p.username)}</td>
+                <td>${App.escapeHTML(p.username)}${registrationHint}</td>
                 <td>${App.escapeHTML(p.email || '-')}</td>
-                <td style="color:#f59e0b; font-weight:bold;">${p.points} <i data-lucide="coins"></i></td>
-                <td style="color:#10b981; font-weight:bold;">${p.totalTopupTHB.toFixed(2)} บาท</td>
+                <td style="color:#f59e0b; font-weight:bold;">${p.points.toLocaleString('th-TH')} <i data-lucide="coins"></i></td>
+                <td style="color:#10b981; font-weight:bold;">${p.totalTopupTHB.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</td>
                 <td>${p.last_seen ? new Date(p.last_seen).toLocaleString() : '-'}</td>
                 <td><button class="submit-login-btn btn-view-profile" style="padding:6px 12px; width:auto">View Profile</button></td>
             `;
@@ -226,9 +233,18 @@ const Admin = {
         document.getElementById('player-search-results').style.display = 'none';
         document.getElementById('player-profile-view').style.display = 'block';
         
-        // Fetch specific player profile
+        // Fetch the nLogin profile first, then use the wallet-specific endpoint
+        // as the authoritative source for current balance and ledger history.
         const res = await this.fetchAdmin(`/api/admin/players/${encodeURIComponent(username)}`);
         const p = res.player;
+        let walletRes = {
+            player: { balance_points: Number(p.balance_points) || 0 },
+            transactions: []
+        };
+        if (p.registered_on_web !== false) {
+            walletRes = await this.fetchAdmin(`/api/admin/wallet/player/${encodeURIComponent(p.username)}`);
+        }
+        const userTxs = Array.isArray(walletRes.transactions) ? walletRes.transactions : [];
         
         document.getElementById('profile-username').innerText = p.username;
         document.getElementById('profile-email').innerText = p.email || '-';
@@ -237,12 +253,8 @@ const Admin = {
         
         // Client-side Relation Filtering
         // 1. Wallet Balance
-        const userTxs = this.globalData.transactions.filter(t => t.username === p.username);
-        if (userTxs.length > 0) {
-            document.getElementById('profile-balance').innerText = userTxs[0].balance_after;
-        } else {
-            document.getElementById('profile-balance').innerText = "0";
-        }
+        const currentBalance = Number(walletRes.player?.balance_points) || 0;
+        document.getElementById('profile-balance').innerText = currentBalance.toLocaleString('th-TH');
 
         // 2. Orders
         const userOrders = this.globalData.orders.filter(o => o.username === p.username);
@@ -270,7 +282,7 @@ const Admin = {
                 userTxs.forEach(t => {
                     const tr = document.createElement('tr');
                     const color = t.type === 'credit' ? 'var(--success)' : 'var(--danger)';
-                    tr.innerHTML = `<td>${t.id}</td><td style="color:${color}; font-weight:bold;">${App.escapeHTML(t.type).toUpperCase()}</td><td>${t.amount_points}</td><td>${t.balance_after}</td><td>${new Date(t.created_at).toLocaleString()}</td>`;
+                    tr.innerHTML = `<td>${t.id}</td><td style="color:${color}; font-weight:bold;">${App.escapeHTML(t.type).toUpperCase()}</td><td>${Number(t.amount_points).toLocaleString('th-TH')}</td><td>${Number(t.balance_after).toLocaleString('th-TH')}</td><td>${new Date(t.created_at).toLocaleString()}</td>`;
                     pTbody.appendChild(tr);
                 });
             }
@@ -293,10 +305,7 @@ const Admin = {
 
     openPlayerWalletModal(action) {
         const username = document.getElementById('profile-username').innerText;
-        document.getElementById('wallet-username').value = username;
-        document.getElementById('wallet-action').value = action;
-        document.getElementById('wallet-amount').value = '';
-        document.getElementById('wallet-modal').classList.add('active');
+        this.openWalletModal(action, username);
     },
 
     // --- PRODUCTS ---
@@ -461,6 +470,7 @@ const Admin = {
     // --- WALLET ---
     async loadWallet() {
         const res = await this.fetchAdmin('/api/admin/wallet');
+        this.globalData.transactions = res.transactions;
         const tbody = document.getElementById('wallet-tbody');
         tbody.innerHTML = '';
         res.transactions.forEach(t => {
@@ -479,17 +489,18 @@ const Admin = {
         });
     },
 
-    openWalletModal() {
-        document.getElementById('wallet-username').value = '';
+    openWalletModal(action = 'credit', username = '') {
+        document.getElementById('wallet-username').value = username;
+        document.getElementById('wallet-action').value = action === 'debit' ? 'debit' : 'credit';
         document.getElementById('wallet-amount').value = '';
         document.getElementById('wallet-modal').classList.add('active');
     },
 
     async saveWallet(e) {
         e.preventDefault();
-        const username = document.getElementById('wallet-username').value;
+        const username = document.getElementById('wallet-username').value.trim();
         const action = document.getElementById('wallet-action').value;
-        const amount = parseInt(document.getElementById('wallet-amount').value);
+        const amount = parseInt(document.getElementById('wallet-amount').value, 10);
 
         const res = await this.fetchAdmin(`/api/admin/wallet/${action}`, {
             method: 'POST',
@@ -497,31 +508,301 @@ const Admin = {
         });
         
         if (res.ok) {
-            Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'เปลี่ยนสถานะสำเร็จ', timer: 1500, showConfirmButton: false, background: '#1a1f2b', color: '#fff' });
-            Admin.loadOrders();
+            Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ',
+                text: `${action === 'credit' ? 'เพิ่ม' : 'ลด'} ${amount.toLocaleString('th-TH')} พอยท์ให้ ${username} แล้ว`,
+                timer: 1800,
+                showConfirmButton: false,
+                background: '#1a1f2b',
+                color: '#fff'
+            });
         }
         
         document.getElementById('wallet-modal').classList.remove('active');
-        
-        // Refresh global data
-        const tRes = await this.fetchAdmin('/api/admin/wallet');
-        this.globalData.transactions = tRes.transactions;
+        await Promise.allSettled([this.loadWallet(), this.loadPlayers()]);
         
         // If we are currently viewing the player profile for this user, refresh it
         if (document.getElementById('players').classList.contains('active') && document.getElementById('player-profile-view').style.display === 'block') {
-            if (document.getElementById('profile-username').innerText === username) {
-                this.viewPlayerProfile(username);
+            if (document.getElementById('profile-username').innerText.toLowerCase() === username.toLowerCase()) {
+                await this.viewPlayerProfile(username);
             }
         }
-        
-        this.loadWallet();
+    },
+
+    // --- MANUAL TOPUP ---
+    async openManualTopupModal(username = '') {
+        const form = document.getElementById('manual-topup-form');
+        const modal = document.getElementById('manual-topup-modal');
+        const usernameInput = document.getElementById('manual-topup-username');
+        const playerState = document.getElementById('manual-topup-player-state');
+
+        form.reset();
+        usernameInput.value = String(username || '').trim();
+        this.manualTopup.pointRate = null;
+        this.manualTopup.player = null;
+        this.manualTopup.lookupRequest += 1;
+        this.manualTopup.submitting = false;
+        playerState.style.color = '#94a3b8';
+        playerState.textContent = 'กำลังโหลดอัตราแลกพอยท์จากระบบ...';
+        modal.classList.add('active');
+        this.updateManualTopupPreview();
+        App.renderIcons();
+
+        try {
+            const config = await this.fetchAdmin('/api/topup/config');
+            const pointRate = Number(config.pointRate);
+            if (!Number.isFinite(pointRate) || pointRate <= 0) {
+                throw new Error(App.translateError('invalid_point_rate'));
+            }
+            this.manualTopup.pointRate = pointRate;
+
+            if (usernameInput.value) {
+                await this.lookupManualTopupPlayer();
+            } else {
+                playerState.style.color = '#94a3b8';
+                playerState.textContent = `ผู้เล่นต้องเคยเข้าสู่ระบบหน้าเว็บอย่างน้อยหนึ่งครั้ง • เรต ${pointRate.toLocaleString('th-TH')} พอยท์/บาท`;
+                this.updateManualTopupPreview();
+            }
+        } catch (error) {
+            playerState.style.color = '#ef4444';
+            playerState.textContent = 'โหลดอัตราแลกพอยท์ไม่สำเร็จ กรุณาปิดหน้าต่างแล้วลองใหม่';
+            this.updateManualTopupPreview();
+        }
+    },
+
+    async lookupManualTopupPlayer() {
+        const usernameInput = document.getElementById('manual-topup-username');
+        const playerState = document.getElementById('manual-topup-player-state');
+        const username = usernameInput.value.trim();
+        const requestId = ++this.manualTopup.lookupRequest;
+
+        this.manualTopup.player = null;
+        this.updateManualTopupPreview();
+
+        if (!username) {
+            playerState.style.color = '#94a3b8';
+            playerState.textContent = 'กรุณากรอกชื่อผู้เล่น';
+            return null;
+        }
+
+        playerState.style.color = '#94a3b8';
+        playerState.textContent = 'กำลังตรวจสอบบัญชีผู้เล่น...';
+
+        try {
+            const res = await App.api(`/api/admin/wallet/player/${encodeURIComponent(username)}`);
+            if (requestId !== this.manualTopup.lookupRequest) return null;
+
+            if (!res.ok) {
+                playerState.style.color = '#ef4444';
+                playerState.textContent = App.translateError(res.error);
+                this.updateManualTopupPreview();
+                return null;
+            }
+
+            this.manualTopup.player = {
+                ...res.player,
+                balance_points: Number(res.player.balance_points) || 0
+            };
+            usernameInput.value = res.player.username;
+            playerState.style.color = '#22c55e';
+            playerState.textContent = `พบบัญชี ${res.player.username} • ยอดปัจจุบัน ${this.manualTopup.player.balance_points.toLocaleString('th-TH')} พอยท์`;
+            this.updateManualTopupPreview();
+            return this.manualTopup.player;
+        } catch (error) {
+            if (requestId !== this.manualTopup.lookupRequest) return null;
+            playerState.style.color = '#ef4444';
+            playerState.textContent = 'ตรวจสอบผู้เล่นไม่สำเร็จ กรุณาลองใหม่';
+            this.updateManualTopupPreview();
+            return null;
+        }
+    },
+
+    calculateManualTopupPoints(amountMinor, pointRate) {
+        const normalizedRate = String(pointRate).trim().toLowerCase();
+        if (!/^(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/.test(normalizedRate)) return null;
+
+        try {
+            const [coefficient, exponentPart = '0'] = normalizedRate.split('e');
+            const [wholePart, fractionPart = ''] = coefficient.split('.');
+            const exponent = Number(exponentPart);
+            const digits = `${wholePart}${fractionPart}`.replace(/^0+/, '') || '0';
+            const decimalPlaces = fractionPart.length - exponent;
+
+            let rateNumerator = BigInt(digits);
+            let rateDenominator = 1n;
+            if (decimalPlaces > 0) {
+                rateDenominator = 10n ** BigInt(decimalPlaces);
+            } else if (decimalPlaces < 0) {
+                rateNumerator *= 10n ** BigInt(-decimalPlaces);
+            }
+
+            const divisor = 100n * rateDenominator;
+            const scaledPoints = BigInt(amountMinor) * rateNumerator;
+            return Number((scaledPoints + (divisor / 2n)) / divisor);
+        } catch (_) {
+            return null;
+        }
+    },
+
+    updateManualTopupPreview() {
+        const usernameInput = document.getElementById('manual-topup-username');
+        const amountInput = document.getElementById('manual-topup-amount');
+        const pointsElement = document.getElementById('manual-topup-points');
+        const afterBalanceElement = document.getElementById('manual-topup-after-balance');
+        const submitButton = document.getElementById('manual-topup-submit');
+        if (!usernameInput || !amountInput || !pointsElement || !afterBalanceElement || !submitButton) return null;
+
+        const rawAmount = amountInput.value.trim();
+        const amountMatch = rawAmount.match(/^(\d{1,7})(?:\.(\d{0,2}))?$/);
+        const pointRate = Number(this.manualTopup.pointRate);
+        let calculation = null;
+
+        if (amountMatch && Number.isFinite(pointRate) && pointRate > 0) {
+            const amountMinor = (Number(amountMatch[1]) * 100) + Number((amountMatch[2] || '').padEnd(2, '0'));
+            const points = this.calculateManualTopupPoints(amountMinor, pointRate);
+            if (
+                Number.isSafeInteger(amountMinor) &&
+                amountMinor > 0 &&
+                amountMinor <= 100000000 &&
+                Number.isSafeInteger(points) &&
+                points > 0 &&
+                points <= 10000000
+            ) {
+                calculation = {
+                    amountMinor,
+                    amountBaht: (amountMinor / 100).toFixed(2),
+                    points
+                };
+            }
+        }
+
+        const currentUsername = usernameInput.value.trim().toLowerCase();
+        const matchedPlayer = this.manualTopup.player &&
+            this.manualTopup.player.username.toLowerCase() === currentUsername;
+
+        pointsElement.textContent = calculation ? calculation.points.toLocaleString('th-TH') : '0';
+        afterBalanceElement.textContent = calculation && matchedPlayer
+            ? (this.manualTopup.player.balance_points + calculation.points).toLocaleString('th-TH')
+            : '-';
+        submitButton.disabled = this.manualTopup.submitting || !calculation || !matchedPlayer;
+        submitButton.style.opacity = submitButton.disabled ? '0.55' : '1';
+        submitButton.style.cursor = submitButton.disabled ? 'not-allowed' : 'pointer';
+
+        return calculation;
+    },
+
+    async saveManualTopup(e) {
+        e.preventDefault();
+        if (this.manualTopup.submitting) return;
+
+        const form = document.getElementById('manual-topup-form');
+        if (!form.reportValidity()) return;
+
+        const usernameInput = document.getElementById('manual-topup-username');
+        const username = usernameInput.value.trim();
+        let matchedPlayer = this.manualTopup.player &&
+            this.manualTopup.player.username.toLowerCase() === username.toLowerCase();
+        if (!matchedPlayer) {
+            await this.lookupManualTopupPlayer();
+            matchedPlayer = this.manualTopup.player &&
+                this.manualTopup.player.username.toLowerCase() === usernameInput.value.trim().toLowerCase();
+        }
+        if (!matchedPlayer) return;
+
+        const calculation = this.updateManualTopupPreview();
+        if (!calculation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'จำนวนเงินไม่ถูกต้อง',
+                text: App.translateError('invalid_amount'),
+                background: '#1a1f2b',
+                color: '#fff'
+            });
+            return;
+        }
+
+        const canonicalUsername = this.manualTopup.player.username;
+        const transactionReference = document.getElementById('manual-topup-reference').value.trim();
+        const reason = document.getElementById('manual-topup-reason').value.trim();
+        const submitButton = document.getElementById('manual-topup-submit');
+
+        this.manualTopup.submitting = true;
+        this.updateManualTopupPreview();
+
+        const confirmation = await Swal.fire({
+            icon: 'warning',
+            title: 'ยืนยันบันทึกเติมเงินด้วยมือ',
+            text: `${canonicalUsername} โอน ${Number(calculation.amountBaht).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท และจะได้รับ ${calculation.points.toLocaleString('th-TH')} พอยท์ โปรดตรวจสอบเลขอ้างอิงบนสลิปอีกครั้ง`,
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันและเติมพอยท์',
+            cancelButtonText: 'กลับไปตรวจสอบ',
+            confirmButtonColor: '#d4af37',
+            background: '#1a1f2b',
+            color: '#fff'
+        });
+
+        if (!confirmation.isConfirmed) {
+            this.manualTopup.submitting = false;
+            this.updateManualTopupPreview();
+            return;
+        }
+
+        submitButton.innerHTML = '<i data-lucide="loader-circle"></i> กำลังบันทึก...';
+        App.renderIcons();
+
+        try {
+            const res = await this.fetchAdmin('/api/admin/topup/manual', {
+                method: 'POST',
+                body: JSON.stringify({
+                    username: canonicalUsername,
+                    amount_baht: calculation.amountBaht,
+                    transaction_reference: transactionReference,
+                    reason
+                })
+            });
+
+            document.getElementById('manual-topup-modal').classList.remove('active');
+            await Promise.allSettled([
+                this.loadTopup(),
+                this.loadWallet(),
+                this.loadPlayers()
+            ]);
+
+            const profileIsOpen = document.getElementById('players').classList.contains('active') &&
+                document.getElementById('player-profile-view').style.display === 'block' &&
+                document.getElementById('profile-username').innerText.toLowerCase() === canonicalUsername.toLowerCase();
+            if (profileIsOpen) {
+                await Promise.allSettled([this.viewPlayerProfile(canonicalUsername)]);
+            }
+
+            const topup = res.topup;
+            await Swal.fire({
+                icon: topup.idempotent ? 'info' : 'success',
+                title: topup.idempotent ? 'รายการนี้ถูกบันทึกไว้แล้ว' : 'เติมเงินสำเร็จ',
+                text: `${topup.username} ได้รับ ${Number(topup.points).toLocaleString('th-TH')} พอยท์ ยอดคงเหลือ ${Number(topup.balance_points).toLocaleString('th-TH')} พอยท์`,
+                background: '#1a1f2b',
+                color: '#fff'
+            });
+        } finally {
+            this.manualTopup.submitting = false;
+            submitButton.innerHTML = '<i data-lucide="circle-check-big"></i> ยืนยันและบันทึกรายการเติมเงิน';
+            this.updateManualTopupPreview();
+            App.renderIcons();
+        }
     },
 
     // --- TOPUP ---
     async loadTopup() {
         const res = await this.fetchAdmin('/api/admin/topup');
+        this.globalData.topups = res.requests;
         const tbody = document.getElementById('topup-tbody');
         tbody.innerHTML = '';
+        if (res.requests.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:#94a3b8;">ยังไม่มีรายการเติมเงิน</td></tr>';
+            return;
+        }
+
         res.requests.forEach(t => {
             const tr = document.createElement('tr');
             let actions = '-';
@@ -531,24 +812,53 @@ const Admin = {
                     <button class="action-btn btn-reject">Reject</button>
                 `;
             }
-            
-            let slipHtml = '-';
-            if (t.provider_reference) {
-                slipHtml = `<a href="${t.provider_reference}" target="_blank" class="action-btn" style="background:#6366f1; color:white;"><i data-lucide="image"></i> View Slip</a>`;
+
+            const source = t.source === 'manual' ? 'manual' : 'slip';
+            const sourceHtml = source === 'manual'
+                ? '<span style="display:inline-block; padding:4px 9px; border-radius:999px; color:#fcd34d; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.28); font-weight:700;">MANUAL</span>'
+                : '<span style="display:inline-block; padding:4px 9px; border-radius:999px; color:#c084fc; background:rgba(168,85,247,.12); border:1px solid rgba(168,85,247,.28); font-weight:700;">SLIP</span>';
+
+            const transRef = t.trans_ref ? App.escapeHTML(t.trans_ref) : '';
+            let referenceHtml = transRef
+                ? `<code style="display:block; color:#f8fafc; overflow-wrap:anywhere;">${transRef}</code>`
+                : '-';
+            const providerReference = String(t.provider_reference || '');
+            const safeSlipPath = /^\/?images\/slips\/[A-Za-z0-9._/-]+$/.test(providerReference);
+            if (safeSlipPath) {
+                referenceHtml = `
+                    <a href="${App.escapeHTML(providerReference)}" target="_blank" rel="noopener" class="action-btn" style="background:#6366f1; color:white; padding:6px 10px;"><i data-lucide="image"></i> View Slip</a>
+                    ${transRef ? `<small style="display:block; color:#94a3b8; margin-top:6px;">Ref: ${transRef}</small>` : ''}
+                `;
             }
-            
+
+            const status = String(t.status || '');
+            const statusColor = status === 'approved' ? '#22c55e' : status === 'rejected' ? '#ef4444' : '#f59e0b';
+            let reviewerHtml = t.approved_by
+                ? `<strong style="color:#f8fafc;">${App.escapeHTML(t.approved_by)}</strong>`
+                : (status === 'approved' && source === 'slip' ? '<span style="color:#22c55e;">ระบบอัตโนมัติ</span>' : '-');
+            if (t.admin_note) {
+                reviewerHtml += `<small style="display:block; max-width:230px; margin-top:5px; color:#94a3b8; white-space:normal; line-height:1.45;">${App.escapeHTML(t.admin_note)}</small>`;
+            }
+
+            const createdAt = t.created_at ? new Date(t.created_at).toLocaleString('th-TH') : '-';
+            const approvedAt = t.approved_at
+                ? `<small style="display:block; color:#94a3b8; margin-top:4px;">อนุมัติ ${new Date(t.approved_at).toLocaleString('th-TH')}</small>`
+                : '';
+
             tr.innerHTML = `
                 <td>${t.id}</td>
                 <td>${App.escapeHTML(t.username)}</td>
-                <td>${(t.amount_minor / 100).toFixed(2)} บาท</td>
-                <td>${t.points}</td>
-                <td>${App.escapeHTML(t.status).toUpperCase()}</td>
-                <td>${slipHtml}</td>
-                <td>${new Date(t.created_at).toLocaleString()}</td>
+                <td>${sourceHtml}</td>
+                <td>${(Number(t.amount_minor) / 100).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</td>
+                <td>${Number(t.points).toLocaleString('th-TH')}</td>
+                <td style="color:${statusColor}; font-weight:700;">${App.escapeHTML(status).toUpperCase()}</td>
+                <td>${referenceHtml}</td>
+                <td>${reviewerHtml}</td>
+                <td>${createdAt}${approvedAt}</td>
                 <td>${actions}</td>
             `;
             if (t.status === 'pending') {
-                tr.querySelector('.btn-approve').onclick = () => Admin.actionTopup(t.id, 'approve');
+                tr.querySelector('.btn-approve').onclick = () => Admin.actionTopup(t.id, 'approve', t.trans_ref || '');
                 tr.querySelector('.btn-reject').onclick = () => Admin.actionTopup(t.id, 'reject');
             }
             tbody.appendChild(tr);
@@ -556,11 +866,83 @@ const Admin = {
         App.renderIcons();
     },
 
-    async actionTopup(id, action) {
-        if (!confirm(`Are you sure you want to ${action} this request?`)) return;
-        await this.fetchAdmin(`/api/admin/topup/${id}/${action}`, { method: 'POST' });
-        App.showToast(`Request ${action}d successfully`);
-        this.loadTopup();
+    async actionTopup(id, action, existingReference = '') {
+        let requestOptions = { method: 'POST' };
+
+        if (action === 'approve') {
+            const approval = await Swal.fire({
+                icon: 'question',
+                title: 'อนุมัติรายการเติมเงิน',
+                html: `
+                    <div style="text-align:left;">
+                        <label for="approve-topup-reference" style="display:block; margin-bottom:6px; color:#cbd5e1;">เลขอ้างอิงธุรกรรมจากสลิป</label>
+                        <input id="approve-topup-reference" class="swal2-input" value="${App.escapeHTML(existingReference)}" minlength="6" maxlength="120" autocomplete="off" placeholder="Transaction Reference" style="width:100%; margin:0 0 14px;">
+                        <label for="approve-topup-reason" style="display:block; margin-bottom:6px; color:#cbd5e1;">หมายเหตุการตรวจสอบ</label>
+                        <textarea id="approve-topup-reason" class="swal2-textarea" minlength="5" maxlength="500" rows="3" placeholder="เช่น ตรวจสอบชื่อผู้รับ ยอดเงิน และเวลาโอนแล้ว" style="width:100%; margin:0;"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยันอนุมัติ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1f2b',
+                color: '#fff',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const transactionReference = document.getElementById('approve-topup-reference').value.trim();
+                    const reason = document.getElementById('approve-topup-reason').value.trim();
+                    if (transactionReference.length < 6 || transactionReference.length > 120) {
+                        Swal.showValidationMessage(App.translateError('invalid_transaction_reference'));
+                        return false;
+                    }
+                    if (reason.length < 5 || reason.length > 500) {
+                        Swal.showValidationMessage(App.translateError('invalid_manual_topup_reason'));
+                        return false;
+                    }
+                    return { transactionReference, reason };
+                }
+            });
+            if (!approval.isConfirmed) return;
+
+            requestOptions = {
+                method: 'POST',
+                body: JSON.stringify({
+                    transaction_reference: approval.value.transactionReference,
+                    reason: approval.value.reason
+                })
+            };
+        } else {
+            const rejection = await Swal.fire({
+                icon: 'warning',
+                title: 'ปฏิเสธรายการเติมเงิน?',
+                text: 'รายการนี้จะไม่ได้รับพอยท์ และไม่ถูกนับในยอดเติมเงินหน้าเว็บ',
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยันปฏิเสธ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#ef4444',
+                background: '#1a1f2b',
+                color: '#fff'
+            });
+            if (!rejection.isConfirmed) return;
+        }
+
+        await this.fetchAdmin(`/api/admin/topup/${id}/${action}`, requestOptions);
+        App.showToast(action === 'approve' ? 'อนุมัติและเติมพอยท์เรียบร้อยแล้ว' : 'ปฏิเสธรายการเรียบร้อยแล้ว');
+        await Promise.allSettled([
+            this.loadTopup(),
+            this.loadWallet(),
+            this.loadPlayers()
+        ]);
+
+        const profileView = document.getElementById('player-profile-view');
+        if (
+            action === 'approve' &&
+            document.getElementById('players').classList.contains('active') &&
+            profileView.style.display === 'block'
+        ) {
+            const username = document.getElementById('profile-username').innerText.trim();
+            if (username) await Promise.allSettled([this.viewPlayerProfile(username)]);
+        }
     }
 };
 

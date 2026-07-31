@@ -2,8 +2,96 @@ const crypto = require("crypto");
 const { pool } = require("../db");
 const { env } = require("../config/env");
 const { recreateNLoginPool } = require("../players/nlogin-db");
+const { HttpError } = require("../errors");
 
 let settingsCache = {};
+
+async function ensureColumn(table, column, definition) {
+  const [columns] = await pool.query(`SHOW COLUMNS FROM \`${table}\` LIKE ?`, [column]);
+  if (columns.length === 0) {
+    await pool.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
+  }
+}
+
+async function ensureIndex(table, indexName, definition) {
+  const [indexes] = await pool.query(`SHOW INDEX FROM \`${table}\` WHERE Key_name = ?`, [indexName]);
+  if (indexes.length === 0) {
+    await pool.query(`ALTER TABLE \`${table}\` ADD ${definition}`);
+  }
+}
+
+async function ensureUniqueIndex(table, indexName, columnsSql) {
+  const [indexes] = await pool.query(
+    `SHOW INDEX FROM \`${table}\` WHERE Key_name = ?`,
+    [indexName]
+  );
+  if (indexes.length === 0) {
+    await pool.query(
+      `ALTER TABLE \`${table}\` ADD UNIQUE KEY \`${indexName}\` (${columnsSql})`
+    );
+    return;
+  }
+  if (indexes.some(index => Number(index.Non_unique) !== 0)) {
+    throw new Error(`${table}.${indexName} must be a unique index`);
+  }
+}
+
+async function ensureForeignKey(table, constraintName, definition) {
+  const [constraints] = await pool.execute(
+    `SELECT CONSTRAINT_NAME
+     FROM information_schema.TABLE_CONSTRAINTS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = ?
+       AND CONSTRAINT_NAME = ?`,
+    [table, constraintName]
+  );
+  if (constraints.length === 0) {
+    await pool.query(`ALTER TABLE \`${table}\` ADD CONSTRAINT \`${constraintName}\` ${definition}`);
+  }
+}
+
+async function migrateManualTopups() {
+  await ensureColumn(
+    "topup_requests",
+    "source",
+    "ENUM('slip', 'manual') NOT NULL DEFAULT 'slip' AFTER `status`"
+  );
+  await ensureColumn(
+    "topup_requests",
+    "approved_by_user_id",
+    "BIGINT UNSIGNED NULL AFTER `trans_ref`"
+  );
+  await ensureColumn(
+    "topup_requests",
+    "admin_note",
+    "VARCHAR(500) NULL AFTER `approved_by_user_id`"
+  );
+  await ensureColumn(
+    "topup_requests",
+    "approved_at",
+    "TIMESTAMP NULL AFTER `admin_note`"
+  );
+  await ensureUniqueIndex(
+    "topup_requests",
+    "topup_requests_trans_ref_idx",
+    "`trans_ref`"
+  );
+  await ensureIndex(
+    "topup_requests",
+    "topup_requests_approved_by_idx",
+    "KEY `topup_requests_approved_by_idx` (`approved_by_user_id`)"
+  );
+  await ensureForeignKey(
+    "topup_requests",
+    "topup_requests_approved_by_fk",
+    "FOREIGN KEY (`approved_by_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL"
+  );
+  await pool.execute(
+    `UPDATE topup_requests
+     SET approved_at = updated_at
+     WHERE status = 'approved' AND approved_at IS NULL`
+  );
+}
 
 async function initSettings() {
   // Create table if it doesn't exist
@@ -27,6 +115,13 @@ async function initSettings() {
     }
   } catch (err) {
     console.error("Migration: failed to add columns:", err);
+  }
+
+  try {
+    await migrateManualTopups();
+  } catch (err) {
+    console.error("Migration: failed to prepare manual top-ups:", err);
+    throw err;
   }
 
   // Load existing settings
@@ -92,6 +187,14 @@ async function updateBulkSettings(newSettings) {
   let dbConfigChanged = false;
 
   for (let [key, value] of Object.entries(newSettings)) {
+    if (key === "POINT_RATE") {
+      const pointRate = Number(value);
+      if (!Number.isFinite(pointRate) || pointRate <= 0 || pointRate > 100_000) {
+        throw new HttpError(400, "invalid_point_rate");
+      }
+      value = String(pointRate);
+    }
+
     if (key === "PROMO_IMAGE" && value && value.startsWith('data:image/')) {
       const savedPath = savePromoImage(value);
       if (savedPath) value = savedPath;

@@ -17,12 +17,15 @@
     <!-- Navbar -->
     <nav class="shop-nav">
         <div class="secondary-nav-left">
-            <a href="index.html" class="back-home-btn"><i data-lucide="arrow-left"></i> กลับหน้าหลัก</a>
+            <a href="index.html" class="back-home-btn"><img src="images/logo.png" alt=""> OCTOCRAFT</a>
             <div class="secondary-nav-links">
-                <a href="index.html"><i data-lucide="home"></i> หน้าหลัก</a>
-                <a href="shop.html"><i data-lucide="shopping-cart"></i> ร้านค้า</a>
-                <a href="topup.html" class="active"><i data-lucide="gem"></i> เติมเงิน</a>
-                <a href="https://discord.gg/dU2wma23f3" target="_blank"><i data-lucide="message-circle"></i> Discord</a>
+                <a href="index.html">Home</a>
+                <a href="index.html#features">Features</a>
+                <a href="shop.html">Store</a>
+                <a href="topup.html" class="active">Topup</a>
+                <a href="index.html#community">Vote</a>
+                <a href="index.html#news">News</a>
+                <a href="https://discord.gg/dU2wma23f3" target="_blank">Discord</a>
             </div>
         </div>
         <div class="shop-logo-small">
@@ -38,9 +41,9 @@
     <main class="topup-container">
         <section class="topup-hero smp-panel">
             <div class="topup-hero-copy">
-                <span class="eyebrow"><i data-lucide="gem"></i> PromptPay Top-up</span>
-                <h1>เติมพอยต์เข้า Octocraft</h1>
-                <p>สแกนจ่าย อัปโหลดสลิป แล้วให้ระบบ EasySlip ตรวจสอบให้อัตโนมัติ พอยต์พร้อมใช้กับร้านค้าและกิจกรรมในเซิร์ฟเวอร์</p>
+                <span class="eyebrow"><i data-lucide="gem"></i> SECURE PAYMENT</span>
+                <h1>TOPUP</h1>
+                <p>เติมง่าย ปลอดภัย ทันที!<br><small>สนับสนุนเซิร์ฟเวอร์ เพื่อประสบการณ์การเล่นที่ดียิ่งขึ้น</small></p>
             </div>
             <div class="topup-hero-steps">
                 <div><i data-lucide="scan-line"></i><span>สแกน QR</span></div>
@@ -184,12 +187,17 @@
 
     <!-- Footer -->
     <footer class="site-footer">
-        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
-        <p>&copy; 2026 Octocraft. All Right Reserved.</p>
+        <div class="footer-grid">
+            <div class="footer-brand"><a href="index.html" class="nav-brand"><img src="images/logo.png" alt=""><span>OCTOCRAFT</span></a><p>เซิร์ฟเวอร์ Minecraft คุณภาพ ที่เน้นความสนุก เป็นธรรม และชุมชนที่อบอุ่น</p></div>
+            <div><h3>ลิงก์ด่วน</h3><a href="index.html">Home</a><a href="shop.html">Store</a><a href="topup.html">Topup</a></div>
+            <div><h3>ข้อมูลเซิร์ฟเวอร์</h3><p>Java: play.octocraft.online</p><p>Bedrock: play.octocraft.online</p><p>Port: 19132</p></div>
+            <div class="footer-discord"><i data-lucide="message-circle"></i><div><strong>เข้าร่วม Discord</strong><p>พูดคุย แลกเปลี่ยน และรับข่าวสารก่อนใคร</p></div><a href="https://discord.gg/dU2wma23f3" target="_blank">เข้าร่วมเลย →</a></div>
+        </div>
+        <div class="footer-bottom"><span>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</span><span>&copy; 2026 Octocraft. All Rights Reserved.</span></div>
     </footer>
 
     <!-- App / Scripts -->
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=20260731-manual-topup-2"></script>
     <script>
         let currentAmount = 0;
         let timerInterval;
@@ -435,7 +443,6 @@
                             method: 'POST',
                             body: JSON.stringify({
                                 amount: currentAmount,
-                                points: Math.round(currentAmount * pointRate),
                                 slipData: slipData
                             })
                         });

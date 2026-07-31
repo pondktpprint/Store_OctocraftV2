@@ -96,14 +96,21 @@ CREATE TABLE topup_requests (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT UNSIGNED NOT NULL,
   status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+  source ENUM('slip', 'manual') NOT NULL DEFAULT 'slip',
   amount_minor BIGINT UNSIGNED NOT NULL,
   points BIGINT UNSIGNED NOT NULL,
   provider_reference VARCHAR(120) NULL,
   trans_ref VARCHAR(120) NULL,
+  approved_by_user_id BIGINT UNSIGNED NULL,
+  admin_note VARCHAR(500) NULL,
+  approved_at TIMESTAMP NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY topup_requests_trans_ref_idx (trans_ref),
   KEY topup_requests_user_idx (user_id),
-  CONSTRAINT topup_requests_user_fk FOREIGN KEY (user_id) REFERENCES users (id)
+  KEY topup_requests_approved_by_idx (approved_by_user_id),
+  CONSTRAINT topup_requests_user_fk FOREIGN KEY (user_id) REFERENCES users (id),
+  CONSTRAINT topup_requests_approved_by_fk
+    FOREIGN KEY (approved_by_user_id) REFERENCES users (id) ON DELETE SET NULL
 );

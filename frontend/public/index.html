@@ -176,10 +176,13 @@
             <span>Octocraft</span>
         </a>
         <div class="nav-links">
-            <a href="index.html" class="active"><i data-lucide="home"></i> หน้าหลัก</a>
-            <a href="shop.html"><i data-lucide="shopping-cart"></i> ร้านค้า</a>
-            <a href="topup.html"><i data-lucide="gem"></i> เติมเงิน</a>
-            <a href="https://discord.gg/dU2wma23f3" target="_blank"><i data-lucide="message-circle"></i> Discord</a>
+            <a href="index.html" class="active">Home</a>
+            <a href="#features">Features</a>
+            <a href="shop.html">Store</a>
+            <a href="topup.html">Topup</a>
+            <a href="#community">Vote</a>
+            <a href="#news">News</a>
+            <a href="https://discord.gg/dU2wma23f3" target="_blank">Discord</a>
         </div>
         <div class="user-profile-menu"></div>
     </nav>
@@ -187,12 +190,12 @@
     <main class="container">
         <section class="landing-hero">
             <div class="hero-copy">
-                <span class="hero-kicker">OCTOCRAFT SMP</span>
-                <h1>Octocraft: Minecraft Survival Economy</h1>
-                <p>สัมผัสเซิร์ฟเวอร์เอาชีวิตรอดที่มีระบบร้านค้า เติมพอยต์ และชุมชนพร้อมลุยกับคุณตลอด 24 ชั่วโมง</p>
+                <span class="hero-kicker">OCTOCRAFT SURVIVAL MMO</span>
+                <h1>เซิร์ฟเวอร์ Minecraft<br><span>ที่ทั้งสวยและเล่นสนุก</span></h1>
+                <p>ผจญภัย เอาชีวิตรอด ค้าขาย และสร้างชุมชนไปกับ OctoCraft</p>
                 <div class="hero-actions">
-                    <a href="shop.html" class="hero-btn primary"><i data-lucide="shopping-cart"></i> เข้าร้านค้า</a>
-                    <a href="topup.html" class="hero-btn secondary"><i data-lucide="gem"></i> เติมพอยต์</a>
+                    <a href="shop.html" class="hero-btn primary">PLAY NOW <i data-lucide="arrow-right"></i></a>
+                    <a href="https://discord.gg/dU2wma23f3" target="_blank" class="hero-btn secondary"><i data-lucide="message-circle"></i> JOIN DISCORD</a>
                 </div>
             </div>
             <div class="hero-brand">
@@ -247,51 +250,48 @@
         </section>
 
         <!-- Bottom Layout: Left (Shop, Topup, Contact) | Right (Promotion) -->
-        <div class="main-menu-container">
+        <div class="main-menu-container" id="features">
             <!-- Left Column: Menu Cards -->
             <div class="menu-grid">
                 <!-- Shop Card -->
-                <a href="shop.html" class="job-card">
+                <div class="job-card">
                     <div class="card-icon"><i data-lucide="shopping-cart"></i></div>
                     <div class="card-content">
-                        <h2>ร้านค้า (Shop)</h2>
-                        <p>เลือกซื้อไอเทมกล่องสุ่มและยศพิเศษต่างๆ ในเกม</p>
+                        <h2>Survival MMO</h2>
+                        <p>เอาชีวิตรอด ผจญภัย ในโลกกว้างไร้ขีดจำกัด</p>
                     </div>
-                </a>
+                </div>
 
                 <!-- Topup Card -->
-                <a href="topup.html" class="job-card">
+                <div class="job-card">
                     <div class="card-icon"><i data-lucide="gem"></i></div>
                     <div class="card-content">
-                        <h2>เติมเงิน (Topup)</h2>
-                        <p>เติมพอยท์ผ่านคิวอาร์โค้ดระบบอัตโนมัติ 24 ชม.</p>
+                        <h2>Economy</h2>
+                        <p>ระบบเศรษฐกิจสมดุล ซื้อขายอย่างยุติธรรม</p>
                     </div>
-                </a>
+                </div>
+                <div class="job-card"><div class="card-icon"><i data-lucide="wheat"></i></div><div class="card-content"><h2>Farming</h2><p>ทำฟาร์ม ปลูกพืช เก็บเกี่ยวหลากหลาย</p></div></div>
 
                 <!-- Contact Card -->
                 <div class="job-card" style="cursor: default;">
-                    <div class="card-icon"><i data-lucide="messages-square"></i></div>
+                    <div class="card-icon"><i data-lucide="shield-check"></i></div>
                     <div class="card-content">
-                        <h2>ติดต่อเรา (Contact)</h2>
-                        <p>พบปัญหาการใช้งาน ติดต่อทีมงานช่วยเหลือได้ตลอดเวลา</p>
-                        <div style="display: flex; gap: 15px; margin-top: 12px; flex-wrap: wrap;">
-                            <a href="https://discord.gg/dU2wma23f3" target="_blank" class="copy-ip-action-btn" style="text-decoration:none; margin-top:0;">
-                                <i data-lucide="message-circle"></i> Discord Invite
-                            </a>
-                            <a href="https://facebook.com" target="_blank" class="copy-ip-action-btn" style="text-decoration:none; margin-top:0; background:rgba(24,119,242,0.15); border-color:rgba(24,119,242,0.3); color:#1877f2;">
-                                <i data-lucide="external-link"></i> Facebook Page
-                            </a>
-                        </div>
+                        <h2>Land Protect</h2>
+                        <p>ปกป้องที่ดิน ปลอดภัย ไร้กังวล</p>
                     </div>
                 </div>
+                <div class="job-card"><div class="card-icon"><i data-lucide="store"></i></div><div class="card-content"><h2>Player Shops</h2><p>เปิดร้านค้าส่วนตัว ค้าขายกับผู้เล่น</p></div></div>
+                <div class="job-card"><div class="card-icon"><i data-lucide="gavel"></i></div><div class="card-content"><h2>Auction House</h2><p>ประมูลไอเทม ซื้อขายอย่างยุติธรรม</p></div></div>
+                <div class="job-card"><div class="card-icon"><i data-lucide="briefcase-business"></i></div><div class="card-content"><h2>Jobs</h2><p>ทำงานรับเงิน หลากหลายอาชีพ</p></div></div>
+                <div class="job-card"><div class="card-icon"><i data-lucide="scroll-text"></i></div><div class="card-content"><h2>Quests</h2><p>ภารกิจรายวัน รับรางวัลมากมาย</p></div></div>
             </div>
 
             <!-- Right Column: Promotion Card -->
-            <div class="promo-card">
+            <div class="promo-card" id="news">
                 <div style="position: absolute; top: 20px; left: 20px; z-index: 5;">
                     <span class="promo-badge" id="promo-badge">PROMOTION</span>
                 </div>
-                <img src="images/promo.png" id="promo-image" alt="Promotion" class="promo-image" onerror="this.src='https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=600&h=800'">
+                <img src="images/octocraft-hero-v2.png" id="promo-image" alt="Promotion" class="promo-image">
                 <div class="promo-overlay">
                     <h3 id="promo-title">เติมเงินคูณ 2 ต้อนรับซีซั่นใหม่!</h3>
                     <p id="promo-subtitle" style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 8px; font-weight: 400; line-height: 1.4; margin-bottom: 0;">
@@ -370,10 +370,15 @@
     </div>
 
     <footer class="site-footer">
-        <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
-        <p>&copy; 2026 Octocraft. All Right Reserved.</p>
+        <div class="footer-grid">
+            <div class="footer-brand"><a href="index.html" class="nav-brand"><img src="images/logo.png" alt=""><span>OCTOCRAFT</span></a><p>เซิร์ฟเวอร์ Minecraft คุณภาพ ที่เน้นความสนุก เป็นธรรม และชุมชนที่อบอุ่น</p></div>
+            <div><h3>ลิงก์ด่วน</h3><a href="index.html">Home</a><a href="shop.html">Store</a><a href="topup.html">Topup</a></div>
+            <div><h3>ข้อมูลเซิร์ฟเวอร์</h3><p>Java: play.octocraft.online</p><p>Bedrock: play.octocraft.online</p><p>Port: 19132</p></div>
+            <div class="footer-discord"><i data-lucide="message-circle"></i><div><strong>เข้าร่วม Discord</strong><p>พูดคุย แลกเปลี่ยน และรับข่าวสารก่อนใคร</p></div><a href="https://discord.gg/dU2wma23f3" target="_blank">เข้าร่วมเลย →</a></div>
+        </div>
+        <div class="footer-bottom"><span>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</span><span>&copy; 2026 Octocraft. All Rights Reserved.</span></div>
     </footer>
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=20260731-manual-topup-2"></script>
     <script>
         // Copy IP helper
         function copyServerIP(event) {
@@ -578,6 +583,8 @@
 
                 donators.forEach(d => {
                     const li = document.createElement('li');
+                    const safeName = App.escapeHTML(d.name || '');
+                    const skinName = encodeURIComponent(d.name || 'Steve');
                     li.style.display = 'flex';
                     li.style.justifyContent = 'space-between';
                     li.style.alignItems = 'center';
@@ -586,8 +593,8 @@
 
                     li.innerHTML = `
                         <span style="display:flex; align-items:center; gap:8px;">
-                            <img src="https://minotar.net/helm/${d.name}/24.png" onerror="this.src='https://minotar.net/helm/Steve/24.png'" style="width:24px; height:24px; border-radius:4px;">
-                            <strong>${d.name}</strong>
+                            <img src="https://minotar.net/helm/${skinName}/24.png" onerror="this.src='https://minotar.net/helm/Steve/24.png'" style="width:24px; height:24px; border-radius:4px;">
+                            <strong>${safeName}</strong>
                         </span>
                         <span style="color: #10b981; font-weight: bold;">+${parseFloat(d.amount).toFixed(2)} บาท</span>
                     `;

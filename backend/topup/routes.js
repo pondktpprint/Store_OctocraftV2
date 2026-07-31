@@ -7,6 +7,7 @@ const { HttpError, asyncHandler } = require("../errors");
 const { requireUser } = require("../auth/session");
 const { getSettings } = require("../settings/service");
 const { recordTransaction } = require("../wallet/service");
+const { parseBahtToMinor, calculatePoints } = require("../admin/manual-topup");
 
 const topupRouter = express.Router();
 
@@ -25,6 +26,9 @@ function normalizeSlipReference(value) {
 
 // Helper to parse base64 image data
 function parseBase64Image(dataString) {
+  if (typeof dataString !== "string") {
+    throw new HttpError(400, "invalid_image_format");
+  }
   const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
   if (!matches || matches.length !== 3) {
     throw new HttpError(400, "invalid_image_format");
@@ -48,21 +52,16 @@ topupRouter.get("/config", asyncHandler(async (req, res) => {
 
 // 2. POST /api/topup/verify-slip (Authenticated)
 topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
-  const { amount, points, slipData } = req.body;
+  const { amount, slipData } = req.body;
   
-  if (!amount || !points || !slipData) {
+  if (!amount || !slipData) {
     throw new HttpError(400, "missing_required_fields");
   }
 
-  const parsedAmount = parseFloat(amount);
-  const parsedPoints = parseInt(points, 10);
-
-  if (isNaN(parsedAmount) || parsedAmount <= 0) {
-    throw new HttpError(400, "invalid_amount");
-  }
-  if (isNaN(parsedPoints) || parsedPoints <= 0) {
-    throw new HttpError(400, "invalid_points");
-  }
+  const amountMinor = parseBahtToMinor(amount);
+  const parsedAmount = amountMinor / 100;
+  const settings = await getSettings();
+  const parsedPoints = calculatePoints(amountMinor, settings.POINT_RATE || 1);
 
   // Parse and validate base64 image
   const image = parseBase64Image(slipData);
@@ -93,14 +92,12 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
   // Reference path relative to web server public folder
   const relativePath = `images/slips/${filename}`;
 
-  const amountMinor = Math.round(parsedAmount * 100); // Satang
-  const settings = await getSettings();
-
   if (settings.EASYSLIP_API_KEY) {
     // EasySlip verification enabled
     try {
       const easySlipRes = await fetch("https://api.easyslip.com/v2/verify/bank", {
         method: "POST",
+        signal: AbortSignal.timeout(15_000),
         headers: {
           "Authorization": `Bearer ${settings.EASYSLIP_API_KEY}`,
           "Content-Type": "application/json"
@@ -114,7 +111,14 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
 
       const easySlipData = await easySlipRes.json();
       
-      if (easySlipData.success !== true && easySlipData.status !== 200) {
+      const providerStatus = easySlipData.status == null
+        ? null
+        : Number(easySlipData.status);
+      const providerSucceeded = easySlipRes.ok &&
+        easySlipData.success !== false &&
+        (providerStatus === null || providerStatus === 200) &&
+        (easySlipData.success === true || providerStatus === 200);
+      if (!providerSucceeded) {
         console.error("[EasySlip] Slip verification failed:", {
           httpStatus: easySlipRes.status,
           apiStatus: easySlipData.status,
@@ -131,12 +135,28 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
         easySlipData.data?.payload
       );
 
+      if (!transRef) {
+        await pool.execute(
+          `INSERT INTO topup_requests
+           (user_id, status, source, amount_minor, points, provider_reference)
+           VALUES (?, 'pending', 'slip', ?, ?, ?)`,
+          [req.user.id, amountMinor, parsedPoints, relativePath]
+        );
+        res.json({
+          ok: true,
+          status: "pending",
+          message: "ระบบอ่านเลขอ้างอิงจากสลิปไม่ได้ บันทึกรายการไว้ให้ทีมงานตรวจสอบแล้ว"
+        });
+        return;
+      }
+
       // Automatically approve and credit points
       await transaction(async (connection) => {
         try {
           const [result] = await connection.execute(
-            `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference, trans_ref)
-             VALUES (?, 'approved', ?, ?, ?, ?)`,
+            `INSERT INTO topup_requests
+             (user_id, status, source, amount_minor, points, provider_reference, trans_ref, approved_at)
+             VALUES (?, 'approved', 'slip', ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
             [req.user.id, amountMinor, parsedPoints, relativePath, transRef]
           );
           
@@ -163,7 +183,7 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
 
     } catch (err) {
       if (err instanceof HttpError) throw err;
-      console.error("[Topup] EasySlip passed but topup failed:", {
+      console.error("[Topup] EasySlip verification or top-up failed:", {
         code: err.code,
         errno: err.errno,
         sqlMessage: err.sqlMessage,
@@ -176,8 +196,9 @@ topupRouter.post("/verify-slip", requireUser, asyncHandler(async (req, res) => {
   } else {
     // Manual verification fallback
     await pool.execute(
-      `INSERT INTO topup_requests (user_id, status, amount_minor, points, provider_reference)
-       VALUES (?, 'pending', ?, ?, ?)`,
+      `INSERT INTO topup_requests
+       (user_id, status, source, amount_minor, points, provider_reference)
+       VALUES (?, 'pending', 'slip', ?, ?, ?)`,
       [req.user.id, amountMinor, parsedPoints, relativePath]
     );
 

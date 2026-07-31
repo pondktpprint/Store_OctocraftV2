@@ -105,11 +105,12 @@ app.get("/api/public/donators", async (req, res) => {
     }));
 
     const [recentDonators] = await pool.execute(
-      `SELECT u.username AS name, tr.amount_minor, tr.created_at
+      `SELECT u.username AS name, tr.amount_minor,
+              COALESCE(tr.approved_at, tr.created_at) AS created_at
        FROM topup_requests tr
        JOIN users u ON u.id = tr.user_id
        WHERE tr.status = 'approved'
-       ORDER BY tr.id DESC
+       ORDER BY COALESCE(tr.approved_at, tr.created_at) DESC, tr.id DESC
        LIMIT 5`
     );
 

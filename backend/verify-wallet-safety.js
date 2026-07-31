@@ -9,7 +9,7 @@ const schema = fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8");
 
 assert(walletService.includes('input.type !== "credit" && input.type !== "debit"'));
 assert(walletService.includes("invalid_wallet_transaction_type"));
-assert(walletService.includes("if (nextBalance < 0)"));
+assert(walletService.includes("if (nextBalance < 0n)"));
 assert(walletService.includes("insufficient_wallet_balance"));
 assert(walletService.includes("INSERT INTO wallet_transactions"));
 assert(walletService.includes("UPDATE wallet_accounts SET balance_points = ? WHERE user_id = ?"));
