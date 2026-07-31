@@ -22,7 +22,7 @@ body:not(.shop-page) {
         url('../images/immersive_bg.png');
     background-size: cover, cover, cover, cover;
     background-position: center;
-    font-family: 'Kanit', 'Outfit', sans-serif;
+    font-family: 'Kanit', sans-serif;
 }
 
 body:not(.shop-page)::before {
@@ -66,7 +66,7 @@ body:not(.shop-page) .bubbles {
     gap: 10px;
     color: #ffffff;
     text-decoration: none;
-    font-family: 'Outfit', 'Kanit', sans-serif;
+    font-family: 'Kanit', sans-serif;
     font-size: 1.05rem;
     font-weight: 800;
     white-space: nowrap;
@@ -176,7 +176,7 @@ body:not(.shop-page) .container {
     color: var(--smp-blue);
     display: inline-block;
     margin-bottom: 18px;
-    font-family: 'Outfit', 'Kanit', sans-serif;
+    font-family: 'Kanit', sans-serif;
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.22em;
@@ -576,7 +576,7 @@ body.shop-page {
         radial-gradient(circle at 88% 16%, rgba(34, 197, 94, 0.13), transparent 30%),
         linear-gradient(180deg, rgba(5, 5, 6, 0.9), rgba(5, 5, 6, 0.96)),
         url('../images/immersive_bg.png') center/cover fixed;
-    font-family: 'Kanit', 'Prompt', 'Outfit', sans-serif;
+    font-family: 'Kanit', sans-serif;
 }
 
 body.shop-page::before {
@@ -876,7 +876,7 @@ body:has(.admin-layout) {
 }
 
 .admin-layout {
-    font-family: 'Kanit', 'Prompt', 'Outfit', sans-serif;
+    font-family: 'Kanit', sans-serif;
 }
 
 .admin-sidebar {
@@ -3175,7 +3175,7 @@ body,
 body.shop-page {
     background: var(--octo-bg) !important;
     color: #f8f7ff !important;
-    font-family: 'Kanit', 'Outfit', sans-serif !important;
+    font-family: 'Kanit', sans-serif !important;
 }
 
 body::before,
@@ -3217,7 +3217,7 @@ body.shop-page::before {
     gap: 12px !important;
     color: #fff !important;
     text-decoration: none !important;
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Kanit', sans-serif !important;
     font-size: 1.55rem !important;
     font-weight: 800 !important;
     letter-spacing: .08em !important;
@@ -3379,7 +3379,7 @@ body:not(.shop-page) .container {
     min-width: 220px !important;
     height: 54px !important;
     border-radius: 6px !important;
-    font-family: 'Outfit', 'Kanit', sans-serif !important;
+    font-family: 'Kanit', sans-serif !important;
     font-size: 1.08rem !important;
     letter-spacing: .01em !important;
 }
@@ -3596,7 +3596,7 @@ body:not(.shop-page) .promo-overlay { z-index: 2 !important; }
 .topup-hero h1 {
     margin: 0 !important;
     color: #fff !important;
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Kanit', sans-serif !important;
     font-size: clamp(4rem, 9vw, 7.4rem) !important;
     line-height: .9 !important;
     letter-spacing: -.04em !important;
@@ -4189,6 +4189,577 @@ body .topup-card-wrapper {
     body .site-footer {
         padding: 28px 18px 18px !important;
         text-align: left !important;
+    }
+}
+
+/* Live top-up status */
+.slip-upload-section {
+    position: relative;
+}
+
+.slip-upload-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.slip-upload-section:focus-within .slip-upload-label {
+    border-color: rgba(99, 153, 255, .82) !important;
+    outline: 3px solid rgba(59, 130, 246, .28);
+    outline-offset: 4px;
+}
+
+#slip-file-name {
+    max-width: 100%;
+    min-width: 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.back-step-btn:disabled {
+    cursor: not-allowed !important;
+    opacity: .46;
+}
+
+#generate-qr-btn:disabled,
+.premium-amount-btn:disabled {
+    cursor: not-allowed !important;
+    opacity: .48;
+    filter: saturate(.55);
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+#generate-qr-btn:disabled:hover,
+.premium-amount-btn:disabled:hover {
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.topup-step.is-pending-locked .payment-methods,
+.topup-step.is-pending-locked .premium-amount-grid,
+.topup-step.is-pending-locked .custom-input-wrapper,
+.topup-step.is-pending-locked .points-preview {
+    opacity: .48;
+}
+
+.topup-step.is-pending-locked .step-desc::after {
+    content: " มีรายการเดิมรอตรวจสอบอยู่ กรุณาดูสถานะด้านล่าง";
+    color: #f4c96b;
+    font-weight: 600;
+}
+
+.live-topup-status[hidden],
+.live-status-actions[hidden],
+.live-status-actions [hidden] {
+    display: none !important;
+}
+
+.live-topup-status {
+    position: relative;
+    width: min(760px, calc(100% - 40px));
+    margin: -24px auto 56px;
+    padding: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(184, 103, 255, .5);
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 88% 0%, rgba(137, 55, 219, .2), transparent 36%),
+        linear-gradient(145deg, rgba(18, 18, 47, .97), rgba(6, 8, 24, .98));
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .42), 0 0 28px rgba(145, 58, 221, .14);
+    color: #fff;
+    isolation: isolate;
+}
+
+.live-status-glow {
+    position: absolute;
+    z-index: -1;
+    top: -110px;
+    right: -80px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: rgba(157, 65, 238, .24);
+    filter: blur(70px);
+    pointer-events: none;
+}
+
+.live-status-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.live-status-heading {
+    min-width: 0;
+}
+
+.live-status-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 7px;
+    color: #d6a5ff;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.live-status-kicker .lucide {
+    width: 15px !important;
+    height: 15px !important;
+    color: #a855f7;
+}
+
+.live-status-heading h2 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.25rem, 3vw, 1.65rem);
+    line-height: 1.25;
+}
+
+.live-status-heading h2:focus {
+    outline: 2px solid rgba(168, 85, 247, .62);
+    outline-offset: 5px;
+    border-radius: 6px;
+}
+
+.live-status-heading p {
+    max-width: 520px;
+    margin: 7px 0 0;
+    color: #a9a8bb;
+    font-size: .9rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.live-status-badge {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 6px 12px;
+    border: 1px solid rgba(130, 197, 255, .3);
+    border-radius: 999px;
+    background: rgba(50, 132, 255, .1);
+    color: #9ec8ff;
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.live-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 12px currentColor;
+    animation: live-status-pulse 1.4s ease-in-out infinite;
+}
+
+.live-status-badge.approved {
+    border-color: rgba(52, 211, 153, .38);
+    background: rgba(16, 185, 129, .12);
+    color: #62e6ae;
+}
+
+.live-status-badge.pending {
+    border-color: rgba(245, 185, 76, .42);
+    background: rgba(245, 158, 11, .1);
+    color: #f7c562;
+}
+
+.live-status-badge.error,
+.live-status-badge.rejected {
+    border-color: rgba(251, 113, 133, .38);
+    background: rgba(244, 63, 94, .1);
+    color: #fb8ea2;
+}
+
+.live-status-badge.approved .live-status-dot,
+.live-status-badge.error .live-status-dot,
+.live-status-badge.rejected .live-status-dot {
+    animation: none;
+}
+
+.live-status-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.live-status-meta > div {
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid rgba(159, 161, 196, .16);
+    border-radius: 9px;
+    background: rgba(7, 9, 27, .52);
+}
+
+.live-status-meta span,
+.live-status-meta strong {
+    display: block;
+}
+
+.live-status-meta span {
+    color: #838397;
+    font-size: .7rem;
+}
+
+.live-status-meta strong {
+    margin-top: 3px;
+    color: #f5f2fb;
+    font-size: .92rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.live-status-meta > div:nth-child(2) strong {
+    color: #f5bd57;
+}
+
+.live-status-progress {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr) 40px minmax(0, 1fr);
+    align-items: center;
+    margin: 0 0 18px;
+}
+
+.live-status-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid rgba(153, 156, 191, .16);
+    border-radius: 10px;
+    background: rgba(8, 10, 28, .58);
+    color: #727386;
+    transition: border-color .25s ease, background .25s ease, transform .25s ease;
+}
+
+.live-step-icon {
+    flex: 0 0 36px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(143, 146, 177, .2);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .025);
+}
+
+.live-step-icon .lucide {
+    width: 19px !important;
+    height: 19px !important;
+}
+
+.live-step-copy {
+    min-width: 0;
+}
+
+.live-step-copy strong,
+.live-step-copy small {
+    display: block;
+}
+
+.live-step-copy strong {
+    color: inherit;
+    font-size: .85rem;
+    white-space: nowrap;
+}
+
+.live-step-copy small {
+    margin-top: 2px;
+    color: #9696aa;
+    font-size: .66rem;
+    line-height: 1.35;
+}
+
+.live-status-step.is-active {
+    border-color: rgba(138, 99, 255, .7);
+    background: linear-gradient(145deg, rgba(91, 51, 180, .28), rgba(34, 75, 145, .18));
+    color: #bba9ff;
+    box-shadow: 0 0 20px rgba(120, 75, 236, .15);
+    transform: translateY(-2px);
+}
+
+.live-status-step.is-active .live-step-icon {
+    border-color: rgba(151, 106, 255, .58);
+    background: rgba(116, 65, 222, .18);
+    box-shadow: 0 0 15px rgba(116, 65, 222, .2);
+}
+
+.live-status-step.is-complete {
+    border-color: rgba(59, 210, 170, .34);
+    background: rgba(20, 122, 102, .11);
+    color: #65ddb4;
+}
+
+.live-status-step.is-complete .live-step-icon {
+    border-color: rgba(61, 219, 174, .36);
+    background: rgba(19, 154, 116, .12);
+}
+
+.live-status-step.is-waiting {
+    border-color: rgba(245, 185, 76, .42);
+    background: rgba(190, 124, 26, .1);
+    color: #f1c36c;
+}
+
+.live-status-step.is-error {
+    border-color: rgba(251, 113, 133, .42);
+    background: rgba(190, 48, 75, .1);
+    color: #fb8ea2;
+}
+
+.live-step-line {
+    height: 2px;
+    background: rgba(143, 146, 177, .18);
+    transition: background .25s ease, box-shadow .25s ease;
+}
+
+.live-step-line.is-complete {
+    background: #47cda3;
+    box-shadow: 0 0 10px rgba(71, 205, 163, .42);
+}
+
+.live-status-result {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 14px 15px;
+    border: 1px solid rgba(115, 151, 255, .22);
+    border-radius: 10px;
+    background: rgba(40, 76, 150, .11);
+}
+
+.live-result-icon {
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(95, 82, 213, .18);
+    color: #b2a8ff;
+}
+
+.live-result-icon .lucide {
+    width: 21px !important;
+    height: 21px !important;
+}
+
+.live-result-icon .icon-spin {
+    animation: live-status-spin 1s linear infinite;
+}
+
+.live-status-result strong {
+    color: #f7f6fa;
+    font-size: .9rem;
+}
+
+.live-status-result p {
+    margin: 3px 0 0;
+    color: #9292a6;
+    font-size: .76rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.live-topup-status[data-state="approved"] .live-status-result {
+    border-color: rgba(52, 211, 153, .32);
+    background: rgba(16, 185, 129, .1);
+}
+
+.live-topup-status[data-state="approved"] .live-result-icon {
+    background: rgba(16, 185, 129, .16);
+    color: #62e6ae;
+}
+
+.live-topup-status[data-state="pending"] .live-status-result {
+    border-color: rgba(245, 185, 76, .36);
+    background: rgba(190, 124, 26, .09);
+}
+
+.live-topup-status[data-state="pending"] .live-result-icon {
+    background: rgba(190, 124, 26, .15);
+    color: #f5c56b;
+}
+
+.live-topup-status[data-state="error"] .live-status-result,
+.live-topup-status[data-state="rejected"] .live-status-result {
+    border-color: rgba(251, 113, 133, .36);
+    background: rgba(190, 48, 75, .09);
+}
+
+.live-topup-status[data-state="error"] .live-result-icon,
+.live-topup-status[data-state="rejected"] .live-result-icon {
+    background: rgba(190, 48, 75, .15);
+    color: #fb8ea2;
+}
+
+.live-status-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.live-status-actions a,
+.live-status-actions button {
+    min-height: 44px;
+    padding: 0 15px;
+    border-radius: 8px;
+    font: 600 .8rem 'Kanit', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.live-status-actions .lucide {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+.live-status-primary {
+    border: 1px solid #d2a0ff;
+    background: linear-gradient(180deg, #9d41ee, #6520a8);
+    box-shadow: 0 0 14px rgba(159, 61, 239, .28);
+    color: #fff;
+}
+
+.live-status-secondary {
+    border: 1px solid rgba(166, 168, 201, .25);
+    background: rgba(9, 11, 29, .7);
+    color: #c4c2ce;
+}
+
+.live-status-actions a:hover,
+.live-status-actions button:hover {
+    border-color: #cd92ff;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.live-status-actions a:focus-visible,
+.live-status-actions button:focus-visible {
+    outline: 3px solid #41c9ff;
+    outline-offset: 3px;
+}
+
+.live-status-burst {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.live-status-burst span {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--burst-color, #d08cff);
+    animation: live-status-burst .85s cubic-bezier(.2, .8, .2, 1) forwards;
+}
+
+@keyframes live-status-pulse {
+    0%, 100% { opacity: .5; transform: scale(.78); }
+    50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes live-status-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes live-status-burst {
+    0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+    100% {
+        opacity: 0;
+        transform: translate(var(--burst-x), var(--burst-y)) rotate(210deg);
+    }
+}
+
+@media (max-width: 680px) {
+    .live-topup-status {
+        width: calc(100% - 24px);
+        margin: -10px auto 36px;
+        padding: 18px 14px;
+    }
+
+    .live-status-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .live-status-badge {
+        align-self: flex-start;
+    }
+
+    .live-status-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .live-status-meta > div:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .live-status-progress {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .live-status-step {
+        width: 100%;
+    }
+
+    .live-step-line {
+        width: 2px;
+        height: 16px;
+        margin-left: 29px;
+    }
+
+    .live-status-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .live-status-actions a,
+    .live-status-actions button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    .live-topup-status *,
+    .topup-slider,
+    .bubble,
+    .icon-spin {
+        scroll-behavior: auto !important;
+        animation: none !important;
+        transition: none !important;
     }
 }
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octocraft</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -194,7 +194,7 @@
                 <h1>เซิร์ฟเวอร์ Minecraft<br><span>ที่ทั้งสวยและเล่นสนุก</span></h1>
                 <p>ผจญภัย เอาชีวิตรอด ค้าขาย และสร้างชุมชนไปกับ OctoCraft</p>
                 <div class="hero-actions">
-                    <a href="shop.html" class="hero-btn primary">PLAY NOW <i data-lucide="arrow-right"></i></a>
+                    <a href="shop.html" class="hero-btn primary">SHOP <i data-lucide="arrow-right"></i></a>
                     <a href="https://discord.gg/dU2wma23f3" target="_blank" class="hero-btn secondary"><i data-lucide="message-circle"></i> JOIN DISCORD</a>
                 </div>
             </div>
@@ -378,7 +378,7 @@
         </div>
         <div class="footer-bottom"><span>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</span><span>&copy; 2026 Octocraft. All Rights Reserved.</span></div>
     </footer>
-    <script src="js/app.js?v=20260731-manual-topup-2"></script>
+    <script src="js/app.js?v=20260731-live-topup-1"></script>
     <script>
         // Copy IP helper
         function copyServerIP(event) {
@@ -427,7 +427,7 @@
                             document.getElementById('login-modal').classList.remove('active');
                             window.location.reload();
                         } else {
-                            Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: data.error || 'เข้าสู่ระบบล้มเหลว', background: '#1a1f2b', color: '#fff' });
+                            Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: App.translateError(data.error) || 'เข้าสู่ระบบล้มเหลว', background: '#1a1f2b', color: '#fff' });
                         }
                     } catch (err) {
                         Swal.fire({ icon: 'error', title: 'ล้มเหลว', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', background: '#1a1f2b', color: '#fff' });

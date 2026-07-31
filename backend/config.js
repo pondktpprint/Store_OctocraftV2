@@ -17,7 +17,8 @@ const config = {
     loginMax: env.RATE_LIMIT_LOGIN_MAX,
     loginWindowMs: env.RATE_LIMIT_LOGIN_WINDOW_MS,
     apiMax: env.RATE_LIMIT_API_MAX,
-    apiWindowMs: env.RATE_LIMIT_API_WINDOW_MS
+    apiWindowMs: env.RATE_LIMIT_API_WINDOW_MS,
+    publicMax: env.RATE_LIMIT_PUBLIC_MAX
   }
 };
 

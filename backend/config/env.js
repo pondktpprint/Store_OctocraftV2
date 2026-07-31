@@ -45,7 +45,8 @@ const env = {
   RATE_LIMIT_LOGIN_MAX: Number(optional("RATE_LIMIT_LOGIN_MAX", 5)),
   RATE_LIMIT_LOGIN_WINDOW_MS: Number(optional("RATE_LIMIT_LOGIN_WINDOW_MS", 15 * 60 * 1000)),
   RATE_LIMIT_API_MAX: Number(optional("RATE_LIMIT_API_MAX", 1000)),
-  RATE_LIMIT_API_WINDOW_MS: Number(optional("RATE_LIMIT_API_WINDOW_MS", 15 * 60 * 1000))
+  RATE_LIMIT_API_WINDOW_MS: Number(optional("RATE_LIMIT_API_WINDOW_MS", 15 * 60 * 1000)),
+  RATE_LIMIT_PUBLIC_MAX: Number(optional("RATE_LIMIT_PUBLIC_MAX", 600))
 };
 
 module.exports = { env };

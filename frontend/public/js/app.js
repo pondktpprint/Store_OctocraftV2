@@ -41,9 +41,12 @@ const App = {
             'product_inactive': 'สินค้านี้ถูกปิดการขายชั่วคราว',
             'invalid_credentials': 'ชื่อตัวละครหรือรหัสผ่านไม่ถูกต้อง',
             'too_many_requests': 'ทำรายการถี่เกินไป กรุณารอสักครู่',
+            'too_many_attempts': 'เข้าสู่ระบบไม่สำเร็จหลายครั้ง กรุณารอสักครู่แล้วลองใหม่',
             'auth_required': 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
             'admin_required': 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้',
             'slip_verification_failed': 'สลิปไม่ถูกต้อง หรือถูกใช้งานไปแล้ว',
+            'slip_amount_mismatch': 'ยอดเงินในสลิปไม่ตรงกับยอดที่เลือก กรุณาตรวจสอบแล้วลองใหม่',
+            'slip_receiver_mismatch': 'บัญชีผู้รับในสลิปไม่ตรงกับบัญชีรับเงินของเซิร์ฟเวอร์',
             'missing_required_fields': 'กรุณากรอกข้อมูลให้ครบถ้วน',
             'missing_fields': 'กรุณากรอกข้อมูลให้ครบถ้วน',
             'invalid_amount': 'จำนวนเงินไม่ถูกต้อง',
@@ -70,7 +73,7 @@ const App = {
             'nlogin_db_unreachable': 'ไม่สามารถเชื่อมต่อฐานข้อมูลผู้เล่นได้',
             'invalid_image_format': 'รูปสลิปมีรูปแบบข้อมูลไม่ถูกต้อง',
             'unsupported_image_type': 'ไฟล์รูปภาพไม่รองรับ (รับเฉพาะ PNG, JPG, WEBP)',
-            'file_too_large': 'ไฟล์ขนาดใหญ่เกินไป (สูงสุด 10MB)',
+            'file_too_large': 'ไฟล์ขนาดใหญ่เกินไป (สูงสุด 4MB)',
             'invalid_payload': 'ข้อมูลที่ส่งมาไม่ถูกต้อง',
             'out_of_stock': 'สินค้าหมด'
         };
@@ -200,6 +203,7 @@ const App = {
         localStorage.removeItem('octo_token');
         localStorage.removeItem('octo_user');
         localStorage.removeItem('octo_cart');
+        localStorage.removeItem('octo_pending_topup_status');
         this.state.token = null;
         this.state.user = null;
         this.state.cart = [];

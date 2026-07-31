@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Octocraft</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/redesign.css">
+    <link rel="stylesheet" href="css/redesign.css?v=20260731-live-topup-1">
 </head>
 <body class="shop-page">
     <div class="bubbles" id="bubbles-container"></div>
@@ -56,8 +56,8 @@
             <div class="topup-slider" id="topup-slider">
                 
                 <!-- Step 1: Select Amount -->
-                <div class="topup-step step-1" id="step1">
-                    <h2 class="step-title"><i data-lucide="gem"></i> เติมเงิน (Top-up)</h2>
+                <div class="topup-step step-1" id="step1" aria-hidden="false">
+                    <h2 class="step-title" id="topup-step-one-title" tabindex="-1"><i data-lucide="gem"></i> เติมเงิน (Top-up)</h2>
                     <p class="step-desc" id="point-rate-desc">สแกนจ่ายผ่านพร้อมเพย์ รับพอยท์อัตโนมัติ (อัตรา 1 บาท = 1 Point)</p>
                     
                     <div class="payment-methods">
@@ -131,18 +131,18 @@
                         }
                     </style>
                     <div class="premium-amount-grid">
-                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(50)"><span class="amt">50</span><span class="cur">บาท</span></button>
-                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(90)"><span class="amt">90</span><span class="cur">บาท</span></button>
-                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(150)"><span class="amt">150</span><span class="cur">บาท</span></button>
-                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(300)"><span class="amt">300</span><span class="cur">บาท</span></button>
-                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(500)"><span class="amt">500</span><span class="cur">บาท</span></button>
-                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(1000)"><span class="amt">1000</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(50, this)"><span class="amt">50</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(90, this)"><span class="amt">90</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(150, this)"><span class="amt">150</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(300, this)"><span class="amt">300</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(500, this)"><span class="amt">500</span><span class="cur">บาท</span></button>
+                        <button class="amount-btn premium-amount-btn" onclick="selectAmount(1000, this)"><span class="amt">1000</span><span class="cur">บาท</span></button>
                     </div>
 
                     <div class="custom-amount">
                         <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted);">หรือระบุจำนวนเงินเอง (บาท):</label>
                         <div class="custom-input-wrapper" style="position: relative;">
-                            <input type="number" id="custom-amount-input" placeholder="0" min="1" oninput="calculatePoints()" style="width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-size: 1.1rem;">
+                            <input type="number" id="custom-amount-input" placeholder="0" min="1" oninput="calculatePoints(true)" style="width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-size: 1.1rem;">
                             <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-weight: 600;">THB</span>
                         </div>
                     </div>
@@ -155,9 +155,9 @@
                 </div>
 
                 <!-- Step 2: Pay and Upload Slip -->
-                <div class="topup-step step-2" id="step2">
-                <button class="back-step-btn" onclick="goToStep1()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; margin-bottom: 20px;"><i data-lucide="chevron-left"></i> ย้อนกลับ / ยกเลิกรายการ</button>
-                    <h2 class="step-title"><i data-lucide="scan-line"></i> สแกนชำระเงิน</h2>
+                <div class="topup-step step-2" id="step2" inert aria-hidden="true">
+                <button class="back-step-btn" id="topup-back-button" onclick="goToStep1()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; margin-bottom: 20px;"><i data-lucide="chevron-left"></i> ย้อนกลับ / ยกเลิกรายการ</button>
+                    <h2 class="step-title" id="topup-step-two-title" tabindex="-1"><i data-lucide="scan-line"></i> สแกนชำระเงิน</h2>
                     <p class="step-desc">กรุณาสแกนคิวอาร์โค้ดด้านล่างเพื่อชำระเงิน และแนบรูปภาพสลิปโอนเงิน</p>
 
                     <div class="timer-container" style="text-align: center; margin: 15px 0; font-size: 1.2rem; color: #f59e0b; font-weight: bold;">
@@ -172,10 +172,10 @@
 
                     <div class="slip-upload-section" style="margin-bottom: 25px;">
                         <label for="slip-upload" class="slip-upload-label" id="slip-label" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(255,255,255,0.2); padding: 25px; border-radius: 8px; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.2);">
-                        <i data-lucide="cloud-upload" style="font-size: 2.5rem; margin-bottom: 10px; color: var(--primary);"></i>
+                        <i data-lucide="cloud-upload" style="font-size: 2.5rem; margin-bottom: 10px; color: var(--primary-blue);"></i>
                             <span id="slip-file-name" style="font-weight: 600;">คลิกเพื่อแนบรูปสลิปโอนเงิน</span>
                         </label>
-                        <input type="file" id="slip-upload" accept="image/*" onchange="handleSlipUpload(this)" hidden>
+                        <input type="file" class="slip-upload-input" id="slip-upload" accept="image/*" aria-describedby="slip-file-name" onchange="handleSlipUpload(this)">
                     </div>
 
                     <button class="action-btn" id="confirm-payment-btn" disabled onclick="submitPayment()" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 8px; border: none; font-weight: 800; cursor: pointer;">ยืนยันการทำรายการ</button>
@@ -183,6 +183,65 @@
                 
             </div>
         </div>
+
+        <section class="live-topup-status" id="live-topup-status" hidden aria-labelledby="live-status-title">
+            <div class="live-status-glow" aria-hidden="true"></div>
+            <header class="live-status-header">
+                <div class="live-status-heading">
+                    <span class="live-status-kicker"><i data-lucide="radio"></i> LIVE TOP-UP STATUS</span>
+                    <h2 id="live-status-title" tabindex="-1">กำลังเริ่มตรวจสอบรายการ</h2>
+                    <p id="live-status-message">กรุณาเปิดหน้านี้ไว้ ระบบจะอัปเดตสถานะให้อัตโนมัติ</p>
+                </div>
+                <span class="live-status-badge processing" id="live-status-badge">
+                    <span class="live-status-dot"></span>
+                    <span id="live-status-badge-text">กำลังดำเนินการ</span>
+                </span>
+            </header>
+
+            <div class="live-status-meta">
+                <div><span>ยอดชำระ</span><strong id="live-status-amount">-</strong></div>
+                <div><span>พอยท์ที่จะได้รับ</span><strong id="live-status-points">-</strong></div>
+                <div><span>เลขรายการ</span><strong id="live-status-request-id">กำลังสร้าง...</strong></div>
+            </div>
+
+            <div class="live-status-progress" role="list" aria-label="ขั้นตอนการตรวจสอบการเติมเงิน">
+                <div class="live-status-step" id="live-step-upload" role="listitem">
+                    <span class="live-step-icon"><i data-lucide="cloud-upload"></i></span>
+                    <span class="live-step-copy"><strong>ส่งสลิป</strong><small>เตรียมรูปและส่งข้อมูล</small></span>
+                </div>
+                <span class="live-step-line" aria-hidden="true"></span>
+                <div class="live-status-step" id="live-step-verify" role="listitem">
+                    <span class="live-step-icon"><i data-lucide="scan-search"></i></span>
+                    <span class="live-step-copy"><strong>EasySlip</strong><small>ตรวจยอดและผู้รับ</small></span>
+                </div>
+                <span class="live-step-line" aria-hidden="true"></span>
+                <div class="live-status-step" id="live-step-credit" role="listitem">
+                    <span class="live-step-icon"><i data-lucide="coins"></i></span>
+                    <span class="live-step-copy"><strong>รับพอยท์</strong><small>บันทึกเข้ากระเป๋า</small></span>
+                </div>
+            </div>
+
+            <div class="live-status-result" id="live-status-result" role="status" aria-live="polite" aria-atomic="true">
+                <span class="live-result-icon"><i data-lucide="loader-circle"></i></span>
+                <div>
+                    <strong id="live-result-title">ระบบกำลังเตรียมรายการ</strong>
+                    <p id="live-result-message">ขั้นตอนนี้อาจใช้เวลาสักครู่ กรุณาอย่าส่งสลิปซ้ำ</p>
+                </div>
+            </div>
+
+            <div class="live-status-actions" id="live-status-actions" hidden>
+                <button type="button" class="live-status-secondary" id="live-status-history-button" onclick="App.openTopupHistoryModal()">
+                    <i data-lucide="history"></i> ดูประวัติ
+                </button>
+                <a href="shop.html" class="live-status-primary" id="live-status-primary-action">
+                    <i data-lucide="shopping-bag"></i> ไปหน้าร้านค้า
+                </a>
+                <button type="button" class="live-status-secondary" id="live-status-new-button" onclick="resetLiveTopupFlow()">
+                    <i data-lucide="refresh-cw"></i> เติมเงินอีกครั้ง
+                </button>
+            </div>
+            <div class="live-status-burst" id="live-status-burst" aria-hidden="true"></div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -197,7 +256,7 @@
     </footer>
 
     <!-- App / Scripts -->
-    <script src="js/app.js?v=20260731-manual-topup-2"></script>
+    <script src="js/app.js?v=20260731-live-topup-1"></script>
     <script>
         let currentAmount = 0;
         let timerInterval;
@@ -206,9 +265,19 @@
         let promptpayTarget = "";
         let promptpayName = "";
         let pointRate = 1.0;
+        let activeQrAmount = 0;
+        let qrFlowActive = false;
+        let topupSubmissionInFlight = false;
+        let statusPollTimer = null;
+        let statusPollAttempts = 0;
+        let statusPollInFlight = false;
+        let statusPollGeneration = 0;
+        let activePendingRequestId = null;
+        const TOPUP_STATUS_STORAGE_KEY = 'octo_pending_topup_status';
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
         async function initTopup() {
-            createBubbles();
+            if (!prefersReducedMotion.matches) createBubbles();
             
             if (!App.state.token) {
                 window.location.href = 'index.html?login=true';
@@ -227,6 +296,8 @@
             } catch (err) {
                 console.error("Failed to load payment config", err);
             }
+
+            await resumePendingTopup();
         }
 
         function createBubbles() {
@@ -248,34 +319,68 @@
             }
         }
 
-        function selectAmount(amount) {
+        function selectAmount(amount, selectedButton) {
             document.getElementById('custom-amount-input').value = amount;
-            calculatePoints();
+            calculatePoints(false);
             
             document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            selectedButton?.classList.add('active');
         }
 
-        function calculatePoints() {
+        function calculatePoints(isManualInput = false) {
             const input = document.getElementById('custom-amount-input').value;
             currentAmount = parseFloat(input) || 0;
             const pointsExpected = Math.round(currentAmount * pointRate);
             document.getElementById('points-preview-val').innerText = pointsExpected.toLocaleString();
             
             const generateBtn = document.getElementById('generate-qr-btn');
-            if (currentAmount > 0) {
-                generateBtn.disabled = false;
-            } else {
-                generateBtn.disabled = true;
-            }
+            generateBtn.disabled =
+                currentAmount <= 0 || Boolean(activePendingRequestId) || qrFlowActive;
             
             // Remove active from amount grid buttons if editing manually
-            if (!event || event.type === 'input') {
+            if (isManualInput) {
                 document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
             }
         }
 
+        function setStepOneControlsDisabled(disabled) {
+            const stepOne = document.getElementById('step1');
+            const amountInput = document.getElementById('custom-amount-input');
+            const generateButton = document.getElementById('generate-qr-btn');
+            amountInput.disabled = disabled;
+            stepOne.querySelectorAll('.amount-btn').forEach(button => {
+                button.disabled = disabled;
+            });
+            generateButton.disabled = disabled || currentAmount <= 0 || Boolean(activePendingRequestId);
+        }
+
+        function setVisibleTopupStep(stepNumber, focusHeading = false) {
+            const stepOne = document.getElementById('step1');
+            const stepTwo = document.getElementById('step2');
+            const showingStepTwo = stepNumber === 2;
+            stepOne.inert = showingStepTwo;
+            stepOne.setAttribute('aria-hidden', String(showingStepTwo));
+            stepTwo.inert = !showingStepTwo;
+            stepTwo.setAttribute('aria-hidden', String(!showingStepTwo));
+            if (focusHeading) {
+                const heading = document.getElementById(
+                    showingStepTwo ? 'topup-step-two-title' : 'topup-step-one-title'
+                );
+                window.setTimeout(() => {
+                    heading?.focus({ preventScroll: true });
+                }, prefersReducedMotion.matches ? 0 : 340);
+            }
+        }
+
         function goToStep2() {
+            if (activePendingRequestId) {
+                document.getElementById('live-status-title')?.focus({ preventScroll: true });
+                document.getElementById('live-topup-status')?.scrollIntoView({
+                    behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
+                    block: 'nearest'
+                });
+                return;
+            }
             if (currentAmount <= 0) return;
             if (!promptpayTarget) {
                 Swal.fire({
@@ -319,6 +424,10 @@
         }
         
         function proceedToStep2() {
+            if (activePendingRequestId) return;
+            activeQrAmount = currentAmount;
+            qrFlowActive = true;
+            setStepOneControlsDisabled(true);
             document.getElementById('qr-amount-display').innerText = currentAmount.toFixed(2) + ' THB';
             
             // Generate dynamic PromptPay QR code image
@@ -326,12 +435,27 @@
             qrImage.src = `https://promptpay.io/${promptpayTarget}/${currentAmount}.png`;
             
             document.getElementById('topup-slider').style.transform = 'translateX(-50%)';
+            setVisibleTopupStep(2, true);
             
             startTimer();
         }
 
         function goToStep1() {
+            if (topupSubmissionInFlight || activePendingRequestId) {
+                if (activePendingRequestId) {
+                    document.getElementById('live-status-title')?.focus({ preventScroll: true });
+                    document.getElementById('live-topup-status')?.scrollIntoView({
+                        behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
+                        block: 'nearest'
+                    });
+                }
+                return;
+            }
+            qrFlowActive = false;
+            activeQrAmount = 0;
+            setStepOneControlsDisabled(false);
             document.getElementById('topup-slider').style.transform = 'translateX(0)';
+            setVisibleTopupStep(1, true);
             resetTimer();
             resetUpload();
         }
@@ -371,6 +495,429 @@
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
+        function formatTopupAmount(amount) {
+            const parsed = Number(amount);
+            if (!Number.isFinite(parsed)) return '-';
+            return `${parsed.toLocaleString('th-TH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })} บาท`;
+        }
+
+        function setLiveStepState(stepName, state, detail) {
+            const step = document.getElementById(`live-step-${stepName}`);
+            if (!step) return;
+            step.classList.remove('is-active', 'is-complete', 'is-waiting', 'is-error');
+            step.removeAttribute('aria-current');
+            if (state) step.classList.add(`is-${state}`);
+            if (state === 'active') step.setAttribute('aria-current', 'step');
+            const detailElement = step.querySelector('.live-step-copy small');
+            if (detailElement && detail) detailElement.textContent = detail;
+        }
+
+        function setLiveResultIcon(iconName, spinning = false) {
+            const icon = document.querySelector('#live-status-result .live-result-icon');
+            if (!icon) return;
+            icon.innerHTML = `<i data-lucide="${iconName}"${spinning ? ' class="icon-spin"' : ''}></i>`;
+        }
+
+        function createTopupSuccessBurst() {
+            if (prefersReducedMotion.matches) return;
+            const burst = document.getElementById('live-status-burst');
+            if (!burst) return;
+            burst.innerHTML = '';
+            const colors = ['#d08cff', '#65ddb4', '#f5bd57', '#63c8ff'];
+            for (let index = 0; index < 18; index++) {
+                const particle = document.createElement('span');
+                const angle = (Math.PI * 2 * index) / 18;
+                const distance = 70 + Math.random() * 95;
+                particle.style.setProperty('--burst-x', `${Math.cos(angle) * distance}px`);
+                particle.style.setProperty('--burst-y', `${Math.sin(angle) * distance}px`);
+                particle.style.setProperty('--burst-color', colors[index % colors.length]);
+                particle.style.animationDelay = `${Math.random() * 100}ms`;
+                burst.appendChild(particle);
+            }
+            window.setTimeout(() => {
+                burst.innerHTML = '';
+            }, 1200);
+        }
+
+        function updateLiveTopupStatus(state, options = {}) {
+            const panel = document.getElementById('live-topup-status');
+            const title = document.getElementById('live-status-title');
+            const message = document.getElementById('live-status-message');
+            const badge = document.getElementById('live-status-badge');
+            const badgeText = document.getElementById('live-status-badge-text');
+            const result = document.getElementById('live-status-result');
+            const resultTitle = document.getElementById('live-result-title');
+            const resultMessage = document.getElementById('live-result-message');
+            const actions = document.getElementById('live-status-actions');
+            const primaryAction = document.getElementById('live-status-primary-action');
+            const historyButton = document.getElementById('live-status-history-button');
+            const newButton = document.getElementById('live-status-new-button');
+            const backButton = document.getElementById('topup-back-button');
+            const stepOne = document.getElementById('step1');
+            const lines = panel.querySelectorAll('.live-step-line');
+            const amount = options.amount ?? currentAmount;
+            const points = options.points ?? Math.round(Number(amount || 0) * pointRate);
+
+            const copy = {
+                uploading: {
+                    badge: 'กำลังอัปโหลด',
+                    title: 'กำลังเตรียมสลิปของคุณ',
+                    message: 'ระบบกำลังปรับขนาดรูปและส่งข้อมูลอย่างปลอดภัย',
+                    resultTitle: 'กำลังส่งสลิป',
+                    resultMessage: 'กรุณาอย่าปิดหน้านี้หรือกดยืนยันซ้ำ',
+                    icon: 'loader-circle',
+                    spinning: true
+                },
+                verifying: {
+                    badge: 'กำลังตรวจสอบ',
+                    title: 'EasySlip กำลังตรวจสอบรายการ',
+                    message: 'กำลังตรวจยอดเงิน เลขอ้างอิง และบัญชีผู้รับ',
+                    resultTitle: 'กำลังยืนยันข้อมูลจากธนาคาร',
+                    resultMessage: 'โดยปกติใช้เวลาไม่กี่วินาที กรุณารอสักครู่',
+                    icon: 'scan-search',
+                    spinning: false
+                },
+                approved: {
+                    badge: 'สำเร็จแล้ว',
+                    title: 'เติมพอยท์สำเร็จ!',
+                    message: options.message || 'พอยท์ถูกเพิ่มเข้ากระเป๋าของคุณเรียบร้อยแล้ว',
+                    resultTitle: `ได้รับ ${Number(points || 0).toLocaleString()} Points`,
+                    resultMessage: 'คุณสามารถใช้พอยท์ซื้อสินค้าในร้านค้าได้ทันที',
+                    icon: 'circle-check',
+                    spinning: false
+                },
+                pending: {
+                    badge: 'รอตรวจสอบ',
+                    title: 'รับสลิปเรียบร้อยแล้ว',
+                    message: options.message || 'รายการกำลังรอทีมงานตรวจสอบ ระบบจะอัปเดตหน้านี้ให้อัตโนมัติ',
+                    resultTitle: 'รายการอยู่ในคิวตรวจสอบ',
+                    resultMessage: 'คุณสามารถเปิดหน้านี้ไว้หรือกลับมาตรวจสอบภายหลังได้ กรุณาอย่าส่งสลิปเดิมซ้ำ',
+                    icon: 'clock-3',
+                    spinning: false
+                },
+                rejected: {
+                    badge: 'ไม่ผ่านการตรวจสอบ',
+                    title: 'รายการไม่ได้รับการอนุมัติ',
+                    message: options.message || 'กรุณาตรวจสอบสลิปและยอดเงิน หรือติดต่อทีมงานผ่าน Discord',
+                    resultTitle: 'ยังไม่มีการเพิ่มพอยท์',
+                    resultMessage: 'หากคิดว่าเกิดข้อผิดพลาด กรุณาเก็บสลิปไว้เป็นหลักฐาน',
+                    icon: 'circle-x',
+                    spinning: false
+                },
+                error: {
+                    badge: 'ยังไม่สำเร็จ',
+                    title: 'ไม่สามารถตรวจสอบรายการได้',
+                    message: options.message || 'เกิดข้อผิดพลาด กรุณาลองส่งข้อมูลอีกครั้ง',
+                    resultTitle: 'ระบบยังไม่ได้เพิ่มพอยท์',
+                    resultMessage: 'ตรวจสอบการเชื่อมต่อและลองใหม่ โดยไม่ต้องโอนเงินซ้ำ',
+                    icon: 'triangle-alert',
+                    spinning: false
+                }
+            };
+            const selected = copy[state] || copy.error;
+
+            panel.hidden = false;
+            panel.dataset.state = state;
+            title.textContent = selected.title;
+            message.textContent = selected.message;
+            badge.className = `live-status-badge ${state === 'uploading' || state === 'verifying' ? 'processing' : state}`;
+            badgeText.textContent = selected.badge;
+            resultTitle.textContent = selected.resultTitle;
+            resultMessage.textContent = selected.resultMessage;
+            result.setAttribute('role', state === 'error' || state === 'rejected' ? 'alert' : 'status');
+            document.getElementById('live-status-amount').textContent = formatTopupAmount(amount);
+            document.getElementById('live-status-points').textContent =
+                Number(points || 0).toLocaleString() + ' Points';
+            document.getElementById('live-status-request-id').textContent =
+                options.requestId ? `#${options.requestId}` : 'กำลังสร้าง...';
+            setLiveResultIcon(selected.icon, selected.spinning);
+
+            lines.forEach(line => line.classList.remove('is-complete'));
+            if (state === 'uploading') {
+                setLiveStepState('upload', 'active', 'กำลังเตรียมและส่งรูป');
+                setLiveStepState('verify', null, 'รอรับข้อมูลสลิป');
+                setLiveStepState('credit', null, 'รอผลตรวจสอบ');
+            } else if (state === 'verifying') {
+                setLiveStepState('upload', 'complete', 'ส่งสลิปเรียบร้อย');
+                setLiveStepState('verify', 'active', 'กำลังตรวจสอบกับ EasySlip');
+                setLiveStepState('credit', null, 'รอผลตรวจสอบ');
+                lines[0]?.classList.add('is-complete');
+            } else if (state === 'approved') {
+                setLiveStepState('upload', 'complete', 'ส่งสลิปเรียบร้อย');
+                setLiveStepState('verify', 'complete', 'ข้อมูลถูกต้อง');
+                setLiveStepState('credit', 'complete', 'เพิ่มพอยท์เรียบร้อย');
+                lines.forEach(line => line.classList.add('is-complete'));
+            } else if (state === 'pending') {
+                setLiveStepState('upload', 'complete', 'ส่งสลิปเรียบร้อย');
+                setLiveStepState('verify', 'complete', 'รับข้อมูลเรียบร้อย');
+                setLiveStepState('credit', 'waiting', 'รอทีมงานตรวจสอบ');
+                lines[0]?.classList.add('is-complete');
+            } else if (state === 'rejected') {
+                setLiveStepState('upload', 'complete', 'ส่งสลิปเรียบร้อย');
+                setLiveStepState('verify', 'complete', 'ตรวจสอบเรียบร้อย');
+                setLiveStepState('credit', 'error', 'ไม่ได้เพิ่มพอยท์');
+                lines[0]?.classList.add('is-complete');
+            } else {
+                const failedStage = options.failedStage === 'upload' ? 'upload' : 'verify';
+                setLiveStepState('upload', failedStage === 'upload' ? 'error' : 'complete',
+                    failedStage === 'upload' ? 'ส่งรูปไม่สำเร็จ' : 'ส่งสลิปเรียบร้อย');
+                setLiveStepState('verify', failedStage === 'verify' ? 'error' : null,
+                    failedStage === 'verify' ? 'ตรวจสอบไม่สำเร็จ' : 'รอตรวจสอบ');
+                setLiveStepState('credit', null, 'ยังไม่ได้เพิ่มพอยท์');
+                if (failedStage === 'verify') lines[0]?.classList.add('is-complete');
+            }
+
+            const showActions = ['approved', 'pending', 'rejected', 'error'].includes(state);
+            const loginRequired = options.loginRequired === true;
+            const flowLocked = ['uploading', 'verifying', 'pending'].includes(state);
+            const pendingLock = state === 'pending';
+            backButton.disabled = flowLocked;
+            setStepOneControlsDisabled(flowLocked || qrFlowActive);
+            stepOne.classList.toggle('is-pending-locked', pendingLock);
+            if (pendingLock) {
+                stepOne.setAttribute('aria-disabled', 'true');
+            } else {
+                stepOne.removeAttribute('aria-disabled');
+            }
+            actions.hidden = !showActions;
+            primaryAction.hidden = state !== 'approved' && !loginRequired;
+            primaryAction.href = loginRequired ? 'index.html?login=true' : 'shop.html';
+            primaryAction.innerHTML = loginRequired
+                ? '<i data-lucide="log-in"></i> เข้าสู่ระบบใหม่'
+                : '<i data-lucide="shopping-bag"></i> ไปหน้าร้านค้า';
+            historyButton.hidden = state === 'error';
+            newButton.hidden = state === 'pending' || loginRequired;
+
+            App.renderIcons();
+            if (state === 'approved') createTopupSuccessBurst();
+            if (options.focus !== false) {
+                window.setTimeout(() => {
+                    panel.scrollIntoView({
+                        behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
+                        block: 'nearest'
+                    });
+                    title.focus({ preventScroll: true });
+                }, 40);
+            }
+        }
+
+        function rememberPendingTopup(requestId, amount, points) {
+            let existing = null;
+            try {
+                existing = JSON.parse(localStorage.getItem(TOPUP_STATUS_STORAGE_KEY) || 'null');
+            } catch (_) {}
+            const record = {
+                requestId: String(requestId),
+                amount: Number(amount),
+                points: Number(points),
+                userId: String(App.state.user?.id || ''),
+                createdAt: String(existing?.requestId) === String(requestId)
+                    ? Number(existing.createdAt || Date.now())
+                    : Date.now()
+            };
+            activePendingRequestId = record.requestId;
+            try {
+                localStorage.setItem(TOPUP_STATUS_STORAGE_KEY, JSON.stringify(record));
+            } catch (error) {
+                console.warn('Unable to persist pending top-up status', error);
+            }
+        }
+
+        function clearRememberedTopup(requestId = null) {
+            let storedRequestId = null;
+            try {
+                storedRequestId = JSON.parse(
+                    localStorage.getItem(TOPUP_STATUS_STORAGE_KEY) || 'null'
+                )?.requestId;
+            } catch (_) {}
+            if (!requestId || String(requestId) === String(storedRequestId)) {
+                try {
+                    localStorage.removeItem(TOPUP_STATUS_STORAGE_KEY);
+                } catch (_) {}
+            }
+            if (!requestId || String(requestId) === String(activePendingRequestId)) {
+                activePendingRequestId = null;
+            }
+        }
+
+        function stopTopupStatusPolling() {
+            if (statusPollTimer) window.clearTimeout(statusPollTimer);
+            statusPollTimer = null;
+            statusPollAttempts = 0;
+            statusPollGeneration++;
+        }
+
+        function scheduleTopupStatusPoll(requestId, generation = statusPollGeneration) {
+            if (
+                !requestId
+                || generation !== statusPollGeneration
+                || String(requestId) !== String(activePendingRequestId)
+            ) return;
+            if (statusPollTimer) window.clearTimeout(statusPollTimer);
+            statusPollTimer = null;
+            if (statusPollAttempts >= 48) {
+                let stored = {};
+                try {
+                    stored = JSON.parse(localStorage.getItem(TOPUP_STATUS_STORAGE_KEY) || '{}');
+                } catch (_) {}
+                updateLiveTopupStatus('pending', {
+                    requestId,
+                    amount: stored.amount,
+                    points: stored.points,
+                    message: 'รายการยังอยู่ในคิวตรวจสอบ คุณสามารถปิดหน้านี้และกลับมาดูประวัติภายหลังได้',
+                    focus: false
+                });
+                return;
+            }
+            const delay = statusPollAttempts < 12 ? 5000 : 15000;
+            statusPollTimer = window.setTimeout(() => {
+                statusPollTimer = null;
+                pollTopupStatus(requestId, false, generation);
+            }, delay);
+        }
+
+        async function pollTopupStatus(
+            requestId,
+            immediate = false,
+            generation = statusPollGeneration
+        ) {
+            if (
+                !requestId
+                || generation !== statusPollGeneration
+                || String(requestId) !== String(activePendingRequestId)
+            ) return;
+            if (document.hidden && !immediate) {
+                scheduleTopupStatusPoll(requestId, generation);
+                return;
+            }
+            if (statusPollInFlight) {
+                scheduleTopupStatusPoll(requestId, generation);
+                return;
+            }
+
+            statusPollInFlight = true;
+            statusPollAttempts++;
+            try {
+                const response = await App.api(`/api/topup/status/${encodeURIComponent(requestId)}`, {
+                    cache: 'no-store'
+                });
+                if (
+                    generation !== statusPollGeneration
+                    || String(requestId) !== String(activePendingRequestId)
+                ) return;
+                if (!response.ok) {
+                    if (response.error === 'request_not_found') {
+                        clearRememberedTopup(requestId);
+                        stopTopupStatusPolling();
+                        updateLiveTopupStatus('error', {
+                            requestId,
+                            message: 'ไม่พบรายการเติมเงินนี้ กรุณาตรวจสอบประวัติหรือล็อกอินใหม่',
+                            focus: false
+                        });
+                    } else if (response.error === 'auth_required') {
+                        stopTopupStatusPolling();
+                        activePendingRequestId = null;
+                        updateLiveTopupStatus('error', {
+                            requestId,
+                            message: 'เซสชันเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบใหม่เพื่อตรวจสอบรายการต่อ',
+                            loginRequired: true,
+                            focus: false
+                        });
+                    } else {
+                        scheduleTopupStatusPoll(requestId, generation);
+                    }
+                    return;
+                }
+
+                const topup = response.topup;
+                const details = {
+                    requestId: topup.id,
+                    amount: topup.amount,
+                    points: topup.points,
+                    focus: false
+                };
+                if (topup.status === 'approved') {
+                    stopTopupStatusPolling();
+                    clearRememberedTopup(requestId);
+                    updateLiveTopupStatus('approved', details);
+                    App.updateNavPoints();
+                    return;
+                }
+                if (topup.status === 'rejected') {
+                    stopTopupStatusPolling();
+                    clearRememberedTopup(requestId);
+                    updateLiveTopupStatus('rejected', details);
+                    return;
+                }
+
+                rememberPendingTopup(topup.id, topup.amount, topup.points);
+                updateLiveTopupStatus('pending', details);
+                scheduleTopupStatusPoll(requestId, generation);
+            } catch (error) {
+                console.error('Failed to refresh top-up status', error);
+                scheduleTopupStatusPoll(requestId, generation);
+            } finally {
+                statusPollInFlight = false;
+            }
+        }
+
+        function startTopupStatusPolling(requestId) {
+            stopTopupStatusPolling();
+            activePendingRequestId = String(requestId);
+            scheduleTopupStatusPoll(activePendingRequestId, statusPollGeneration);
+        }
+
+        async function resumePendingTopup() {
+            let stored;
+            try {
+                stored = JSON.parse(localStorage.getItem(TOPUP_STATUS_STORAGE_KEY) || 'null');
+            } catch (_) {
+                try {
+                    localStorage.removeItem(TOPUP_STATUS_STORAGE_KEY);
+                } catch (_) {}
+                return;
+            }
+            if (
+                !stored?.requestId
+                || (
+                    stored.userId
+                    && App.state.user?.id
+                    && String(stored.userId) !== String(App.state.user.id)
+                )
+                || Date.now() - Number(stored.createdAt || 0) > 24 * 60 * 60 * 1000
+            ) {
+                try {
+                    localStorage.removeItem(TOPUP_STATUS_STORAGE_KEY);
+                } catch (_) {}
+                return;
+            }
+
+            stopTopupStatusPolling();
+            activePendingRequestId = String(stored.requestId);
+            updateLiveTopupStatus('pending', {
+                requestId: stored.requestId,
+                amount: stored.amount,
+                points: stored.points,
+                message: 'กำลังตรวจสอบสถานะล่าสุดของรายการที่รออนุมัติ',
+                focus: true
+            });
+            await pollTopupStatus(activePendingRequestId, true, statusPollGeneration);
+        }
+
+        function resetLiveTopupFlow() {
+            stopTopupStatusPolling();
+            clearRememberedTopup();
+            topupSubmissionInFlight = false;
+            document.getElementById('live-topup-status').hidden = true;
+            const confirmButton = document.getElementById('confirm-payment-btn');
+            confirmButton.innerHTML = 'ยืนยันการทำรายการ';
+            goToStep1();
+            App.renderIcons();
+        }
+
         function handleSlipUpload(input) {
             const label = document.getElementById('slip-file-name');
             const confirmBtn = document.getElementById('confirm-payment-btn');
@@ -378,7 +925,7 @@
             
             if (input.files && input.files[0]) {
                 label.innerText = `ไฟล์แนบ: ${input.files[0].name}`;
-                labelContainer.style.borderColor = 'var(--success)';
+                labelContainer.style.borderColor = '#22c55e';
                 labelContainer.style.background = 'rgba(0, 210, 255, 0.05)';
                 confirmBtn.disabled = false;
             } else {
@@ -396,6 +943,7 @@
         }
 
         async function submitPayment() {
+            if (topupSubmissionInFlight || activePendingRequestId) return;
             const fileInput = document.getElementById('slip-upload');
             if (!fileInput.files || !fileInput.files[0]) {
                 Swal.fire({
@@ -406,12 +954,21 @@
                 });
                 return;
             }
+            const submittedAmount = activeQrAmount > 0 ? activeQrAmount : currentAmount;
+            const submittedPoints = Math.round(submittedAmount * pointRate);
             
             const btn = document.getElementById('confirm-payment-btn');
-            const originalText = btn.innerHTML;
-                btn.innerHTML = '<i data-lucide="loader-circle" class="icon-spin"></i> กำลังอัปโหลดข้อมูล...';
-                App.renderIcons();
+            topupSubmissionInFlight = true;
+            clearInterval(timerInterval);
+            stopTopupStatusPolling();
+            activePendingRequestId = null;
+            btn.innerHTML = '<i data-lucide="loader-circle" class="icon-spin"></i> กำลังอัปโหลดข้อมูล...';
+            App.renderIcons();
             btn.disabled = true;
+            updateLiveTopupStatus('uploading', {
+                amount: submittedAmount,
+                points: submittedPoints
+            });
 
             const file = fileInput.files[0];
             const reader = new FileReader();
@@ -433,59 +990,119 @@
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        topupSubmissionInFlight = false;
+                        btn.innerHTML = 'ยืนยันการทำรายการ';
+                        btn.disabled = false;
+                        updateLiveTopupStatus('error', {
+                            failedStage: 'upload',
+                            message: 'เบราว์เซอร์ไม่สามารถเตรียมรูปสลิปได้ กรุณาลองใช้รูปอื่น'
+                        });
+                        return;
+                    }
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Compress to JPEG with 70% quality (drastically reduces mobile upload sizes)
+                    // Compress to JPEG with 70% quality to keep the EasySlip payload below 4 MB.
                     const slipData = canvas.toDataURL('image/jpeg', 0.7);
+                    updateLiveTopupStatus('verifying', {
+                        amount: submittedAmount,
+                        points: submittedPoints,
+                        focus: false
+                    });
+                    btn.innerHTML = '<i data-lucide="scan-search"></i> EasySlip กำลังตรวจสอบ...';
+                    App.renderIcons();
 
                     try {
                         const res = await App.api('/api/topup/verify-slip', {
                             method: 'POST',
                             body: JSON.stringify({
-                                amount: currentAmount,
+                                amount: submittedAmount,
                                 slipData: slipData
                             })
                         });
                         
-                        if (res.ok) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'สำเร็จ!',
-                                text: res.message || "แนบสลิปเรียบร้อย! เจ้าหน้าที่กำลังตรวจสอบข้อมูลการโอนเงินของท่าน",
-                                background: '#1a1f2b', color: '#fff'
-                            }).then(() => {
-                                window.location.reload();
+                        if (res.ok && res.status === 'approved') {
+                            clearRememberedTopup(res.requestId);
+                            stopTopupStatusPolling();
+                            updateLiveTopupStatus('approved', {
+                                requestId: res.requestId,
+                                amount: submittedAmount,
+                                points: submittedPoints,
+                                message: res.message
                             });
+                            btn.innerHTML = '<i data-lucide="circle-check"></i> เติมพอยท์สำเร็จ';
+                            btn.disabled = true;
+                            App.updateNavPoints();
+                        } else if (res.ok && res.status === 'pending') {
+                            updateLiveTopupStatus('pending', {
+                                requestId: res.requestId,
+                                amount: submittedAmount,
+                                points: submittedPoints,
+                                message: res.message
+                            });
+                            btn.innerHTML = '<i data-lucide="clock-3"></i> อยู่ระหว่างรอตรวจสอบ';
+                            btn.disabled = true;
+                            if (res.requestId) {
+                                rememberPendingTopup(res.requestId, submittedAmount, submittedPoints);
+                                startTopupStatusPolling(res.requestId);
+                            }
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'เกิดข้อผิดพลาด',
-                                text: App.translateError(res.error) || "ไม่สามารถส่งข้อมูลได้",
-                                background: '#1a1f2b', color: '#fff'
+                            updateLiveTopupStatus('error', {
+                                failedStage: 'verify',
+                                amount: submittedAmount,
+                                points: submittedPoints,
+                                message: App.translateError(res.error) || 'ไม่สามารถส่งข้อมูลได้'
                             });
+                            btn.innerHTML = 'ลองตรวจสอบสลิปอีกครั้ง';
+                            btn.disabled = false;
                         }
                     } catch (err) {
                         console.error("Slip upload error:", err);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'เกิดข้อผิดพลาด',
-                            text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์',
-                            background: '#1a1f2b', color: '#fff'
+                        updateLiveTopupStatus('error', {
+                            failedStage: 'verify',
+                            amount: submittedAmount,
+                            points: submittedPoints,
+                            message: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'
                         });
-                    } finally {
-                        btn.innerHTML = originalText;
+                        btn.innerHTML = 'ลองตรวจสอบสลิปอีกครั้ง';
                         btn.disabled = false;
+                    } finally {
+                        topupSubmissionInFlight = false;
+                        App.renderIcons();
                     }
                 };
                 img.onerror = function() {
-                    Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไฟล์รูปภาพไม่ถูกต้อง', background: '#1a1f2b', color: '#fff' });
-                    btn.innerHTML = originalText;
+                    topupSubmissionInFlight = false;
+                    updateLiveTopupStatus('error', {
+                        failedStage: 'upload',
+                        message: 'ไฟล์รูปภาพไม่ถูกต้อง กรุณาเลือกสลิป PNG, JPG หรือ WEBP'
+                    });
+                    btn.innerHTML = 'เลือกสลิปแล้วลองอีกครั้ง';
                     btn.disabled = false;
+                    App.renderIcons();
                 };
                 img.src = event.target.result;
             };
+            reader.onerror = function() {
+                topupSubmissionInFlight = false;
+                updateLiveTopupStatus('error', {
+                    failedStage: 'upload',
+                    message: 'ไม่สามารถอ่านไฟล์สลิปได้ กรุณาเลือกไฟล์ใหม่'
+                });
+                btn.innerHTML = 'เลือกสลิปแล้วลองอีกครั้ง';
+                btn.disabled = false;
+                App.renderIcons();
+            };
             reader.readAsDataURL(file);
         }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && activePendingRequestId) {
+                if (statusPollTimer) window.clearTimeout(statusPollTimer);
+                statusPollTimer = null;
+                pollTopupStatus(activePendingRequestId, true, statusPollGeneration);
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             // Wait for App class to be available

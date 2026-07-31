@@ -17,14 +17,23 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 const rateLimit = require("express-rate-limit");
+const publicApiLimiter = rateLimit({
+  windowMs: config.rateLimit.apiWindowMs,
+  max: config.rateLimit.publicMax,
+  message: { ok: false, error: "too_many_requests" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 const apiLimiter = rateLimit({
   windowMs: config.rateLimit.apiWindowMs,
   max: config.rateLimit.apiMax,
   message: { ok: false, error: "too_many_requests" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.path.startsWith("/public/"),
 });
 
+app.use("/api/public", publicApiLimiter);
 app.use("/api", apiLimiter);
 
 app.get("/health", (req, res) => res.json({ ok: true }));

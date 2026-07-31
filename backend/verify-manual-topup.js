@@ -99,7 +99,10 @@ assert(topupRoutes.includes("calculatePoints(amountMinor, settings.POINT_RATE ||
 assert(!topupRoutes.includes("const { amount, points, slipData }"));
 assert(topupRoutes.includes("easySlipRes.ok"));
 assert(topupRoutes.includes("easySlipData.success !== false"));
-assert(topupRoutes.includes("if (!transRef)"));
+assert(topupRoutes.includes("verification.canAutoApprove"));
+assert(topupRoutes.includes("verification.isAmountMatched === false"));
+assert(topupRoutes.includes("verification.isDuplicate === true"));
+assert(topupRoutes.includes("verification.accountMatched"));
 
 assert(adminScript.includes("openManualTopupModal"));
 assert(adminScript.includes("lookupManualTopupPlayer"));

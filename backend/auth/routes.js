@@ -1,19 +1,16 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const rateLimit = require("express-rate-limit");
 const { pool } = require("../db");
 const { config } = require("../config");
 const { HttpError, asyncHandler } = require("../errors");
 const { issueToken, requireUser } = require("./session");
+const { createLoginLimiter } = require("./rate-limit");
 
 const authRouter = express.Router();
 
-const loginLimiter = rateLimit({
+const loginLimiter = createLoginLimiter({
   windowMs: config.rateLimit.loginWindowMs,
-  max: config.rateLimit.loginMax,
-  message: { ok: false, error: "too_many_attempts" },
-  standardHeaders: true,
-  legacyHeaders: false,
+  max: config.rateLimit.loginMax
 });
 
 const { verifyNLoginPassword } = require("../players/service");

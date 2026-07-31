@@ -25,11 +25,18 @@ body {
     background-position: center;
     background-attachment: fixed;
     color: var(--text-main);
-    font-family: 'Prompt', 'Outfit', sans-serif;
+    font-family: 'Kanit', sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
 }
 
 /* Bubbles Animation */
@@ -289,7 +296,7 @@ body {
 }
 
 .logo-fallback {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Kanit', sans-serif;
     font-size: 1.75rem;
     font-weight: 800;
     text-transform: uppercase;
