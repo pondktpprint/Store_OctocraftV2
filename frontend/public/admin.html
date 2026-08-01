@@ -480,7 +480,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="css/admin-theme.css?v=20260801-admin-theme-1">
+    <link rel="stylesheet" href="css/admin-theme.css?v=20260801-order-details-1">
 </head>
 <body class="admin-page">
     <!-- MOBILE HEADER -->
@@ -810,7 +810,7 @@
                 <h4 style="margin: 25px 0 15px 0; color:#f8fafc;"><i data-lucide="shopping-basket"></i> Recent Orders</h4>
                     <div class="admin-table-wrapper" style="margin-bottom: 25px;">
                         <table class="admin-table">
-                            <thead><tr><th>ID</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Items</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
                             <tbody id="profile-orders-tbody"></tbody>
                         </table>
                     </div>
@@ -834,9 +834,11 @@
                             <tr>
                                 <th>ID</th>
                                 <th>User</th>
+                                <th>Items</th>
                                 <th>Points</th>
                                 <th>Status</th>
                                 <th>Date</th>
+                                <th>Details</th>
                             </tr>
                         </thead>
                         <tbody id="orders-tbody"></tbody>
@@ -921,6 +923,37 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- ORDER DETAILS MODAL -->
+    <div id="order-detail-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="order-detail-title">
+        <div class="modal-content order-detail-modal-content">
+            <button class="close-modal" type="button" aria-label="ปิดรายละเอียดคำสั่งซื้อ" onclick="Admin.closeOrderDetails()">&times;</button>
+            <header class="order-detail-header">
+                <span class="order-detail-header-icon"><i data-lucide="package-search"></i></span>
+                <div>
+                    <span class="order-detail-kicker">ORDER DETAILS</span>
+                    <h3 id="order-detail-title">Order #<span id="order-detail-id">-</span></h3>
+                    <p>รายการสินค้าที่ผู้เล่นซื้อและผลการส่งเข้าเซิร์ฟเวอร์</p>
+                </div>
+            </header>
+
+            <div class="order-detail-overview">
+                <div><small>PLAYER</small><strong id="order-detail-player">-</strong></div>
+                <div><small>TOTAL POINTS</small><strong id="order-detail-points">-</strong></div>
+                <div><small>ORDER STATUS</small><strong id="order-detail-status">-</strong></div>
+                <div><small>ORDER DATE</small><strong id="order-detail-date">-</strong></div>
+            </div>
+
+            <div class="order-detail-section-heading">
+                <div>
+                    <span>PRODUCTS</span>
+                    <strong id="order-detail-item-count">0 รายการ</strong>
+                </div>
+                <span class="order-detail-help"><i data-lucide="info"></i> จำนวนส่งสำเร็จอ้างอิงจาก Delivery Jobs</span>
+            </div>
+            <div class="order-detail-items" id="order-detail-items"></div>
+        </div>
     </div>
 
     <!-- PRODUCT MODAL -->
@@ -1068,7 +1101,7 @@
     </div>
 
     <script src="js/app.js?v=20260731-live-topup-1"></script>
-    <script src="js/admin.js?v=20260801-easyslip-health-1"></script>
+    <script src="js/admin.js?v=20260801-order-details-1"></script>
     <script>
         // Auto-close sidebar on mobile when a tab is clicked
         document.querySelectorAll('.admin-tab-btn').forEach(btn => {

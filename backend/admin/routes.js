@@ -13,6 +13,7 @@ const {
   parseManualTopupReason
 } = require("./manual-topup");
 const { checkEasySlipHealth } = require("./easyslip-health");
+const { loadAdminOrders } = require("./order-details");
 
 const adminRouter = express.Router();
 
@@ -77,13 +78,7 @@ adminRouter.post("/settings/regenerate-token", asyncHandler(async (req, res) => 
 }));
 
 adminRouter.get("/orders", asyncHandler(async (req, res) => {
-  const [orders] = await pool.execute(
-    `SELECT o.id, o.status, o.total_points, o.created_at, u.username
-     FROM orders o
-     JOIN users u ON u.id = o.user_id
-     ORDER BY o.id DESC
-     LIMIT 100`
-  );
+  const orders = await loadAdminOrders(pool);
   res.json({ ok: true, orders });
 }));
 

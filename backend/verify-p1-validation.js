@@ -52,7 +52,7 @@ assert(ordersRoutes.includes("const MAX_ORDER_LINES = 50"));
 assert(ordersRoutes.includes("const MAX_CHECKOUT_QUANTITY = 100"));
 assert(ordersRoutes.includes("items.length > MAX_ORDER_LINES"));
 assert(ordersRoutes.includes("quantity > MAX_CHECKOUT_QUANTITY"));
-assert(ordersRoutes.includes("SELECT id, price_points, minecraft_command"));
+assert(ordersRoutes.includes("SELECT id, sku, name, price_points, minecraft_command"));
 assert(ordersRoutes.includes("total += Number(product.price_points) * quantity"));
 assert(!ordersRoutes.includes("price_points:"));
 assert(!ordersRoutes.includes("line.price"));

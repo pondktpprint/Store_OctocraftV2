@@ -423,14 +423,20 @@ const Admin = {
         const oTbody = document.getElementById('profile-orders-tbody');
         oTbody.innerHTML = '';
         if (userOrders.length === 0) {
-            oTbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No recent orders found</td></tr>';
+            oTbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No recent orders found</td></tr>';
         }
         
         const orderIds = new Set();
         userOrders.forEach(o => {
-            orderIds.add(o.id);
+            orderIds.add(String(o.id));
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${o.id}</td><td>${o.total_points}</td><td>${o.status}</td><td>${new Date(o.created_at).toLocaleString()}</td>`;
+            tr.innerHTML = `
+                <td>${App.escapeHTML(o.id)}</td>
+                <td><span class="order-items-summary">${App.escapeHTML(this.getOrderItemsSummary(o))}</span></td>
+                <td>${Number(o.total_points).toLocaleString('th-TH')}</td>
+                <td>${this.renderOrderStatusBadge(o.status)}</td>
+                <td>${new Date(o.created_at).toLocaleString('th-TH')}</td>
+            `;
             oTbody.appendChild(tr);
         });
 
@@ -451,7 +457,7 @@ const Admin = {
         }
 
         // 4. Delivery Jobs (matched by orderIds)
-        const userJobs = this.globalData.jobs.filter(j => orderIds.has(j.order_id));
+        const userJobs = this.globalData.jobs.filter(j => orderIds.has(String(j.order_id)));
         const jTbody = document.getElementById('profile-jobs-tbody');
         jTbody.innerHTML = '';
         if (userJobs.length === 0) {
@@ -578,21 +584,128 @@ const Admin = {
     },
 
     // --- ORDERS ---
+    getOrderItemsSummary(order) {
+        const items = Array.isArray(order?.items) ? order.items : [];
+        if (!items.length) return 'ไม่พบรายละเอียดสินค้า';
+
+        const visible = items.slice(0, 2).map(item => {
+            const quantity = Number(item.quantity) || 0;
+            return `${item.name || `Product #${item.productId || '-'}`} ×${quantity}`;
+        });
+        if (items.length > visible.length) visible.push(`+${items.length - visible.length} รายการ`);
+        return visible.join(', ');
+    },
+
+    renderOrderStatusBadge(status) {
+        const states = {
+            pending_delivery: { label: 'กำลังจัดส่ง', className: 'pending' },
+            delivered: { label: 'ส่งสำเร็จ', className: 'success' },
+            delivery_failed: { label: 'ส่งไม่สำเร็จ', className: 'failed' }
+        };
+        const state = states[String(status || '')] || { label: String(status || 'Unknown'), className: 'neutral' };
+        return `<span class="order-status-badge ${state.className}">${App.escapeHTML(state.label)}</span>`;
+    },
+
+    getOrderItemDeliveryState(item) {
+        const delivery = item?.delivery || {};
+        const quantity = Number(item?.quantity) || 0;
+        const succeeded = Number(delivery.succeeded) || 0;
+        const failed = Number(delivery.failed) || 0;
+        const pending = Number(delivery.pending) || 0;
+
+        if (failed > 0) {
+            return { className: 'failed', label: `ไม่สำเร็จ ${failed} ชิ้น`, detail: `สำเร็จ ${succeeded} • รอดำเนินการ ${pending}` };
+        }
+        if (pending > 0 || succeeded < quantity) {
+            return { className: 'pending', label: `กำลังส่ง ${Math.max(pending, quantity - succeeded)} ชิ้น`, detail: `สำเร็จแล้ว ${succeeded}/${quantity}` };
+        }
+        return { className: 'success', label: `ส่งสำเร็จ ${succeeded}/${quantity}`, detail: 'คำสั่งถูกส่งเข้าเซิร์ฟเวอร์แล้ว' };
+    },
+
     async loadOrders() {
         const res = await this.fetchAdmin('/api/admin/orders');
+        this.globalData.orders = Array.isArray(res.orders) ? res.orders : [];
         const tbody = document.getElementById('orders-tbody');
         tbody.innerHTML = '';
-        res.orders.forEach(o => {
+        if (this.globalData.orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">ยังไม่มีคำสั่งซื้อ</td></tr>';
+            return;
+        }
+
+        this.globalData.orders.forEach(o => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${o.id}</td>
+                <td><strong class="order-id">#${App.escapeHTML(o.id)}</strong></td>
                 <td>${App.escapeHTML(o.username)}</td>
-                <td>${o.total_points}</td>
-                <td>${App.escapeHTML(o.status)}</td>
-                <td>${new Date(o.created_at).toLocaleString()}</td>
+                <td><span class="order-items-summary">${App.escapeHTML(this.getOrderItemsSummary(o))}</span></td>
+                <td><strong>${Number(o.total_points).toLocaleString('th-TH')}</strong></td>
+                <td>${this.renderOrderStatusBadge(o.status)}</td>
+                <td>${new Date(o.created_at).toLocaleString('th-TH')}</td>
+                <td><button type="button" class="action-btn btn-edit order-detail-button"><i data-lucide="eye"></i> ดูรายละเอียด</button></td>
             `;
+            tr.querySelector('.order-detail-button').onclick = () => this.openOrderDetails(o.id);
             tbody.appendChild(tr);
         });
+        App.renderIcons();
+    },
+
+    openOrderDetails(orderId) {
+        const order = this.globalData.orders.find(item => String(item.id) === String(orderId));
+        if (!order) {
+            App.showToast('ไม่พบรายละเอียดคำสั่งซื้อนี้', 'error');
+            return;
+        }
+
+        const items = Array.isArray(order.items) ? order.items : [];
+        const totalQuantity = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        document.getElementById('order-detail-id').textContent = order.id;
+        document.getElementById('order-detail-player').textContent = order.username || '-';
+        document.getElementById('order-detail-points').textContent = `${Number(order.total_points).toLocaleString('th-TH')} Points`;
+        document.getElementById('order-detail-status').innerHTML = this.renderOrderStatusBadge(order.status);
+        document.getElementById('order-detail-date').textContent = new Date(order.created_at).toLocaleString('th-TH');
+        document.getElementById('order-detail-item-count').textContent = `${items.length} รายการ • ${totalQuantity} ชิ้น`;
+
+        const container = document.getElementById('order-detail-items');
+        if (!items.length) {
+            container.innerHTML = '<div class="order-detail-empty"><i data-lucide="package-x"></i><strong>ไม่พบรายละเอียดสินค้า</strong><span>ออเดอร์เก่าอาจถูกสร้างก่อนระบบบันทึกรายการสินค้า</span></div>';
+        } else {
+            container.innerHTML = items.map(item => {
+                const delivery = this.getOrderItemDeliveryState(item);
+                const quantity = Number(item.quantity) || 0;
+                const unitPrice = Number(item.unitPricePoints) || 0;
+                const totalPoints = Number(item.totalPoints) || (quantity * unitPrice);
+                return `
+                    <article class="order-detail-item">
+                        <span class="order-detail-product-icon"><i data-lucide="box"></i></span>
+                        <div class="order-detail-product-copy">
+                            <strong>${App.escapeHTML(item.name || `Product #${item.productId || '-'}`)}</strong>
+                            <code>${App.escapeHTML(item.sku || 'unknown')}</code>
+                        </div>
+                        <div class="order-detail-price">
+                            <small>QUANTITY</small>
+                            <strong>×${quantity}</strong>
+                            <span>${unitPrice.toLocaleString('th-TH')} / ชิ้น</span>
+                        </div>
+                        <div class="order-detail-price total">
+                            <small>LINE TOTAL</small>
+                            <strong>${totalPoints.toLocaleString('th-TH')}</strong>
+                            <span>Points</span>
+                        </div>
+                        <div class="order-delivery-state ${delivery.className}">
+                            <span>${App.escapeHTML(delivery.label)}</span>
+                            <small>${App.escapeHTML(delivery.detail)}</small>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('order-detail-modal').classList.add('active');
+        App.renderIcons();
+    },
+
+    closeOrderDetails() {
+        document.getElementById('order-detail-modal').classList.remove('active');
     },
 
     // --- DELIVERY JOBS ---

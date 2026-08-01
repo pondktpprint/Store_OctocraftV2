@@ -33,9 +33,12 @@ ordersRouter.get("/:id", requireUser, asyncHandler(async (req, res) => {
   );
   if (!orders.length) throw new HttpError(404, "order_not_found");
   const [items] = await pool.execute(
-    `SELECT oi.id, oi.product_id, p.name, oi.quantity, oi.unit_price_points
+    `SELECT oi.id, oi.product_id,
+            COALESCE(oi.product_name_snapshot, p.name, CONCAT('Product #', oi.product_id)) AS name,
+            COALESCE(oi.product_sku_snapshot, p.sku, 'unknown') AS sku,
+            oi.quantity, oi.unit_price_points
      FROM order_items oi
-     JOIN products p ON p.id = oi.product_id
+     LEFT JOIN products p ON p.id = oi.product_id
      WHERE oi.order_id = ?`,
     [req.params.id]
   );
@@ -64,7 +67,7 @@ ordersRouter.post("/", requireUser, asyncHandler(async (req, res) => {
       }
 
       const [products] = await connection.execute(
-        `SELECT id, price_points, minecraft_command
+        `SELECT id, sku, name, price_points, minecraft_command
          FROM products
          WHERE id = ? AND active = 1
          FOR UPDATE`,
@@ -93,11 +96,14 @@ ordersRouter.post("/", requireUser, asyncHandler(async (req, res) => {
     for (const line of resolved) {
       const [itemResult] = await connection.execute(
         `INSERT INTO order_items
-         (order_id, product_id, quantity, unit_price_points, minecraft_command)
-         VALUES (?, ?, ?, ?, ?)`,
+         (order_id, product_id, product_name_snapshot, product_sku_snapshot,
+          quantity, unit_price_points, minecraft_command)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           orderId,
           line.product.id,
+          line.product.name,
+          line.product.sku,
           line.quantity,
           line.product.price_points,
           line.product.minecraft_command

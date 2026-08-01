@@ -62,6 +62,8 @@ CREATE TABLE order_items (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_id BIGINT UNSIGNED NOT NULL,
   product_id BIGINT UNSIGNED NOT NULL,
+  product_name_snapshot VARCHAR(160) NOT NULL,
+  product_sku_snapshot VARCHAR(64) NOT NULL,
   quantity INT UNSIGNED NOT NULL,
   unit_price_points INT UNSIGNED NOT NULL,
   minecraft_command VARCHAR(512) NOT NULL,

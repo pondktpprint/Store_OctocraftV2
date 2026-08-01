@@ -93,6 +93,26 @@ async function migrateManualTopups() {
   );
 }
 
+async function migrateOrderItemSnapshots() {
+  await ensureColumn(
+    "order_items",
+    "product_name_snapshot",
+    "VARCHAR(160) NULL AFTER `product_id`"
+  );
+  await ensureColumn(
+    "order_items",
+    "product_sku_snapshot",
+    "VARCHAR(64) NULL AFTER `product_name_snapshot`"
+  );
+  await pool.execute(
+    `UPDATE order_items oi
+     JOIN products p ON p.id = oi.product_id
+     SET oi.product_name_snapshot = COALESCE(oi.product_name_snapshot, p.name),
+         oi.product_sku_snapshot = COALESCE(oi.product_sku_snapshot, p.sku)
+     WHERE oi.product_name_snapshot IS NULL OR oi.product_sku_snapshot IS NULL`
+  );
+}
+
 async function initSettings() {
   // Create table if it doesn't exist
   await pool.execute(`
@@ -121,6 +141,13 @@ async function initSettings() {
     await migrateManualTopups();
   } catch (err) {
     console.error("Migration: failed to prepare manual top-ups:", err);
+    throw err;
+  }
+
+  try {
+    await migrateOrderItemSnapshots();
+  } catch (err) {
+    console.error("Migration: failed to prepare order item snapshots:", err);
     throw err;
   }
 
