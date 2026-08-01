@@ -12,6 +12,8 @@ const Admin = {
         lookupRequest: 0,
         submitting: false
     },
+
+    easySlipHealthLoading: false,
     
     init() {
         if (!App.state.token) {
@@ -75,6 +77,7 @@ const Admin = {
 
     // --- SYSTEM STATUS & SETTINGS ---
     async loadSystemStatus() {
+        this.loadEasySlipHealth(false);
         try {
             const res = await this.fetchAdmin('/api/admin/system-status');
             
@@ -123,6 +126,165 @@ const Admin = {
             
         } catch(e) {
             console.error('Failed to load system status', e);
+        }
+    },
+
+    setEasySlipHealthText(id, value) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    },
+
+    renderEasySlipHealth(health) {
+        const state = String(health?.state || 'unavailable');
+        const card = document.getElementById('easyslip-health-card');
+        const badge = document.getElementById('easyslip-health-badge');
+        const quotaBar = document.getElementById('easyslip-health-quota-bar');
+        const numberFormat = new Intl.NumberFormat('th-TH', { maximumFractionDigits: 2 });
+        const numericOrNull = value => {
+            if (value === null || value === undefined || value === '') return null;
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+        const stateLabels = {
+            healthy: 'พร้อมใช้งาน',
+            degraded: 'ต้องตรวจสอบ',
+            unavailable: 'เชื่อมต่อไม่ได้',
+            blocked: 'ถูกระงับ/ตั้งค่าไม่ถูกต้อง',
+            disabled: 'ยังไม่ได้เปิดใช้งาน'
+        };
+        const errorCode = health?.credentials?.error?.code || health?.service?.error?.code || '';
+        let summary = 'EasySlip พร้อมตรวจสอบสลิปอัตโนมัติ';
+        if (state === 'disabled') {
+            summary = 'ยังไม่ได้ตั้งค่า EasySlip API Key ระบบจะส่งสลิปเข้าคิวให้ทีมงานตรวจสอบแทน';
+        } else if (state === 'blocked') {
+            const blockedMessages = {
+                INVALID_API_KEY: 'API Key ไม่ถูกต้อง กรุณาตรวจสอบคีย์แล้วบันทึกการตั้งค่าใหม่',
+                MISSING_API_KEY: 'ไม่พบ API Key กรุณาตั้งค่าคีย์ก่อนเปิดตรวจสลิปอัตโนมัติ',
+                IP_NOT_ALLOWED: 'IP ของเซิร์ฟเวอร์นี้ไม่ได้อยู่ใน EasySlip Whitelist',
+                BRANCH_INACTIVE: 'EasySlip Branch นี้ถูกปิดใช้งาน',
+                SERVICE_BANNED: 'บริการ EasySlip ของบัญชีนี้ถูกระงับ',
+                USER_BANNED: 'บัญชี EasySlip ถูกระงับการใช้งาน'
+            };
+            summary = blockedMessages[errorCode] || 'EasySlip ปฏิเสธการเชื่อมต่อ กรุณาตรวจสอบบัญชี Branch และ API Key';
+        } else if (state === 'unavailable') {
+            summary = 'ไม่สามารถเชื่อมต่อ EasySlip ได้ในขณะนี้ รายการใหม่จะถูกเก็บไว้ให้ทีมงานตรวจสอบ';
+        } else if (state === 'degraded') {
+            summary = Number(health?.quota?.remaining) === 0
+                ? 'โควตา EasySlip หมดแล้ว รายการใหม่จะไม่สามารถอนุมัติอัตโนมัติได้'
+                : 'EasySlip ตอบกลับได้บางส่วน กรุณาตรวจสอบรายละเอียดก่อนรับรายการจริง';
+        }
+
+        card.dataset.state = state;
+        badge.className = `easyslip-health-badge ${state}`;
+        this.setEasySlipHealthText('easyslip-health-badge-text', stateLabels[state] || stateLabels.unavailable);
+        this.setEasySlipHealthText('easyslip-health-summary', summary);
+
+        const reachable = health?.service?.reachable === true;
+        this.setEasySlipHealthText(
+            'easyslip-health-service',
+            state === 'disabled' ? 'Disabled' : (reachable ? 'Online' : 'Offline')
+        );
+        const latency = numericOrNull(health?.service?.latencyMs);
+        this.setEasySlipHealthText('easyslip-health-latency', latency === null ? '-' : `${numberFormat.format(latency)} ms`);
+
+        const quota = health?.quota || {};
+        const remaining = numericOrNull(quota.remaining);
+        const max = numericOrNull(quota.max);
+        const used = numericOrNull(quota.used);
+        this.setEasySlipHealthText(
+            'easyslip-health-quota',
+            remaining === null ? (max === null && state === 'healthy' ? 'ไม่จำกัด' : '-') : numberFormat.format(remaining)
+        );
+        this.setEasySlipHealthText(
+            'easyslip-health-quota-used',
+            used === null
+                ? 'ไม่มีข้อมูลการใช้งาน'
+                : `ใช้แล้ว ${numberFormat.format(used)}${max === null ? '' : ` / ${numberFormat.format(max)}`}`
+        );
+        const percentUsed = numericOrNull(quota.percentUsed);
+        quotaBar.style.width = percentUsed !== null
+            ? `${Math.max(0, Math.min(100, percentUsed))}%`
+            : '0%';
+
+        const accountCredit = numericOrNull(health?.account?.credit);
+        const credit = accountCredit !== null
+            ? `${numberFormat.format(accountCredit)} เครดิต`
+            : '-';
+        this.setEasySlipHealthText('easyslip-health-credit', credit);
+
+        const configured = health?.configured === true;
+        const keyValid = health?.credentials?.valid;
+        this.setEasySlipHealthText(
+            'easyslip-health-key',
+            !configured ? 'Not configured' : (keyValid === true ? 'Valid & authenticated' : keyValid === false ? 'Invalid' : 'ตรวจสอบไม่ได้')
+        );
+        const branch = health?.branch || {};
+        const branchState = branch.isActive === true ? 'Active' : branch.isActive === false ? 'Inactive' : 'Unknown';
+        this.setEasySlipHealthText(
+            'easyslip-health-branch',
+            branch.name ? `${branch.name} • ${branchState}` : branchState
+        );
+        this.setEasySlipHealthText('easyslip-health-package', health?.product?.name || '-');
+
+        const last = health?.lastVerification;
+        let lastText = 'ยังไม่มีรายการตรวจสอบ';
+        if (last) {
+            const date = last.approvedAt || last.createdAt;
+            const timeText = date ? new Date(date).toLocaleString('th-TH') : '-';
+            lastText = `${String(last.status || 'unknown').toUpperCase()} • ${timeText}`;
+        }
+        this.setEasySlipHealthText('easyslip-health-last', lastText);
+        this.setEasySlipHealthText(
+            'easyslip-health-checked',
+            health?.checkedAt ? `ตรวจล่าสุด ${new Date(health.checkedAt).toLocaleString('th-TH')}` : 'ยังไม่ได้ตรวจสอบ'
+        );
+        this.setEasySlipHealthText(
+            'easyslip-health-source',
+            health?.cached ? 'ข้อมูล cache ภายใน 30 วินาที' : 'เรียกข้อมูลจาก EasySlip โดยตรง'
+        );
+        App.renderIcons();
+    },
+
+    async loadEasySlipHealth(forceRefresh = false) {
+        if (this.easySlipHealthLoading) return;
+        const refreshButton = document.getElementById('easyslip-health-refresh');
+        const badge = document.getElementById('easyslip-health-badge');
+        const card = document.getElementById('easyslip-health-card');
+        if (!refreshButton || !badge || !card) return;
+
+        this.easySlipHealthLoading = true;
+        refreshButton.disabled = true;
+        refreshButton.classList.add('is-loading');
+        card.dataset.state = 'checking';
+        badge.className = 'easyslip-health-badge checking';
+        this.setEasySlipHealthText('easyslip-health-badge-text', 'กำลังตรวจสอบ');
+        this.setEasySlipHealthText('easyslip-health-summary', 'กำลังเชื่อมต่อ EasySlip เพื่อตรวจสอบบริการและโควตา');
+        App.renderIcons();
+
+        try {
+            const suffix = forceRefresh ? '?refresh=1' : '';
+            const res = await App.api(`/api/admin/easyslip-health${suffix}`, { cache: 'no-store' });
+            if (!res.ok) throw new Error(App.translateError(res.error));
+            this.renderEasySlipHealth(res.health);
+        } catch (error) {
+            this.renderEasySlipHealth({
+                state: 'unavailable',
+                configured: true,
+                checkedAt: new Date().toISOString(),
+                service: { reachable: false, latencyMs: null, error: { code: 'INTERNAL_REQUEST_FAILED' } },
+                credentials: { valid: null },
+                quota: {},
+                account: {},
+                branch: {},
+                product: {},
+                lastVerification: null
+            });
+            console.error('Failed to load EasySlip health', error);
+        } finally {
+            this.easySlipHealthLoading = false;
+            refreshButton.disabled = false;
+            refreshButton.classList.remove('is-loading');
+            App.renderIcons();
         }
     },
 

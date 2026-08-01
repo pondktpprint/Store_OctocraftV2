@@ -12,6 +12,7 @@ const {
   parseTransactionReference,
   parseManualTopupReason
 } = require("./manual-topup");
+const { checkEasySlipHealth } = require("./easyslip-health");
 
 const adminRouter = express.Router();
 
@@ -25,6 +26,38 @@ adminRouter.get("/system-status", asyncHandler(async (req, res) => {
     bridge_token: settings.BRIDGE_TOKEN,
     bridge_connected: getConnectedClientCount() > 0,
     nlogin_db_status: nloginDbStatus
+  });
+}));
+
+adminRouter.get("/easyslip-health", asyncHandler(async (req, res) => {
+  const settings = await getSettings();
+  const health = await checkEasySlipHealth(settings.EASYSLIP_API_KEY, {
+    force: req.query.refresh === "1"
+  });
+  const [rows] = await pool.execute(
+    `SELECT id, status, amount_minor, points, admin_note, created_at, approved_at
+     FROM topup_requests
+     WHERE source = 'slip'
+     ORDER BY id DESC
+     LIMIT 1`
+  );
+  const latest = rows[0] || null;
+
+  res.set("Cache-Control", "private, no-store");
+  res.json({
+    ok: true,
+    health: {
+      ...health,
+      lastVerification: latest ? {
+        id: String(latest.id),
+        status: latest.status,
+        amount: Number(latest.amount_minor) / 100,
+        points: Number(latest.points),
+        reason: latest.admin_note || null,
+        createdAt: latest.created_at,
+        approvedAt: latest.approved_at
+      } : null
+    }
   });
 }));
 

@@ -7,7 +7,7 @@
     <link rel="icon" href="images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/redesign.css">
+    <link rel="stylesheet" href="css/redesign.css?v=20260801-easyslip-health-1">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -544,6 +544,70 @@
                     </div>
                 </div>
 
+                <!-- EasySlip API Health -->
+                <section class="admin-card easyslip-health-card" id="easyslip-health-card" data-state="checking" aria-labelledby="easyslip-health-title">
+                    <div class="easyslip-health-glow" aria-hidden="true"></div>
+                    <header class="easyslip-health-header">
+                        <div class="easyslip-health-heading">
+                            <span class="easyslip-health-icon"><i data-lucide="activity"></i></span>
+                            <div>
+                                <span class="easyslip-health-kicker">PAYMENT PROVIDER</span>
+                                <h3 id="easyslip-health-title">EasySlip Health</h3>
+                            </div>
+                        </div>
+                        <div class="easyslip-health-header-actions">
+                            <span class="easyslip-health-badge checking" id="easyslip-health-badge">
+                                <span class="easyslip-health-dot"></span>
+                                <span id="easyslip-health-badge-text">กำลังตรวจสอบ</span>
+                            </span>
+                            <button type="button" class="easyslip-health-refresh" id="easyslip-health-refresh" onclick="Admin.loadEasySlipHealth(true)">
+                                <i data-lucide="refresh-cw"></i>
+                                ตรวจสอบตอนนี้
+                            </button>
+                        </div>
+                    </header>
+
+                    <p class="easyslip-health-summary" id="easyslip-health-summary" role="status" aria-live="polite">
+                        กำลังเชื่อมต่อ EasySlip เพื่อตรวจสอบบริการและโควตา
+                    </p>
+
+                    <div class="easyslip-health-metrics">
+                        <div class="easyslip-health-metric">
+                            <span class="easyslip-health-metric-icon"><i data-lucide="wifi"></i></span>
+                            <div><small>API Service</small><strong id="easyslip-health-service">Checking...</strong></div>
+                        </div>
+                        <div class="easyslip-health-metric">
+                            <span class="easyslip-health-metric-icon"><i data-lucide="gauge"></i></span>
+                            <div><small>Response Time</small><strong id="easyslip-health-latency">-</strong></div>
+                        </div>
+                        <div class="easyslip-health-metric quota">
+                            <span class="easyslip-health-metric-icon"><i data-lucide="tickets"></i></span>
+                            <div>
+                                <small>Quota Remaining</small>
+                                <strong id="easyslip-health-quota">-</strong>
+                                <div class="easyslip-quota-track" aria-hidden="true"><span id="easyslip-health-quota-bar"></span></div>
+                                <em id="easyslip-health-quota-used">รอข้อมูลโควตา</em>
+                            </div>
+                        </div>
+                        <div class="easyslip-health-metric">
+                            <span class="easyslip-health-metric-icon"><i data-lucide="wallet-cards"></i></span>
+                            <div><small>Account Credit</small><strong id="easyslip-health-credit">-</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="easyslip-health-details">
+                        <div><span><i data-lucide="key-round"></i> API Key</span><strong id="easyslip-health-key">-</strong></div>
+                        <div><span><i data-lucide="git-branch"></i> Branch</span><strong id="easyslip-health-branch">-</strong></div>
+                        <div><span><i data-lucide="package-check"></i> Package</span><strong id="easyslip-health-package">-</strong></div>
+                        <div><span><i data-lucide="receipt-text"></i> Last Verification</span><strong id="easyslip-health-last">-</strong></div>
+                    </div>
+
+                    <footer class="easyslip-health-footer">
+                        <span id="easyslip-health-checked">ยังไม่ได้ตรวจสอบ</span>
+                        <span id="easyslip-health-source">เรียกข้อมูลจาก EasySlip โดยตรง</span>
+                    </footer>
+                </section>
+
                 <!-- API Bridge Token -->
                 <div class="admin-card">
                         <h4 style="color:#f8fafc; margin:0 0 15px 0; font-size:1.1rem;"><i data-lucide="key-round"></i> API Bridge Token</h4>
@@ -1003,7 +1067,7 @@
     </div>
 
     <script src="js/app.js?v=20260731-live-topup-1"></script>
-    <script src="js/admin.js?v=20260731-manual-topup-2"></script>
+    <script src="js/admin.js?v=20260801-easyslip-health-1"></script>
     <script>
         // Auto-close sidebar on mobile when a tab is clicked
         document.querySelectorAll('.admin-tab-btn').forEach(btn => {
