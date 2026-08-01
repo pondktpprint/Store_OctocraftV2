@@ -11,6 +11,7 @@
     "verify:easyslip-health": "node backend/verify-easyslip-health.js",
     "verify:manual-topup": "node backend/verify-manual-topup.js",
     "verify:order-details": "node backend/verify-order-details.js",
+    "verify:premium-ux": "node backend/verify-premium-ux.js",
     "verify:p1": "node backend/verify-p1-validation.js",
     "verify:wallet": "node backend/verify-wallet-safety.js"
   },

@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/redesign.css">
+    <link rel="stylesheet" href="css/redesign.css?v=20260801-premium-ux-1">
 </head>
 <body class="shop-page">
     <div class="bubbles" id="bubbles-container"></div>
@@ -265,7 +265,12 @@
             <!-- Items Grid (Right) -->
             <div class="shop-main-content">
                 <div class="items-grid" id="items-grid">
-                    <div style="text-align: center; width: 100%; color: white; padding: 40px;">กำลังโหลดสินค้า...</div>
+                    <div class="octo-skeleton-card" aria-hidden="true"><span class="octo-skeleton octo-skeleton-image"></span><span class="octo-skeleton octo-skeleton-label"></span><span class="octo-skeleton octo-skeleton-title"></span><span class="octo-skeleton octo-skeleton-price"></span><span class="octo-skeleton octo-skeleton-button"></span></div>
+                    <div class="octo-skeleton-card" aria-hidden="true"><span class="octo-skeleton octo-skeleton-image"></span><span class="octo-skeleton octo-skeleton-label"></span><span class="octo-skeleton octo-skeleton-title"></span><span class="octo-skeleton octo-skeleton-price"></span><span class="octo-skeleton octo-skeleton-button"></span></div>
+                    <div class="octo-skeleton-card" aria-hidden="true"><span class="octo-skeleton octo-skeleton-image"></span><span class="octo-skeleton octo-skeleton-label"></span><span class="octo-skeleton octo-skeleton-title"></span><span class="octo-skeleton octo-skeleton-price"></span><span class="octo-skeleton octo-skeleton-button"></span></div>
+                    <div class="octo-skeleton-card" aria-hidden="true"><span class="octo-skeleton octo-skeleton-image"></span><span class="octo-skeleton octo-skeleton-label"></span><span class="octo-skeleton octo-skeleton-title"></span><span class="octo-skeleton octo-skeleton-price"></span><span class="octo-skeleton octo-skeleton-button"></span></div>
+                    <div class="octo-skeleton-card" aria-hidden="true"><span class="octo-skeleton octo-skeleton-image"></span><span class="octo-skeleton octo-skeleton-label"></span><span class="octo-skeleton octo-skeleton-title"></span><span class="octo-skeleton octo-skeleton-price"></span><span class="octo-skeleton octo-skeleton-button"></span></div>
+                    <div class="octo-skeleton-card" aria-hidden="true"><span class="octo-skeleton octo-skeleton-image"></span><span class="octo-skeleton octo-skeleton-label"></span><span class="octo-skeleton octo-skeleton-title"></span><span class="octo-skeleton octo-skeleton-price"></span><span class="octo-skeleton octo-skeleton-button"></span></div>
                 </div>
             </div>
         </div>
@@ -307,7 +312,7 @@
         </div>
         <div class="footer-bottom"><span>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</span><span>&copy; 2026 Octocraft. All Rights Reserved.</span></div>
     </footer>
-    <script src="js/app.js?v=20260731-live-topup-1"></script>
+    <script src="js/app.js?v=20260801-premium-ux-1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             if (!App.state.token) {
@@ -325,10 +330,12 @@
                     renderProducts(shopItems);
                     updateCategoryCounts();
                 } else {
-                    document.getElementById('items-grid').innerHTML = '<div style="color:red; text-align:center;">ไม่สามารถโหลดสินค้าได้</div>';
+                    document.getElementById('items-grid').innerHTML = App.emptyState({ icon: 'cloud-off', title: 'โหลดสินค้าไม่สำเร็จ', message: 'กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง', action: '<button class="details-btn" onclick="window.location.reload()"><i data-lucide="refresh-cw"></i> ลองอีกครั้ง</button>' });
+                    App.renderIcons();
                 }
             } catch (err) {
-                document.getElementById('items-grid').innerHTML = '<div style="color:red; text-align:center;">ไม่สามารถโหลดสินค้าได้</div>';
+                document.getElementById('items-grid').innerHTML = App.emptyState({ icon: 'cloud-off', title: 'โหลดสินค้าไม่สำเร็จ', message: 'กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง', action: '<button class="details-btn" onclick="window.location.reload()"><i data-lucide="refresh-cw"></i> ลองอีกครั้ง</button>' });
+                App.renderIcons();
             }
 
             function updateCategoryCounts() {
@@ -356,7 +363,8 @@
                 grid.innerHTML = '';
                 
                 if (products.length === 0) {
-                    grid.innerHTML = '<div style="text-align: center; width: 100%; color: var(--text-muted); padding: 40px; font-size: 1.1rem;">ไม่มีสินค้าในหมวดหมู่นี้</div>';
+                    grid.innerHTML = App.emptyState({ icon: 'package-search', title: 'ยังไม่มีสินค้าในหมวดนี้', message: 'ลองเลือกหมวดอื่น หรือกลับมาตรวจสอบสินค้าใหม่ภายหลัง' });
+                    App.renderIcons();
                     return;
                 }
 
@@ -365,11 +373,11 @@
                     card.classList.add('item-card');
                     card.innerHTML = `
                         <div class="item-img-container">
-                            <img src="${getItemIcon(item)}" alt="${item.name}" class="item-image">
+                            <img src="${App.escapeHTML(getItemIcon(item))}" alt="${App.escapeHTML(item.name)}" class="item-image">
                         </div>
                         <div class="item-info-shop">
-                            <span class="badge" style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.08); display: inline-block; margin-bottom: 8px;">${item.category || 'Rank'}</span>
-                            <h3 class="item-name" style="margin-top:0;">${item.name}</h3>
+                            <span class="badge" style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.08); display: inline-block; margin-bottom: 8px;">${App.escapeHTML(item.category || 'Rank')}</span>
+                            <h3 class="item-name" style="margin-top:0;">${App.escapeHTML(item.name)}</h3>
                     <div class="item-price"><i data-lucide="coins"></i> ${item.price_points.toLocaleString()} Points</div>
                         </div>
                         <div class="item-actions" style="margin-top:15px; display:flex; flex-direction:column; gap:12px;">
@@ -419,7 +427,7 @@
             window.addToCartLocal = (event, id) => {
                 const item = shopItems.find(i => i.id === id);
                 const qty = document.getElementById(`qty-${id}`).value;
-                App.addToCart(item, qty);
+                App.addToCart(item, qty, event.currentTarget);
                 
                 const btn = event.currentTarget;
                 const orig = btn.innerHTML;
@@ -435,20 +443,27 @@
                 body.innerHTML = `
                     <div class="details-header" style="text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px; margin-bottom:20px;">
                         <div class="details-img-bg" style="width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
-                            <img src="${getItemIcon(item)}" alt="${item.name}" class="details-image" style="width:50px; height:50px; object-fit:contain;">
+                            <img src="${App.escapeHTML(getItemIcon(item))}" alt="${App.escapeHTML(item.name)}" class="details-image" style="width:50px; height:50px; object-fit:contain;">
                         </div>
-                        <span class="badge" style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); display: inline-block; margin-bottom: 10px;">${item.category || 'Rank'}</span>
-                        <h2 class="details-title" style="margin:0; font-size:1.6rem; color:white;">${item.name}</h2>
+                        <span class="badge" style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1); display: inline-block; margin-bottom: 10px;">${App.escapeHTML(item.category || 'Rank')}</span>
+                        <h2 class="details-title" style="margin:0; font-size:1.6rem; color:white;">${App.escapeHTML(item.name)}</h2>
                 <div class="details-price" style="font-size: 1.3rem; font-weight: bold; color: #f59e0b; margin-top: 5px;"><i data-lucide="coins"></i> ${item.price_points.toLocaleString()} Points</div>
                     </div>
                     <div class="details-desc" style="color:var(--text-muted); line-height:1.6; margin-bottom:25px;">
-                        <p>${item.description || 'ไม่มีคำอธิบายเพิ่มเติมสำหรับสินค้านี้'}</p>
-                        <p style="font-size:0.85rem;"><small>SKU: ${item.sku}</small></p>
+                        <p>${App.escapeHTML(item.description || 'ไม่มีคำอธิบายเพิ่มเติมสำหรับสินค้านี้')}</p>
+                        <p style="font-size:0.85rem;"><small>SKU: ${App.escapeHTML(item.sku)}</small></p>
                     </div>
-            <button class="checkout-btn" onclick="App.addToCart({id: ${item.id}, name: '${item.name}', price_points: ${item.price_points}}, 1); document.getElementById('details-modal').classList.remove('active');" style="width:100%; padding:15px; border-radius:8px; border:none; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:8px;"><i data-lucide="shopping-cart"></i> เพิ่มลงตะกร้า 1 ชิ้น</button>
+            <button class="checkout-btn" onclick="addDetailsToCart(${item.id}, this)" style="width:100%; padding:15px; border-radius:8px; border:none; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:8px;"><i data-lucide="shopping-cart"></i> เพิ่มลงตะกร้า 1 ชิ้น</button>
                 `;
                 document.getElementById('details-modal').classList.add('active');
                 App.renderIcons();
+            };
+
+            window.addDetailsToCart = (id, button) => {
+                const item = shopItems.find(product => product.id === id);
+                if (!item) return;
+                App.addToCart(item, 1, button);
+                document.getElementById('details-modal').classList.remove('active');
             };
         });
     </script>

@@ -7,7 +7,7 @@
     <link rel="icon" href="images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/redesign.css">
+    <link rel="stylesheet" href="css/redesign.css?v=20260801-premium-ux-1">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="shop-page">
@@ -44,14 +44,16 @@
             <h2 style="margin:0;"><i data-lucide="wallet"></i> กระเป๋าเงิน (Wallet)</h2>
                 <div style="text-align: right;">
                     <div style="font-size: 0.9rem; color: var(--text-muted);">ยอดคงเหลือ</div>
-                    <div style="font-size: 2rem; font-weight: bold; color: #f59e0b;" id="wallet-balance">... Points</div>
+                    <div class="wallet-balance-wrap" style="font-size: 2rem; font-weight: bold; color: #f59e0b;"><i data-lucide="coins"></i> <span id="wallet-balance">...</span> Points</div>
                 </div>
             </div>
             
             <h3>ประวัติการทำรายการ</h3>
             <div class="history-list-container" style="max-height: 500px; overflow-y: auto;">
                 <ul id="tx-list" style="list-style: none; padding: 0;">
-                    <li style="text-align:center; color: var(--text-muted); padding: 20px;">กำลังโหลด...</li>
+                    <li class="octo-skeleton-row" aria-hidden="true"><span class="octo-skeleton octo-skeleton-icon"></span><span><i class="octo-skeleton"></i><i class="octo-skeleton"></i></span><span class="octo-skeleton octo-skeleton-value"></span></li>
+                    <li class="octo-skeleton-row" aria-hidden="true"><span class="octo-skeleton octo-skeleton-icon"></span><span><i class="octo-skeleton"></i><i class="octo-skeleton"></i></span><span class="octo-skeleton octo-skeleton-value"></span></li>
+                    <li class="octo-skeleton-row" aria-hidden="true"><span class="octo-skeleton octo-skeleton-icon"></span><span><i class="octo-skeleton"></i><i class="octo-skeleton"></i></span><span class="octo-skeleton octo-skeleton-value"></span></li>
                 </ul>
             </div>
         </div>
@@ -61,7 +63,7 @@
         <p>เราไม่มีส่วนเกี่ยวข้องกับ Mojang AB.</p>
         <p>&copy; 2026 Octocraft. All Right Reserved.</p>
     </footer>
-    <script src="js/app.js?v=20260731-live-topup-1"></script>
+    <script src="js/app.js?v=20260801-premium-ux-1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             if (!App.state.token) {
@@ -74,12 +76,15 @@
                 const list = document.getElementById('tx-list');
                 
                 if (res.ok) {
-                document.getElementById('wallet-balance').innerHTML = `<i data-lucide="coins"></i> ${res.wallet.balance_points.toLocaleString()} Points`;
-                App.renderIcons();
+                const balance = Number(res.wallet.balance_points) || 0;
+                App.animatePointValue(document.getElementById('wallet-balance'), App.state.lastPointBalance, balance);
+                App.state.lastPointBalance = balance;
+                localStorage.setItem('octo_last_points', String(balance));
                     
                     list.innerHTML = '';
                     if (res.transactions.length === 0) {
-                        list.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">ไม่มีประวัติการทำรายการ</li>';
+                        list.innerHTML = `<li>${App.emptyState({ icon: 'wallet-cards', title: 'ยังไม่มีรายการพอยท์', message: 'ประวัติเติมเงินและการซื้อสินค้าจะแสดงที่นี่' })}</li>`;
+                        App.renderIcons();
                     } else {
                         res.transactions.forEach(tx => {
                             const li = document.createElement('li');

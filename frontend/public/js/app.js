@@ -2,16 +2,25 @@ const App = {
     state: {
         token: localStorage.getItem('octo_token'),
         user: JSON.parse(localStorage.getItem('octo_user') || 'null'),
-        cart: JSON.parse(localStorage.getItem('octo_cart') || '[]')
+        cart: JSON.parse(localStorage.getItem('octo_cart') || '[]'),
+        lastPointBalance: localStorage.getItem('octo_last_points') === null
+            ? null
+            : Number(localStorage.getItem('octo_last_points'))
     },
 
     init() {
         this.bindEvents();
         this.renderSession();
+        this.ensureNavbarServerStatus();
+        this.ensureMobileStickyCart();
         this.updateCartUI();
         if (this.state.token) {
             if (!this.state.user) this.fetchProfile();
             this.updateNavPoints();
+        }
+        if (document.getElementById('nav-player-count')) {
+            this.updateNavbarServerStatus();
+            window.setInterval(() => this.updateNavbarServerStatus(), 45000);
         }
         this.renderIcons();
     },
@@ -30,6 +39,35 @@ const App = {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+    },
+
+    loadingSkeleton(type = 'list', count = 3) {
+        const safeCount = Math.max(1, Math.min(8, Number(count) || 3));
+        if (type === 'products') {
+            return Array.from({ length: safeCount }, () => `
+                <div class="octo-skeleton-card" aria-hidden="true">
+                    <span class="octo-skeleton octo-skeleton-image"></span>
+                    <span class="octo-skeleton octo-skeleton-label"></span>
+                    <span class="octo-skeleton octo-skeleton-title"></span>
+                    <span class="octo-skeleton octo-skeleton-price"></span>
+                    <span class="octo-skeleton octo-skeleton-button"></span>
+                </div>`).join('');
+        }
+        return Array.from({ length: safeCount }, () => `
+            <li class="octo-skeleton-row" aria-hidden="true">
+                <span class="octo-skeleton octo-skeleton-icon"></span>
+                <span><i class="octo-skeleton"></i><i class="octo-skeleton"></i></span>
+                <span class="octo-skeleton octo-skeleton-value"></span>
+            </li>`).join('');
+    },
+
+    emptyState({ icon = 'package-open', title = 'ยังไม่มีข้อมูล', message = 'รายการใหม่จะแสดงที่นี่', action = '' } = {}) {
+        return `<div class="octo-empty-state">
+            <span class="octo-empty-icon"><i data-lucide="${this.escapeHTML(icon)}"></i></span>
+            <strong>${this.escapeHTML(title)}</strong>
+            <p>${this.escapeHTML(message)}</p>
+            ${action}
+        </div>`;
     },
 
     translateError(errCode) {
@@ -99,7 +137,7 @@ const App = {
             }
 
             // Cart toggle
-            if (e.target.closest('#cart-open-btn')) {
+            if (e.target.closest('#cart-open-btn') || e.target.closest('#mobile-cart-open-btn')) {
                 document.getElementById('cart-sidebar')?.classList.add('active');
                 document.getElementById('cart-overlay')?.classList.add('active');
             }
@@ -118,6 +156,11 @@ const App = {
             // Checkout
             if (e.target.closest('.checkout-btn')) {
                 this.checkout();
+            }
+
+            if (e.target.closest('.octo-toast-close')) {
+                e.target.closest('.octo-toast')?.classList.add('is-leaving');
+                window.setTimeout(() => e.target.closest('.octo-toast')?.remove(), 220);
             }
         });
 
@@ -149,9 +192,73 @@ const App = {
         try {
             const res = await this.api('/api/wallet');
             if (res.ok && document.getElementById('dropdown-points')) {
-                document.getElementById('dropdown-points').innerText = res.wallet.balance_points.toLocaleString();
+                const nextBalance = Number(res.wallet.balance_points) || 0;
+                const previousBalance = this.state.lastPointBalance;
+                this.animatePointValue(document.getElementById('dropdown-points'), previousBalance, nextBalance);
+                if (previousBalance !== null && nextBalance > previousBalance) {
+                    this.showToast(`ได้รับ +${(nextBalance - previousBalance).toLocaleString('th-TH')} Points`, 'success', 'พอยท์เข้าแล้ว');
+                }
+                this.state.lastPointBalance = nextBalance;
+                localStorage.setItem('octo_last_points', String(nextBalance));
             }
         } catch(e) {}
+    },
+
+    animatePointValue(element, from, to) {
+        if (!element) return;
+        const start = Number.isFinite(Number(from)) ? Number(from) : Number(to);
+        const target = Number(to) || 0;
+        if (start === target || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            element.textContent = target.toLocaleString('th-TH');
+            return;
+        }
+        const startedAt = performance.now();
+        const duration = 650;
+        element.closest('.dropdown-item, .wallet-balance-wrap')?.classList.add('point-balance-up');
+        const tick = now => {
+            const progress = Math.min(1, (now - startedAt) / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            element.textContent = Math.round(start + ((target - start) * eased)).toLocaleString('th-TH');
+            if (progress < 1) requestAnimationFrame(tick);
+            else window.setTimeout(() => element.closest('.dropdown-item, .wallet-balance-wrap')?.classList.remove('point-balance-up'), 450);
+        };
+        requestAnimationFrame(tick);
+    },
+
+    ensureNavbarServerStatus() {
+        if (document.getElementById('nav-player-status')) return;
+        const nav = document.querySelector('.landing-nav, .shop-nav');
+        if (!nav) return;
+        const badge = document.createElement('div');
+        badge.id = 'nav-player-status';
+        badge.className = 'nav-live-status is-loading';
+        badge.title = 'กำลังตรวจสอบผู้เล่นออนไลน์';
+        badge.innerHTML = '<span class="nav-live-dot"></span><span class="nav-live-copy"><strong id="nav-player-count">--</strong><small>ONLINE</small></span>';
+        const actions = nav.querySelector('.shop-nav-actions');
+        const profile = nav.querySelector('.user-profile-menu');
+        if (actions) actions.insertBefore(badge, actions.firstChild);
+        else if (profile) nav.insertBefore(badge, profile);
+        this.renderIcons();
+    },
+
+    async updateNavbarServerStatus() {
+        const badge = document.getElementById('nav-player-status');
+        const count = document.getElementById('nav-player-count');
+        if (!badge || !count) return;
+        try {
+            const res = await fetch('/api/public/server-status', { cache: 'no-store' });
+            const data = await res.json();
+            const online = data.ok && data.online;
+            badge.className = `nav-live-status ${online ? 'is-online' : 'is-offline'}`;
+            count.textContent = online ? Number(data.players?.online || 0).toLocaleString('th-TH') : 'OFF';
+            badge.title = online
+                ? `${Number(data.players?.online || 0).toLocaleString('th-TH')} / ${Number(data.players?.max || 0).toLocaleString('th-TH')} ผู้เล่นออนไลน์`
+                : 'เซิร์ฟเวอร์ออฟไลน์';
+        } catch (_) {
+            badge.className = 'nav-live-status is-offline';
+            count.textContent = 'OFF';
+            badge.title = 'ไม่สามารถตรวจสอบสถานะเซิร์ฟเวอร์';
+        }
     },
 
     async api(path, options = {}) {
@@ -204,13 +311,14 @@ const App = {
         localStorage.removeItem('octo_user');
         localStorage.removeItem('octo_cart');
         localStorage.removeItem('octo_pending_topup_status');
+        localStorage.removeItem('octo_last_points');
         this.state.token = null;
         this.state.user = null;
         this.state.cart = [];
         window.location.href = 'index.html?login=true';
     },
 
-    addToCart(product, qty) {
+    addToCart(product, qty, sourceElement = null) {
         qty = parseInt(qty);
         if (isNaN(qty) || qty < 1) return;
         
@@ -222,14 +330,54 @@ const App = {
                 product_id: product.id,
                 name: product.name,
                 price: product.price_points,
-                image: 'https://cdn-icons-png.flaticon.com/512/2838/2838575.png',
+                image: product.image || 'https://cdn-icons-png.flaticon.com/512/2838/2838575.png',
                 quantity: qty
             });
         }
         
         localStorage.setItem('octo_cart', JSON.stringify(this.state.cart));
         this.updateCartUI();
-        this.showToast('เพิ่มลงตะกร้าแล้ว!');
+        this.animateCartAdd(sourceElement);
+        this.showToast(`${product.name} × ${qty}`, 'success', 'เพิ่มลงตะกร้าแล้ว');
+    },
+
+    animateCartAdd(sourceElement) {
+        const targets = [document.getElementById('cart-open-btn'), document.getElementById('mobile-cart-open-btn')].filter(Boolean);
+        targets.forEach(target => {
+            target.classList.remove('cart-received');
+            void target.offsetWidth;
+            target.classList.add('cart-received');
+        });
+        const badge = document.getElementById('cart-badge');
+        if (badge) {
+            badge.classList.remove('bounce');
+            void badge.offsetWidth;
+            badge.classList.add('bounce');
+        }
+        if (!sourceElement || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const target = document.getElementById('cart-open-btn') || document.getElementById('mobile-cart-open-btn');
+        if (!target) return;
+        const from = sourceElement.getBoundingClientRect();
+        const to = target.getBoundingClientRect();
+        const particle = document.createElement('span');
+        particle.className = 'cart-fly-particle';
+        particle.style.setProperty('--fly-x', `${to.left - from.left}px`);
+        particle.style.setProperty('--fly-y', `${to.top - from.top}px`);
+        particle.style.left = `${from.left + (from.width / 2)}px`;
+        particle.style.top = `${from.top + (from.height / 2)}px`;
+        document.body.appendChild(particle);
+        window.setTimeout(() => particle.remove(), 720);
+    },
+
+    ensureMobileStickyCart() {
+        if (!document.getElementById('cart-sidebar') || document.getElementById('mobile-cart-open-btn')) return;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.id = 'mobile-cart-open-btn';
+        button.className = 'mobile-sticky-cart';
+        button.innerHTML = '<span class="mobile-cart-icon"><i data-lucide="shopping-bag"></i><b id="mobile-cart-count">0</b></span><span><small>ตะกร้าของคุณ</small><strong id="mobile-cart-total">0 Points</strong></span><i data-lucide="chevron-up"></i>';
+        document.body.appendChild(button);
+        this.renderIcons();
     },
 
     removeFromCart(productId) {
@@ -249,10 +397,12 @@ const App = {
         let totalPrice = 0;
         
         if (this.state.cart.length === 0) {
-            container.innerHTML = '<div class="empty-cart-msg">ยังไม่มีสินค้าในตะกร้า</div>';
+            container.innerHTML = this.emptyState({ icon: 'shopping-basket', title: 'ตะกร้ายังว่างอยู่', message: 'เลือกสินค้าที่ชอบ แล้วกลับมาชำระเงินที่นี่' });
             badge.innerText = '0';
             badge.style.display = 'none';
             totalEl.innerText = '0 Points';
+            this.updateMobileCartSummary(0, 0);
+            this.renderIcons();
             return;
         }
         
@@ -277,12 +427,22 @@ const App = {
         
         badge.innerText = totalQty;
         totalEl.innerText = totalPrice.toLocaleString() + ' Points';
+        this.updateMobileCartSummary(totalQty, totalPrice);
         this.renderIcons();
+    },
+
+    updateMobileCartSummary(quantity, total) {
+        const count = document.getElementById('mobile-cart-count');
+        const totalElement = document.getElementById('mobile-cart-total');
+        const button = document.getElementById('mobile-cart-open-btn');
+        if (count) count.textContent = Number(quantity || 0).toLocaleString('th-TH');
+        if (totalElement) totalElement.textContent = `${Number(total || 0).toLocaleString('th-TH')} Points`;
+        if (button) button.dataset.empty = quantity > 0 ? 'false' : 'true';
     },
 
     async checkout() {
         if (this.state.cart.length === 0) {
-            this.showToast('ไม่มีสินค้าในตะกร้า');
+            this.showToast('เลือกสินค้าอย่างน้อย 1 รายการก่อนชำระเงิน', 'warning', 'ตะกร้ายังว่างอยู่');
             return;
         }
                 if (!App.state.user) {
@@ -348,7 +508,7 @@ const App = {
                     <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i data-lucide="wallet" style="color:#00d2ff;"></i> ประวัติการเติมเงิน</h3>
                     <div style="max-height: 300px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
                         <ul id="topup-popup-tx-list" style="list-style: none; padding: 0; margin: 0;">
-                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">กำลังโหลด...</li>
+                            ${this.loadingSkeleton('list', 3)}
                         </ul>
                     </div>
                 </div>
@@ -372,7 +532,8 @@ const App = {
                 listEl.innerHTML = '';
                 const topups = res.transactions.filter(tx => tx.type === 'credit');
                 if (topups.length === 0) {
-                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการเติมเงิน</li>';
+                    listEl.innerHTML = `<li>${this.emptyState({ icon: 'wallet-cards', title: 'ยังไม่มีประวัติเติมเงิน', message: 'เมื่อเติมเงินสำเร็จ รายการจะแสดงที่นี่' })}</li>`;
+                    this.renderIcons();
                 } else {
                     topups.forEach(tx => {
                         const li = document.createElement('li');
@@ -418,7 +579,7 @@ const App = {
                     <h3 style="margin:0 0 15px 0; font-size:1.35rem; color:#ffffff; display:flex; align-items:center; gap:8px;"><i data-lucide="history" style="color:#00d2ff;"></i> ประวัติการสั่งซื้อ</h3>
                     <div style="max-height: 300px; overflow-y: auto; padding-right:5px; margin-bottom:15px;">
                         <ul id="purchase-popup-list" style="list-style: none; padding: 0; margin: 0;">
-                            <li style="text-align:center; color: var(--text-muted); padding: 15px; font-size:0.9rem;">กำลังโหลด...</li>
+                            ${this.loadingSkeleton('list', 3)}
                         </ul>
                     </div>
                 </div>
@@ -441,7 +602,8 @@ const App = {
             if (res.ok) {
                 listEl.innerHTML = '';
                 if (res.orders.length === 0) {
-                    listEl.innerHTML = '<li style="text-align:center; padding: 15px; color: var(--text-muted); font-size:0.9rem;">ไม่มีประวัติการสั่งซื้อ</li>';
+                    listEl.innerHTML = `<li>${this.emptyState({ icon: 'package-open', title: 'ยังไม่มีคำสั่งซื้อ', message: 'สินค้าที่คุณซื้อจะแสดงสถานะจัดส่งที่นี่' })}</li>`;
+                    this.renderIcons();
                 } else {
                     res.orders.forEach(order => {
                         const li = document.createElement('li');
@@ -480,7 +642,7 @@ const App = {
         }
     },
 
-    showToast(message) {
+    showToast(message, type = 'success', title = '') {
         let container = document.getElementById('toast-container');
         if (!container) {
             container = document.createElement('div');
@@ -489,11 +651,17 @@ const App = {
             document.body.appendChild(container);
         }
         const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i data-lucide="circle-check"></i> <span>${this.escapeHTML(message)}</span>`;
+        const allowedType = ['success', 'warning', 'error', 'info'].includes(type) ? type : 'success';
+        const icons = { success: 'circle-check', warning: 'triangle-alert', error: 'circle-x', info: 'info' };
+        const titles = { success: 'สำเร็จ', warning: 'แจ้งเตือน', error: 'ไม่สำเร็จ', info: 'ข้อมูล' };
+        toast.className = `octo-toast ${allowedType}`;
+        toast.innerHTML = `<span class="octo-toast-icon"><i data-lucide="${icons[allowedType]}"></i></span><span class="octo-toast-copy"><strong>${this.escapeHTML(title || titles[allowedType])}</strong><small>${this.escapeHTML(message)}</small></span><button type="button" class="octo-toast-close" aria-label="ปิดการแจ้งเตือน"><i data-lucide="x"></i></button><i class="octo-toast-progress"></i>`;
         container.appendChild(toast);
         this.renderIcons();
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => {
+            toast.classList.add('is-leaving');
+            setTimeout(() => toast.remove(), 220);
+        }, 3600);
     }
 };
 
