@@ -14,6 +14,8 @@ const {
 } = require("./manual-topup");
 const { checkEasySlipHealth } = require("./easyslip-health");
 const { loadAdminOrders } = require("./order-details");
+const { loadDashboard } = require("./dashboard");
+const { pingMinecraftServer } = require("../rcon/ping");
 
 const adminRouter = express.Router();
 
@@ -28,6 +30,20 @@ adminRouter.get("/system-status", asyncHandler(async (req, res) => {
     bridge_connected: getConnectedClientCount() > 0,
     nlogin_db_status: nloginDbStatus
   });
+}));
+
+adminRouter.get("/dashboard", asyncHandler(async (req, res) => {
+  const settings = await getSettings();
+  const dashboard = await loadDashboard({
+    pool,
+    settings,
+    bridgeConnected: getConnectedClientCount() > 0,
+    pingMinecraftServer,
+    checkEasySlipHealth,
+    forceEasySlip: req.query.refresh === "1"
+  });
+  res.set("Cache-Control", "private, no-store");
+  res.json({ ok: true, dashboard });
 }));
 
 adminRouter.get("/easyslip-health", asyncHandler(async (req, res) => {

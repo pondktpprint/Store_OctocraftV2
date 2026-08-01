@@ -5,6 +5,7 @@
   "main": "backend/index.js",
   "scripts": {
     "start": "node backend/index.js",
+    "verify:dashboard": "node backend/verify-dashboard.js",
     "verify:delivery": "node backend/verify-delivery-reliability.js",
     "verify:easyslip-auth": "node backend/verify-easyslip-auth.js",
     "verify:easyslip-health": "node backend/verify-easyslip-health.js",

@@ -480,7 +480,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="css/admin-theme.css?v=20260801-order-details-1">
+    <link rel="stylesheet" href="css/admin-theme.css?v=20260801-order-details-1-dashboard-2">
 </head>
 <body class="admin-page">
     <!-- MOBILE HEADER -->
@@ -496,8 +496,9 @@
         <aside class="admin-sidebar">
             <h2>Octo Admin</h2>
             <div class="admin-nav">
+            <button class="admin-tab-btn active" data-tab="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</button>
             <button class="admin-tab-btn" data-tab="status"><i data-lucide="server"></i> System Settings</button>
-            <button class="admin-tab-btn active" data-tab="products"><i data-lucide="package"></i> Products</button>
+            <button class="admin-tab-btn" data-tab="products"><i data-lucide="package"></i> Products</button>
             <button class="admin-tab-btn" data-tab="players"><i data-lucide="users"></i> Players</button>
             <button class="admin-tab-btn" data-tab="orders"><i data-lucide="shopping-cart"></i> Orders</button>
             <button class="admin-tab-btn" data-tab="delivery"><i data-lucide="truck"></i> Delivery Jobs</button>
@@ -514,6 +515,113 @@
 
         <!-- MAIN CONTENT -->
         <main class="admin-content">
+
+            <!-- DASHBOARD OVERVIEW -->
+            <div id="dashboard" class="admin-panel active">
+                <div class="dashboard-heading-row">
+                    <div>
+                        <span class="dashboard-kicker">STORE COMMAND CENTER</span>
+                        <h2>Dashboard Overview</h2>
+                        <p>ภาพรวมรายได้ การเติมเงิน คำสั่งซื้อ และสถานะระบบแบบเรียลไทม์</p>
+                    </div>
+                    <div class="dashboard-heading-actions">
+                        <span id="dashboard-updated-at"><i data-lucide="clock-3"></i> กำลังโหลดข้อมูล</span>
+                        <button type="button" id="dashboard-refresh" class="action-btn btn-retry" onclick="Admin.loadDashboard(true)"><i data-lucide="refresh-cw"></i> Refresh Dashboard</button>
+                    </div>
+                </div>
+
+                <section class="dashboard-alert-panel" aria-labelledby="dashboard-alert-title">
+                    <header>
+                        <div>
+                            <span class="dashboard-section-icon"><i data-lucide="bell-ring"></i></span>
+                            <div><small>SMART ALERTS</small><h3 id="dashboard-alert-title">รายการที่ต้องดูแล</h3></div>
+                        </div>
+                        <span id="dashboard-alert-count" class="dashboard-count-badge">กำลังตรวจสอบ</span>
+                    </header>
+                    <div id="dashboard-alerts" class="dashboard-alert-list" role="status" aria-live="polite">
+                        <div class="dashboard-alert loading"><i data-lucide="loader-circle"></i><div><strong>กำลังประมวลผลสถานะระบบ</strong><span>กรุณารอสักครู่</span></div></div>
+                    </div>
+                </section>
+
+                <div class="dashboard-metrics-grid">
+                    <article class="dashboard-metric-card revenue">
+                        <span class="dashboard-metric-icon"><i data-lucide="banknote"></i></span>
+                        <div><small>รายได้วันนี้</small><strong id="dashboard-revenue-today">฿0.00</strong><span id="dashboard-topup-approved-caption">0 รายการสำเร็จวันนี้</span></div>
+                    </article>
+                    <article class="dashboard-metric-card month">
+                        <span class="dashboard-metric-icon"><i data-lucide="calendar-range"></i></span>
+                        <div><small>รายได้เดือนนี้</small><strong id="dashboard-revenue-month">฿0.00</strong><span>ยอดเติมเงินที่อนุมัติแล้ว</span></div>
+                    </article>
+                    <article class="dashboard-metric-card orders">
+                        <span class="dashboard-metric-icon"><i data-lucide="shopping-bag"></i></span>
+                        <div><small>Orders เดือนนี้</small><strong id="dashboard-orders-month">0</strong><span id="dashboard-orders-caption">วันนี้ 0 รายการ</span></div>
+                    </article>
+                    <article class="dashboard-metric-card players" id="dashboard-player-card">
+                        <span class="dashboard-metric-icon"><i data-lucide="users-round"></i></span>
+                        <div><small>ผู้เล่นออนไลน์</small><strong><span id="dashboard-players-online">0</span><em> / <span id="dashboard-players-max">0</span></em></strong><span id="dashboard-server-caption">กำลังตรวจสอบเซิร์ฟเวอร์</span></div>
+                    </article>
+                </div>
+
+                <div class="dashboard-status-grid">
+                    <section class="dashboard-panel-card">
+                        <header class="dashboard-card-header">
+                            <div><span class="dashboard-section-icon"><i data-lucide="receipt"></i></span><div><small>PAYMENTS</small><h3>สถานะเติมเงิน</h3></div></div>
+                            <span>วันนี้ / รายการค้างปัจจุบัน</span>
+                        </header>
+                        <div class="dashboard-triple-status">
+                            <div class="success"><span><i data-lucide="circle-check-big"></i> สำเร็จวันนี้</span><strong id="dashboard-topup-approved">0</strong><small>รายการ</small></div>
+                            <div class="warning"><span><i data-lucide="clock"></i> รอตรวจสอบ</span><strong id="dashboard-topup-pending">0</strong><small id="dashboard-topup-pending-amount">฿0.00</small></div>
+                            <div class="failed"><span><i data-lucide="circle-x"></i> ไม่สำเร็จวันนี้</span><strong id="dashboard-topup-rejected">0</strong><small>รายการ</small></div>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-panel-card">
+                        <header class="dashboard-card-header">
+                            <div><span class="dashboard-section-icon"><i data-lucide="truck"></i></span><div><small>DELIVERY</small><h3>การส่งสินค้า</h3></div></div>
+                            <span id="dashboard-delivery-rate">Success 100%</span>
+                        </header>
+                        <div class="dashboard-delivery-content">
+                            <div class="dashboard-donut" id="dashboard-delivery-donut"><span><strong id="dashboard-delivery-rate-number">100%</strong><small>SUCCESS</small></span></div>
+                            <div class="dashboard-delivery-stats">
+                                <div class="success"><span>สำเร็จวันนี้</span><strong id="dashboard-delivery-success">0</strong></div>
+                                <div class="failed"><span>ล้มเหลววันนี้</span><strong id="dashboard-delivery-failed">0</strong></div>
+                                <div class="warning"><span>กำลังรอ / ส่งอยู่</span><strong id="dashboard-delivery-queue">0</strong></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="dashboard-bottom-grid">
+                    <section class="dashboard-panel-card dashboard-sellers-card">
+                        <header class="dashboard-card-header">
+                            <div><span class="dashboard-section-icon"><i data-lucide="trophy"></i></span><div><small>THIS MONTH</small><h3>สินค้าขายดี</h3></div></div>
+                            <span>เรียงตามจำนวนที่ขาย</span>
+                        </header>
+                        <div id="dashboard-best-sellers" class="dashboard-seller-list">
+                            <div class="dashboard-empty-state"><i data-lucide="package-open"></i><span>กำลังโหลดอันดับสินค้า</span></div>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-panel-card dashboard-easyslip-card" id="dashboard-easyslip-card" data-state="checking">
+                        <header class="dashboard-card-header">
+                            <div><span class="dashboard-section-icon"><i data-lucide="scan-line"></i></span><div><small>PAYMENT PROVIDER</small><h3>EasySlip Quota</h3></div></div>
+                            <span id="dashboard-easyslip-state" class="dashboard-health-pill checking">กำลังตรวจสอบ</span>
+                        </header>
+                        <div class="dashboard-quota-value"><strong id="dashboard-easyslip-remaining">-</strong><span>ครั้งคงเหลือ</span></div>
+                        <div class="dashboard-quota-track"><span id="dashboard-easyslip-bar"></span></div>
+                        <div class="dashboard-quota-meta"><span id="dashboard-easyslip-used">ใช้แล้ว -</span><span id="dashboard-easyslip-max">ทั้งหมด -</span></div>
+                        <p id="dashboard-easyslip-message">กำลังเชื่อมต่อ EasySlip</p>
+                    </section>
+
+                    <section class="dashboard-panel-card dashboard-trend-card">
+                        <header class="dashboard-card-header">
+                            <div><span class="dashboard-section-icon"><i data-lucide="bar-chart-3"></i></span><div><small>LAST 7 DAYS</small><h3>แนวโน้มรายได้</h3></div></div>
+                            <span id="dashboard-trend-total">รวม ฿0.00</span>
+                        </header>
+                        <div id="dashboard-revenue-trend" class="dashboard-revenue-trend"></div>
+                    </section>
+                </div>
+            </div>
             
             <!-- 1. SETTINGS & SYSTEM STATUS -->
             <div id="status" class="admin-panel">
@@ -716,7 +824,7 @@
             </div>
 
             <!-- 2. PRODUCTS MANAGEMENT -->
-            <div id="products" class="admin-panel active">
+            <div id="products" class="admin-panel">
                 <div class="flex-between" style="margin-bottom: 25px;">
                     <h2>Products Management</h2>
                     <button class="action-btn btn-retry" onclick="Admin.openProductModal()" style="padding:10px 20px;">+ Create Product</button>
@@ -1101,7 +1209,7 @@
     </div>
 
     <script src="js/app.js?v=20260731-live-topup-1"></script>
-    <script src="js/admin.js?v=20260801-order-details-1"></script>
+    <script src="js/admin.js?v=20260801-order-details-1-dashboard-2"></script>
     <script>
         // Auto-close sidebar on mobile when a tab is clicked
         document.querySelectorAll('.admin-tab-btn').forEach(btn => {

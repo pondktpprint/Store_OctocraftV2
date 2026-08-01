@@ -13,6 +13,7 @@ const Admin = {
         submitting: false
     },
 
+    dashboardLoading: false,
     easySlipHealthLoading: false,
     
     init() {
@@ -28,7 +29,7 @@ const Admin = {
         }
 
         this.bindTabs();
-        this.loadProducts();
+        this.loadDashboard(false);
         
         // Pre-fetch global data for client-side filtering
         this.fetchAdmin('/api/admin/orders').then(res => this.globalData.orders = res.orders).catch(()=>{});
@@ -49,6 +50,7 @@ const Admin = {
                 const tabId = btn.getAttribute('data-tab');
                 document.getElementById(tabId).classList.add('active');
 
+                if (tabId === 'dashboard') this.loadDashboard(false);
                 if (tabId === 'status') this.loadSystemStatus();
                 if (tabId === 'products') this.loadProducts();
                 if (tabId === 'players') { document.getElementById('player-search-results').style.display='block'; document.getElementById('player-profile-view').style.display='none'; this.loadPlayers(); }
@@ -72,6 +74,152 @@ const Admin = {
         } catch (e) {
             Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'Error: ' + e.message, background: '#1a1f2b', color: '#fff' });
             throw e;
+        }
+    },
+
+    setDashboardText(id, value) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    },
+
+    formatDashboardMoney(value) {
+        return new Intl.NumberFormat('th-TH', {
+            style: 'currency',
+            currency: 'THB',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(Number(value) || 0);
+    },
+
+    renderDashboard(data) {
+        const integer = value => new Intl.NumberFormat('th-TH').format(Number(value) || 0);
+        const topups = data?.topups || {};
+        const orders = data?.orders || {};
+        const delivery = data?.delivery || {};
+        const minecraft = data?.minecraft || {};
+        const health = data?.easySlip || {};
+
+        this.setDashboardText('dashboard-revenue-today', this.formatDashboardMoney(topups.revenue?.today));
+        this.setDashboardText('dashboard-revenue-month', this.formatDashboardMoney(topups.revenue?.month));
+        this.setDashboardText('dashboard-topup-approved-caption', `${integer(topups.approved?.count)} รายการสำเร็จวันนี้`);
+        this.setDashboardText('dashboard-orders-month', integer(orders.month));
+        this.setDashboardText('dashboard-orders-caption', `วันนี้ ${integer(orders.today)} รายการ`);
+        this.setDashboardText('dashboard-players-online', integer(minecraft.players?.online));
+        this.setDashboardText('dashboard-players-max', integer(minecraft.players?.max));
+        this.setDashboardText('dashboard-server-caption', minecraft.online
+            ? `${minecraft.version || 'Minecraft'} • ${minecraft.host || ''}`
+            : 'เซิร์ฟเวอร์ออฟไลน์ / ตรวจสอบไม่ได้');
+        const playerCard = document.getElementById('dashboard-player-card');
+        if (playerCard) playerCard.dataset.state = minecraft.online ? 'online' : 'offline';
+
+        this.setDashboardText('dashboard-topup-approved', integer(topups.approved?.count));
+        this.setDashboardText('dashboard-topup-pending', integer(topups.pending?.count));
+        this.setDashboardText('dashboard-topup-pending-amount', this.formatDashboardMoney(topups.pending?.amount));
+        this.setDashboardText('dashboard-topup-rejected', integer(topups.rejected?.count));
+
+        const deliveryRate = Math.max(0, Math.min(100, Number(delivery.successRateToday) || 0));
+        this.setDashboardText('dashboard-delivery-rate', `Success ${deliveryRate}%`);
+        this.setDashboardText('dashboard-delivery-rate-number', `${deliveryRate}%`);
+        this.setDashboardText('dashboard-delivery-success', integer(delivery.succeededToday));
+        this.setDashboardText('dashboard-delivery-failed', integer(delivery.failedToday));
+        this.setDashboardText('dashboard-delivery-queue', integer((Number(delivery.queued) || 0) + (Number(delivery.processing) || 0)));
+        const donut = document.getElementById('dashboard-delivery-donut');
+        if (donut) donut.style.setProperty('--delivery-rate', `${deliveryRate * 3.6}deg`);
+
+        const sellers = document.getElementById('dashboard-best-sellers');
+        if (sellers) {
+            const rows = Array.isArray(orders.bestSellers) ? orders.bestSellers : [];
+            sellers.innerHTML = rows.length ? rows.map((item, index) => `
+                <div class="dashboard-seller">
+                    <span class="dashboard-seller-rank">${index + 1}</span>
+                    <div class="dashboard-seller-copy"><strong>${App.escapeHTML(item.name || 'สินค้า')}</strong><code>${App.escapeHTML(item.sku || '-')}</code></div>
+                    <span class="dashboard-seller-sales"><strong>${integer(item.quantity)}</strong><small>ชิ้น</small></span>
+                </div>`).join('') : '<div class="dashboard-empty-state"><i data-lucide="package-open"></i><span>เดือนนี้ยังไม่มีรายการขาย</span></div>';
+        }
+
+        const healthState = String(health.state || 'unavailable');
+        const stateLabels = { healthy: 'พร้อมใช้งาน', degraded: 'ต้องตรวจสอบ', unavailable: 'เชื่อมต่อไม่ได้', blocked: 'ถูกระงับ', disabled: 'ยังไม่ตั้งค่า' };
+        const remaining = Number(health.quota?.remaining);
+        const maximum = Number(health.quota?.max);
+        const used = Number(health.quota?.used);
+        const quotaPercent = Number.isFinite(remaining) && Number.isFinite(maximum) && maximum > 0
+            ? Math.max(0, Math.min(100, (remaining / maximum) * 100))
+            : 0;
+        const healthCard = document.getElementById('dashboard-easyslip-card');
+        const healthPill = document.getElementById('dashboard-easyslip-state');
+        if (healthCard) healthCard.dataset.state = healthState;
+        if (healthPill) healthPill.className = `dashboard-health-pill ${healthState}`;
+        this.setDashboardText('dashboard-easyslip-state', stateLabels[healthState] || 'ตรวจสอบไม่ได้');
+        this.setDashboardText('dashboard-easyslip-remaining', Number.isFinite(remaining) ? integer(remaining) : '-');
+        this.setDashboardText('dashboard-easyslip-used', Number.isFinite(used) ? `ใช้แล้ว ${integer(used)}` : 'ใช้แล้ว -');
+        this.setDashboardText('dashboard-easyslip-max', Number.isFinite(maximum) ? `ทั้งหมด ${integer(maximum)}` : 'ทั้งหมด -');
+        this.setDashboardText('dashboard-easyslip-message', healthState === 'healthy'
+            ? (quotaPercent <= 20 ? 'โควตาใกล้หมด ควรเตรียมเพิ่มแพ็กเกจ' : 'ระบบตรวจสอบสลิปอัตโนมัติทำงานปกติ')
+            : 'ระบบตรวจสลิปอัตโนมัติต้องได้รับการตรวจสอบ');
+        const quotaBar = document.getElementById('dashboard-easyslip-bar');
+        if (quotaBar) quotaBar.style.width = `${quotaPercent}%`;
+
+        const alertList = document.getElementById('dashboard-alerts');
+        const alerts = Array.isArray(data?.alerts) ? data.alerts : [];
+        if (alertList) {
+            const icons = { success: 'circle-check', warning: 'triangle-alert', critical: 'octagon-alert' };
+            alertList.innerHTML = alerts.map(alert => `
+                <div class="dashboard-alert ${App.escapeHTML(alert.severity || 'warning')}">
+                    <i data-lucide="${icons[alert.severity] || icons.warning}"></i>
+                    <div><strong>${App.escapeHTML(alert.title || 'แจ้งเตือน')}</strong><span>${App.escapeHTML(alert.message || '')}</span></div>
+                </div>`).join('');
+        }
+        const actionableAlerts = alerts.filter(alert => alert.severity !== 'success').length;
+        this.setDashboardText('dashboard-alert-count', actionableAlerts ? `${integer(actionableAlerts)} รายการต้องดูแล` : 'ทุกระบบปกติ');
+
+        const trendContainer = document.getElementById('dashboard-revenue-trend');
+        const trendRows = Array.isArray(data?.revenueTrend) ? data.revenueTrend : [];
+        const trendMap = new Map(trendRows.map(item => [String(item.day), Number(item.amount) || 0]));
+        const trend = [];
+        const trendEnd = new Date(data?.generatedAt || Date.now());
+        for (let offset = 6; offset >= 0; offset -= 1) {
+            const day = new Date(trendEnd.getTime() - (offset * 86400000));
+            const key = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit'
+            }).format(day);
+            trend.push({ day: key, amount: trendMap.get(key) || 0 });
+        }
+        const maximumTrend = Math.max(1, ...trend.map(item => Number(item.amount) || 0));
+        if (trendContainer) {
+            trendContainer.innerHTML = trend.map(item => {
+                const amount = Number(item.amount) || 0;
+                const date = new Date(`${item.day}T00:00:00+07:00`);
+                const label = Number.isNaN(date.getTime()) ? item.day : date.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', timeZone: 'Asia/Bangkok' });
+                const height = amount > 0 ? Math.max(7, (amount / maximumTrend) * 100) : 3;
+                return `<div class="dashboard-trend-day" title="${App.escapeHTML(this.formatDashboardMoney(amount))}"><div class="dashboard-trend-bar-wrap"><i class="dashboard-trend-bar" style="height:${height}%"></i></div><strong>${App.escapeHTML(label)}</strong><span>${amount ? this.formatDashboardMoney(amount) : '฿0'}</span></div>`;
+            }).join('');
+        }
+        this.setDashboardText('dashboard-trend-total', `รวม ${this.formatDashboardMoney(trend.reduce((sum, item) => sum + (Number(item.amount) || 0), 0))}`);
+        this.setDashboardText('dashboard-updated-at', data?.generatedAt
+            ? `อัปเดต ${new Date(data.generatedAt).toLocaleString('th-TH')}`
+            : 'อัปเดตล่าสุดไม่สำเร็จ');
+        App.renderIcons();
+    },
+
+    async loadDashboard(forceRefresh = false) {
+        if (this.dashboardLoading) return;
+        const refreshButton = document.getElementById('dashboard-refresh');
+        if (!refreshButton) return;
+        this.dashboardLoading = true;
+        refreshButton.disabled = true;
+        refreshButton.classList.add('is-loading');
+        try {
+            const suffix = forceRefresh ? '?refresh=1' : '';
+            const res = await this.fetchAdmin(`/api/admin/dashboard${suffix}`, { cache: 'no-store' });
+            this.renderDashboard(res.dashboard);
+        } catch (error) {
+            this.setDashboardText('dashboard-updated-at', 'โหลด Dashboard ไม่สำเร็จ');
+            console.error('Failed to load dashboard', error);
+        } finally {
+            this.dashboardLoading = false;
+            refreshButton.disabled = false;
+            refreshButton.classList.remove('is-loading');
+            App.renderIcons();
         }
     },
 
